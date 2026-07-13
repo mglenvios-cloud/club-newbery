@@ -1,0 +1,1171 @@
+{
+  "localhost": [
+    {
+      "file": "backend/audit_stability.js",
+      "line": 13,
+      "content": "hostname: 'localhost',"
+    },
+    {
+      "file": "backend/index.js",
+      "line": 117,
+      "content": "console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);"
+    },
+    {
+      "file": "backend/routes/mercadopago.js",
+      "line": 37,
+      "content": "success: 'http://localhost:3000/reservas?status=success',"
+    },
+    {
+      "file": "backend/routes/mercadopago.js",
+      "line": 38,
+      "content": "failure: 'http://localhost:3000/reservas?status=failure',"
+    },
+    {
+      "file": "backend/routes/mercadopago.js",
+      "line": 39,
+      "content": "pending: 'http://localhost:3000/reservas?status=pending'"
+    },
+    {
+      "file": "backend/verify_admin_general.js",
+      "line": 16,
+      "content": "hostname: 'localhost',"
+    },
+    {
+      "file": "backend/verify_ecosystem.js",
+      "line": 18,
+      "content": "hostname: 'localhost',"
+    },
+    {
+      "file": "backend/verify_finanzas.js",
+      "line": 18,
+      "content": "hostname: 'localhost',"
+    },
+    {
+      "file": "backend/verify_integration_fase3.js",
+      "line": 18,
+      "content": "hostname: 'localhost',"
+    },
+    {
+      "file": "backend/verify_liga_pro.js",
+      "line": 18,
+      "content": "hostname: 'localhost',"
+    },
+    {
+      "file": "backend/verify_multimedia.js",
+      "line": 19,
+      "content": "hostname: 'localhost',"
+    },
+    {
+      "file": "backend/verify_reservas.js",
+      "line": 18,
+      "content": "hostname: 'localhost',"
+    },
+    {
+      "file": "backend/verify_socios.js",
+      "line": 17,
+      "content": "hostname: 'localhost',"
+    }
+  ],
+  "127.0.0.1": [],
+  "TODO": [
+    {
+      "file": "frontend/src/app/admin/finanzas/page.js",
+      "line": 412,
+      "content": "<option value=\"ALL\">TODOS LOS ESTADOS</option>"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 953,
+      "content": "<option value=\"ALL\">TODOS LOS EQUIPOS / PLANTELES</option>"
+    },
+    {
+      "file": "frontend/src/app/admin/marketing/page.js",
+      "line": 141,
+      "content": "const [sponsorFilter, setSponsorFilter] = useState({ category: 'TODAS', status: 'TODOS' });"
+    },
+    {
+      "file": "frontend/src/app/admin/marketing/page.js",
+      "line": 340,
+      "content": "const matchesStatus = sponsorFilter.status === 'TODOS' || (sponsorFilter.status === 'ACTIVOS' ? s.is"
+    },
+    {
+      "file": "frontend/src/app/admin/marketing/page.js",
+      "line": 495,
+      "content": "<option value=\"TODOS\">TODOS LOS ESTADOS</option>"
+    },
+    {
+      "file": "frontend/src/app/admin/multimedia/page.js",
+      "line": 217,
+      "content": "<option value=\"ALL\">TODOS LOS TIPOS</option>"
+    },
+    {
+      "file": "frontend/src/app/admin/socios/page.js",
+      "line": 499,
+      "content": "<option value=\"ALL\">TODOS LOS ESTADOS</option>"
+    }
+  ],
+  "FIXME": [],
+  "mock": [
+    {
+      "file": "backend/modules/ligaProStudio/services/highlights.service.js",
+      "line": 20,
+      "content": "// Obtener URL de stream base o mock"
+    },
+    {
+      "file": "backend/modules/ligaProStudio/services/highlights.service.js",
+      "line": 21,
+      "content": "const streamUrl = match?.videoUrl || match?.liveStreamUrl || 'https://youtube.com/watch?v=mock_strea"
+    },
+    {
+      "file": "backend/modules/ligaProStudio/services/highlights.service.js",
+      "line": 82,
+      "content": "const streamUrl = match?.videoUrl || match?.liveStreamUrl || 'https://youtube.com/watch?v=mock_strea"
+    },
+    {
+      "file": "backend/routes/mercadopago.js",
+      "line": 9,
+      "content": "const MP_ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN || 'APP_USR-1234567890123456-MOCK-ACCESS-TOKEN-S"
+    },
+    {
+      "file": "backend/verify_finanzas.js",
+      "line": 62,
+      "content": "password: 'mock_password_hash',"
+    },
+    {
+      "file": "backend/verify_finanzas.js",
+      "line": 145,
+      "content": "paymentId: 'MOCK-MP-TX-9988',"
+    },
+    {
+      "file": "backend/verify_liga_pro.js",
+      "line": 80,
+      "content": "streamUrl: 'https://youtube.com/watch?v=mock_lps_stream',"
+    },
+    {
+      "file": "backend/verify_liga_pro.js",
+      "line": 97,
+      "content": "streamUrl: 'https://youtube.com/watch?v=mock_lps_stream',"
+    },
+    {
+      "file": "backend/verify_multimedia.js",
+      "line": 71,
+      "content": "url: 'https://www.youtube.com/watch?v=mock_ferro_gol',"
+    },
+    {
+      "file": "frontend/src/app/admin/categorias/page.js",
+      "line": 31,
+      "content": "setCategories(local ? JSON.parse(local) : defaultMockCategories);"
+    },
+    {
+      "file": "frontend/src/app/admin/categorias/page.js",
+      "line": 36,
+      "content": "setCategories(local ? JSON.parse(local) : defaultMockCategories);"
+    },
+    {
+      "file": "frontend/src/app/admin/categorias/page.js",
+      "line": 46,
+      "content": "const defaultMockCategories = ["
+    },
+    {
+      "file": "frontend/src/app/admin/comunidad/page.js",
+      "line": 128,
+      "content": "{post.drawingUrl === 'MOCK_DRAWING_DATA' ? ("
+    },
+    {
+      "file": "frontend/src/app/admin/contabilidad/page.js",
+      "line": 60,
+      "content": "setTransactions(local ? JSON.parse(local) : defaultMockTransactions);"
+    },
+    {
+      "file": "frontend/src/app/admin/contabilidad/page.js",
+      "line": 65,
+      "content": "setTransactions(local ? JSON.parse(local) : defaultMockTransactions);"
+    },
+    {
+      "file": "frontend/src/app/admin/contabilidad/page.js",
+      "line": 75,
+      "content": "const defaultMockTransactions = ["
+    },
+    {
+      "file": "frontend/src/app/admin/futsal/page.js",
+      "line": 121,
+      "content": "console.warn(\"Failed fetching data from backend, showing local/mock stats.\", e);"
+    },
+    {
+      "file": "frontend/src/app/admin/login/page.js",
+      "line": 43,
+      "content": "token: 'mock_admin_token',"
+    },
+    {
+      "file": "frontend/src/app/admin/login/page.js",
+      "line": 48,
+      "content": "token: 'mock_futsal_token',"
+    },
+    {
+      "file": "frontend/src/app/admin/noticias/page.js",
+      "line": 26,
+      "content": "setNews(local ? JSON.parse(local) : defaultMockNews);"
+    },
+    {
+      "file": "frontend/src/app/admin/noticias/page.js",
+      "line": 31,
+      "content": "setNews(local ? JSON.parse(local) : defaultMockNews);"
+    },
+    {
+      "file": "frontend/src/app/admin/noticias/page.js",
+      "line": 41,
+      "content": "const defaultMockNews = ["
+    },
+    {
+      "file": "frontend/src/app/admin/reservas/page.js",
+      "line": 125,
+      "content": "const res = await fetch(`${API_URL}/api/reservas/bookings`, { // Post block under generic handler or"
+    },
+    {
+      "file": "frontend/src/app/comunidad/mi-vida/page.js",
+      "line": 35,
+      "content": "setPosts(local ? JSON.parse(local) : defaultMockPosts);"
+    },
+    {
+      "file": "frontend/src/app/comunidad/mi-vida/page.js",
+      "line": 40,
+      "content": "setPosts(local ? JSON.parse(local) : defaultMockPosts);"
+    },
+    {
+      "file": "frontend/src/app/comunidad/mi-vida/page.js",
+      "line": 51,
+      "content": "const defaultMockPosts = ["
+    },
+    {
+      "file": "frontend/src/app/comunidad/mi-vida/page.js",
+      "line": 53,
+      "content": "{ id: 2, authorName: \"Mateo Rossi\", authorAge: 10, category: \"DIBUJO\", content: \"Miren mi dibujo de "
+    },
+    {
+      "file": "frontend/src/app/comunidad/mi-vida/page.js",
+      "line": 385,
+      "content": "{post.drawingUrl === 'MOCK_DRAWING_DATA' ? ("
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/inferiores/[categoria]/page.js",
+      "line": 383,
+      "content": "{ id: 601, category: catName, opponent: \"River Plate\", homeTeam: \"Jorge Newbery\", awayTeam: \"River P"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/page.js",
+      "line": 847,
+      "content": "{ id: 202, category: \"Primera Masculina\", opponent: \"17 de Agosto\", homeTeam: \"Jorge Newbery\", awayT"
+    },
+    {
+      "file": "frontend/src/app/mundo-inferiores/page.js",
+      "line": 22,
+      "content": "setPlayers(local ? JSON.parse(local) : defaultMockPlayers);"
+    },
+    {
+      "file": "frontend/src/app/mundo-inferiores/page.js",
+      "line": 27,
+      "content": "setPlayers(local ? JSON.parse(local) : defaultMockPlayers);"
+    },
+    {
+      "file": "frontend/src/app/mundo-inferiores/page.js",
+      "line": 37,
+      "content": "const defaultMockPlayers = ["
+    },
+    {
+      "file": "frontend/src/app/mundo-inferiores/[id]/page.js",
+      "line": 6,
+      "content": "const mockPlayers = {"
+    },
+    {
+      "file": "frontend/src/app/mundo-inferiores/[id]/page.js",
+      "line": 7,
+      "content": "\"1\": { name: \"Thiago Medina\", age: 11, category: \"2015\", position: \"Ala\", team: \"Futsal AFA Sub-11\","
+    },
+    {
+      "file": "frontend/src/app/mundo-inferiores/[id]/page.js",
+      "line": 8,
+      "content": "\"2\": { name: \"Mateo Rossi\", age: 10, category: \"2016\", position: \"Cierre\", team: \"Futsal AFA Sub-10\""
+    },
+    {
+      "file": "frontend/src/app/mundo-inferiores/[id]/page.js",
+      "line": 9,
+      "content": "\"3\": { name: \"Bautista Castro\", age: 11, category: \"2015\", position: \"Ala\", team: \"Futsal AFA Sub-11"
+    },
+    {
+      "file": "frontend/src/app/mundo-inferiores/[id]/page.js",
+      "line": 11,
+      "content": "\"5\": { name: \"Juana Rossi\", age: 10, category: \"2016\", position: \"Solo Libre\", team: \"Patín Competic"
+    },
+    {
+      "file": "frontend/src/app/mundo-inferiores/[id]/page.js",
+      "line": 18,
+      "content": "const player = mockPlayers[id];"
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 31,
+      "content": "// Fallback a datos mock si no hay token o la llamada falla"
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 128,
+      "content": "preferenceId: 'mock_preference_id'"
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 156,
+      "content": "preferenceId: 'mock_preference_id'"
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 163,
+      "content": "preferenceId: 'mock_preference_id'"
+    },
+    {
+      "file": "frontend/src/app/portal/login/page.js",
+      "line": 46,
+      "content": "token: 'mock_socio_token',"
+    },
+    {
+      "file": "frontend/src/app/reservas/page.js",
+      "line": 155,
+      "content": "const mockBooking = {"
+    },
+    {
+      "file": "frontend/src/app/reservas/page.js",
+      "line": 162,
+      "content": "localStorage.setItem('jn-bookings', JSON.stringify([...list, mockBooking]));"
+    },
+    {
+      "file": "frontend/src/middleware.js",
+      "line": 19,
+      "content": "if (token === 'mock_admin_token') {"
+    },
+    {
+      "file": "frontend/src/middleware.js",
+      "line": 21,
+      "content": "} else if (token === 'mock_futsal_token') {"
+    }
+  ],
+  "fake": [
+    {
+      "file": "backend/seed_demo.js",
+      "line": 269,
+      "content": "liveStreamUrl: 'https://youtube.com/live/fake-stream-url',"
+    },
+    {
+      "file": "backend/seed_demo.js",
+      "line": 394,
+      "content": "{ type: 'VIDEO', title: 'Resumen Completo: Victoria en el Superclásico del Barrio', url: 'https://yo"
+    }
+  ],
+  "demo": [
+    {
+      "file": "backend/index.js",
+      "line": 22,
+      "content": "const demoContactRoutes = require('./routes/demoContact');"
+    },
+    {
+      "file": "backend/index.js",
+      "line": 62,
+      "content": "app.use('/api/demo-contact', demoContactRoutes);"
+    },
+    {
+      "file": "backend/package.json",
+      "line": 8,
+      "content": "\"seed:test\": \"node -e \\\"process.env.APP_ENV='TEST'; require('./seed_demo.js')\\\"\","
+    },
+    {
+      "file": "backend/routes/demoContact.js",
+      "line": 4,
+      "content": "// POST /api/demo-contact"
+    },
+    {
+      "file": "backend/routes/demoContact.js",
+      "line": 8,
+      "content": "console.log('[Demo Contact Submission]', { clubName, contactName, email, phone, membersCount, sports"
+    },
+    {
+      "file": "backend/routes/gemini.js",
+      "line": 73,
+      "content": "res.json({ text: fallbackResponses[activeMode] || \"Tengo problemas de conexión, pero recordá que en "
+    },
+    {
+      "file": "backend/routes/liveMatch.js",
+      "line": 336,
+      "content": "summary = `El Club Jorge Newbery cerró un partido memorable frente a ${match.opponent} con un result"
+    },
+    {
+      "file": "backend/seed_demo.js",
+      "line": 5,
+      "content": "console.log('🌱 Iniciando seed comercial para demostración...\\n');"
+    },
+    {
+      "file": "frontend/src/app/admin/administracion-general/page.js",
+      "line": 50,
+      "content": "const [sedeModal, setSedeModal] = useState({ isOpen: false, editId: null });"
+    },
+    {
+      "file": "frontend/src/app/admin/administracion-general/page.js",
+      "line": 251,
+      "content": "const method = sedeModal.editId ? 'PUT' : 'POST';"
+    },
+    {
+      "file": "frontend/src/app/admin/administracion-general/page.js",
+      "line": 252,
+      "content": "const url = sedeModal.editId"
+    },
+    {
+      "file": "frontend/src/app/admin/administracion-general/page.js",
+      "line": 253,
+      "content": "? `${API_URL}/api/admin-general/sedes/${sedeModal.editId}`"
+    },
+    {
+      "file": "frontend/src/app/admin/administracion-general/page.js",
+      "line": 263,
+      "content": "showToast(sedeModal.editId ? 'Sede actualizada' : 'Sede creada');"
+    },
+    {
+      "file": "frontend/src/app/admin/administracion-general/page.js",
+      "line": 264,
+      "content": "setSedeModal({ isOpen: false, editId: null });"
+    },
+    {
+      "file": "frontend/src/app/admin/administracion-general/page.js",
+      "line": 816,
+      "content": "setSedeModal({ isOpen: true, editId: null });"
+    },
+    {
+      "file": "frontend/src/app/admin/administracion-general/page.js",
+      "line": 832,
+      "content": "<button onClick={() => { setSedeForm(s); setSedeModal({ isOpen: true, editId: s.id }); }} className="
+    },
+    {
+      "file": "frontend/src/app/admin/administracion-general/page.js",
+      "line": 1219,
+      "content": "{sedeModal.isOpen && ("
+    },
+    {
+      "file": "frontend/src/app/admin/administracion-general/page.js",
+      "line": 1223,
+      "content": "<h3 className=\"font-black text-lg uppercase\">{sedeModal.editId ? 'Editar Sede' : 'Nueva Sede'}</h3>"
+    },
+    {
+      "file": "frontend/src/app/admin/administracion-general/page.js",
+      "line": 1224,
+      "content": "<button onClick={() => setSedeModal({ isOpen: false, editId: null })} className=\"text-gray-400 hover"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 12,
+      "content": "// ─── DEMO DATA ────────────────────────────────────────────────────────────────"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 13,
+      "content": "const DEMO_TEAMS = ["
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 23,
+      "content": "const DEMO_CATEGORIES = ["
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 31,
+      "content": "const DEMO_PLAYERS = ["
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 40,
+      "content": "const DEMO_COACHES = ["
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 47,
+      "content": "const DEMO_MATCHES = ["
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 54,
+      "content": "const DEMO_STATS = {"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 64,
+      "content": "upcomingMatches: DEMO_MATCHES.filter(m => m.status === 'UPCOMING').slice(0, 5),"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 106,
+      "content": "const [usingDemoData, setUsingDemoData] = useState(false);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 225,
+      "content": "setStats(cached.stats || DEMO_STATS);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 226,
+      "content": "setPlayers(cached.players || DEMO_PLAYERS);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 229,
+      "content": "setTeams(cached.teams || DEMO_TEAMS);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 230,
+      "content": "setCoaches(cached.coaches || DEMO_COACHES);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 231,
+      "content": "setCategories(cached.categories || DEMO_CATEGORIES);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 232,
+      "content": "setMatches(cached.matches || DEMO_MATCHES);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 233,
+      "content": "setUsingDemoData(false);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 236,
+      "content": "// Usar datos de demostración"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 237,
+      "content": "setStats(DEMO_STATS);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 238,
+      "content": "setPlayers(DEMO_PLAYERS);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 241,
+      "content": "setTeams(DEMO_TEAMS);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 242,
+      "content": "setCoaches(DEMO_COACHES);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 243,
+      "content": "setCategories(DEMO_CATEGORIES);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 244,
+      "content": "setMatches(DEMO_MATCHES);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 245,
+      "content": "setUsingDemoData(true);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 246,
+      "content": "showToast('🔌 API offline — mostrando datos de demostración', 'error');"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 266,
+      "content": "const newStats     = statsData    || DEMO_STATS;"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 267,
+      "content": "const newPlayers   = playersData  || DEMO_PLAYERS;"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 270,
+      "content": "const newTeams     = teamsData    || DEMO_TEAMS;"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 271,
+      "content": "const newCoaches   = coachesData  || DEMO_COACHES;"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 272,
+      "content": "const newCats      = catsData     || DEMO_CATEGORIES;"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 273,
+      "content": "const newMatches   = matchesData  || DEMO_MATCHES;"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 284,
+      "content": "setUsingDemoData(failed.length > 4); // muchos fallos = usar demo"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 298,
+      "content": "if (usingDemoData) showToast('✅ Conexión con la API restaurada', 'success');"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 303,
+      "content": "}, [usingDemoData]);"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 672,
+      "content": "{usingDemoData && ("
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/page.js",
+      "line": 674,
+      "content": "📊 Modo Demo"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/_components/DashboardTab.js",
+      "line": 51,
+      "content": "export default function DashboardTab({ stats, players, teams, coaches, matches, trainings, onRefresh"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/_components/DashboardTab.js",
+      "line": 111,
+      "content": "{usingDemoData && ("
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/_components/DashboardTab.js",
+      "line": 113,
+      "content": "📊 Modo Demo"
+    },
+    {
+      "file": "frontend/src/app/club-digital-pro/page.js",
+      "line": 42,
+      "content": "const res = await fetch(`${API_URL}/api/demo-contact`, {"
+    },
+    {
+      "file": "frontend/src/app/club-digital-pro/page.js",
+      "line": 133,
+      "content": "Solicitar Demo <ArrowRight size={14} />"
+    },
+    {
+      "file": "frontend/src/app/club-digital-pro/page.js",
+      "line": 181,
+      "content": "La plataforma digital del Club Atlético Jorge Newbery sirve como modelo operativo real, demostrando "
+    },
+    {
+      "file": "frontend/src/app/club-digital-pro/page.js",
+      "line": 303,
+      "content": "<p className=\"text-xs text-gray-500 max-w-xs mx-auto\">Dejanos tus datos para coordinar una presentac"
+    },
+    {
+      "file": "frontend/src/app/portal/login/page.js",
+      "line": 147,
+      "content": "{/* Demo info / credentials helper */}"
+    },
+    {
+      "file": "frontend/src/app/portal/login/page.js",
+      "line": 149,
+      "content": "<span className=\"font-bold text-gray-300 uppercase tracking-wide\">💡 Credenciales de demostración:</"
+    },
+    {
+      "file": "frontend/src/app/portal/page.js",
+      "line": 15,
+      "content": "// Fallback a datos simulados para demo si no hay token"
+    },
+    {
+      "file": "frontend/src/app/portal/page.js",
+      "line": 23,
+      "content": "isDemo: true"
+    },
+    {
+      "file": "frontend/src/app/portal/page.js",
+      "line": 41,
+      "content": "isDemo: false"
+    },
+    {
+      "file": "frontend/src/app/portal/page.js",
+      "line": 52,
+      "content": "isDemo: true"
+    },
+    {
+      "file": "frontend/src/app/portal/page.js",
+      "line": 65,
+      "content": "isDemo: true"
+    },
+    {
+      "file": "frontend/src/app/portal/page.js",
+      "line": 84,
+      "content": "{socio.isDemo && ("
+    },
+    {
+      "file": "frontend/src/app/portal/page.js",
+      "line": 87,
+      "content": "<h4 className=\"text-amber-600 font-black text-xs uppercase tracking-widest\">Modo Demostración</h4>"
+    }
+  ],
+  "admin/admin": [
+    {
+      "file": "frontend/src/app/admin/layout.js",
+      "line": 123,
+      "content": "<Link href=\"/admin/administracion-general\" className={`flex items-center gap-3 p-3 rounded-lg hover:"
+    },
+    {
+      "file": "frontend/src/app/admin/login/page.js",
+      "line": 52,
+      "content": "throw new Error('Credenciales incorrectas (Modo Offline: usar admin / admin)');"
+    },
+    {
+      "file": "frontend/src/app/admin/login/page.js",
+      "line": 92,
+      "content": "<p className=\"text-gray-400 mt-2 text-center text-sm\">Panel exclusivo para administración del Club J"
+    }
+  ],
+  "futsal/futsal": [],
+  "fallback": [
+    {
+      "file": "backend/modules/reservas/services/prices.service.js",
+      "line": 44,
+      "content": "// Fallback a cualquier regla del tipo de usuario"
+    },
+    {
+      "file": "backend/routes/gemini.js",
+      "line": 14,
+      "content": "// Respuestas locales de contingencia (Fallback si no hay API Key)"
+    },
+    {
+      "file": "backend/routes/gemini.js",
+      "line": 15,
+      "content": "const fallbackResponses = {"
+    },
+    {
+      "file": "backend/routes/gemini.js",
+      "line": 33,
+      "content": "console.warn(\"[Gemini API] GEMINI_API_KEY no configurada. Usando fallback local.\");"
+    },
+    {
+      "file": "backend/routes/gemini.js",
+      "line": 34,
+      "content": "let fallbackText = fallbackResponses[activeMode] || fallbackResponses.club;"
+    },
+    {
+      "file": "backend/routes/gemini.js",
+      "line": 35,
+      "content": "return res.json({ text: fallbackText });"
+    },
+    {
+      "file": "backend/routes/gemini.js",
+      "line": 73,
+      "content": "res.json({ text: fallbackResponses[activeMode] || \"Tengo problemas de conexión, pero recordá que en "
+    },
+    {
+      "file": "backend/routes/posts.js",
+      "line": 17,
+      "content": "// Heurística local de contingencia (siempre activa como primer filtro o fallback)"
+    },
+    {
+      "file": "backend/routes/posts.js",
+      "line": 67,
+      "content": "// Fallback si la llamada de API falla"
+    },
+    {
+      "file": "backend/verify_ecosystem.js",
+      "line": 65,
+      "content": "// 4. Verificar endpoints de Socios y fallback legacy"
+    },
+    {
+      "file": "frontend/src/app/admin/categorias/page.js",
+      "line": 29,
+      "content": "// Fallback local storage si el servidor falla"
+    },
+    {
+      "file": "frontend/src/app/admin/categorias/page.js",
+      "line": 34,
+      "content": "console.warn(\"Backend offline, cargando fallback local\");"
+    },
+    {
+      "file": "frontend/src/app/admin/categorias/page.js",
+      "line": 111,
+      "content": "// Fallback"
+    },
+    {
+      "file": "frontend/src/app/admin/gestion-deportiva/_components/GlobalSearch.js",
+      "line": 60,
+      "content": "// Fallback: buscar localmente"
+    },
+    {
+      "file": "frontend/src/app/admin/login/page.js",
+      "line": 38,
+      "content": "// Fallback offline / sin backend"
+    },
+    {
+      "file": "frontend/src/app/admin/marketing/page.js",
+      "line": 1021,
+      "content": "<Suspense fallback={"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/inferiores/[categoria]/page.js",
+      "line": 78,
+      "content": "console.warn(\"Failed fetching from backend, loading fallback content\", e);"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/inferiores/[categoria]/page.js",
+      "line": 79,
+      "content": "// Fallback"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/inferiores/[categoria]/page.js",
+      "line": 80,
+      "content": "setPlayers(getFallbackPlayers(catInfo.name));"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/inferiores/[categoria]/page.js",
+      "line": 81,
+      "content": "setMatches(getFallbackMatches(catInfo.name));"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/inferiores/[categoria]/page.js",
+      "line": 82,
+      "content": "setMedia(fallbackMedia);"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/inferiores/[categoria]/page.js",
+      "line": 83,
+      "content": "setNews(fallbackNews);"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/inferiores/[categoria]/page.js",
+      "line": 375,
+      "content": "// Fallback datasets for categories if offline"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/inferiores/[categoria]/page.js",
+      "line": 376,
+      "content": "const getFallbackPlayers = (catName) => ["
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/inferiores/[categoria]/page.js",
+      "line": 382,
+      "content": "const getFallbackMatches = (catName) => ["
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/inferiores/[categoria]/page.js",
+      "line": 387,
+      "content": "const fallbackMedia = ["
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/inferiores/[categoria]/page.js",
+      "line": 391,
+      "content": "const fallbackNews = ["
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/page.js",
+      "line": 49,
+      "content": "// Fallback simulated data"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/page.js",
+      "line": 50,
+      "content": "setPlayers(fallbackPlayers);"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/page.js",
+      "line": 51,
+      "content": "setMatches(fallbackMatches);"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/page.js",
+      "line": 52,
+      "content": "setNews(fallbackNews);"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/page.js",
+      "line": 53,
+      "content": "setMedia(fallbackMedia);"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/page.js",
+      "line": 837,
+      "content": "// Fallback datasets for categories if offline"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/page.js",
+      "line": 838,
+      "content": "const fallbackPlayers = ["
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/page.js",
+      "line": 845,
+      "content": "const fallbackMatches = ["
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/page.js",
+      "line": 850,
+      "content": "const fallbackNews = ["
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/page.js",
+      "line": 854,
+      "content": "const fallbackMedia = ["
+    },
+    {
+      "file": "frontend/src/app/newbery-tv/page.js",
+      "line": 254,
+      "content": "style={{ backgroundImage: `url('${config.defaultFallbackImage}')` }}"
+    },
+    {
+      "file": "frontend/src/app/page.js",
+      "line": 57,
+      "content": "setNews(defaultFallbackNews);"
+    },
+    {
+      "file": "frontend/src/app/page.js",
+      "line": 61,
+      "content": "setNews(defaultFallbackNews);"
+    },
+    {
+      "file": "frontend/src/app/page.js",
+      "line": 112,
+      "content": "const defaultFallbackNews = ["
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 31,
+      "content": "// Fallback a datos mock si no hay token o la llamada falla"
+    },
+    {
+      "file": "frontend/src/app/portal/login/page.js",
+      "line": 41,
+      "content": "// Fallback offline / sin backend"
+    },
+    {
+      "file": "frontend/src/app/portal/page.js",
+      "line": 15,
+      "content": "// Fallback a datos simulados para demo si no hay token"
+    },
+    {
+      "file": "frontend/src/app/portal/page.js",
+      "line": 44,
+      "content": "// Fallback en caso de error"
+    },
+    {
+      "file": "frontend/src/app/portal/page.js",
+      "line": 57,
+      "content": "// Fallback"
+    },
+    {
+      "file": "frontend/src/app/reservas/page.js",
+      "line": 318,
+      "content": "<Suspense fallback={<div className=\"min-h-screen bg-jn-white text-jn-black text-center py-20 font-bo"
+    },
+    {
+      "file": "frontend/src/components/newbery-tv/config.js",
+      "line": 36,
+      "content": "defaultFallbackImage: \"/images/futsal_hero.png\""
+    },
+    {
+      "file": "frontend/src/components/Newbery3DHero.js",
+      "line": 15,
+      "content": "console.warn(\"WebGL no está soportado en este navegador. Cargando fallback.\");"
+    }
+  ],
+  "simulacion": [
+    {
+      "file": "backend/modules/finanzas/services/payments.service.js",
+      "line": 139,
+      "content": "* Prepara una preferencia de Mercado Pago (Simulado)."
+    },
+    {
+      "file": "backend/modules/finanzas/services/payments.service.js",
+      "line": 157,
+      "content": "// Actualizar referencias de Mercado Pago simuladas"
+    },
+    {
+      "file": "backend/modules/finanzas/services/payments.service.js",
+      "line": 166,
+      "content": "// init_point simulado apuntando a nuestro webhook simulado para pruebas locales"
+    },
+    {
+      "file": "backend/modules/finanzas/services/payments.service.js",
+      "line": 175,
+      "content": "* Webhook simulador para Mercado Pago."
+    },
+    {
+      "file": "backend/routes/finanzas.js",
+      "line": 232,
+      "content": "// Dibujar Código QR simulado (Vectorial)"
+    },
+    {
+      "file": "backend/routes/integrations.js",
+      "line": 203,
+      "content": "message: 'Sincronización simulada completada. La API se integrará cuando esté en producción.',"
+    },
+    {
+      "file": "backend/verify_finanzas.js",
+      "line": 141,
+      "content": "// 6. Simular confirmación por Webhook (POST /api/finanzas/mercadopago/webhook)"
+    },
+    {
+      "file": "backend/verify_finanzas.js",
+      "line": 142,
+      "content": "console.log('🔔 5. Simulando recepción de Webhook de aprobación de pago (POST /api/finanzas/mercadop"
+    },
+    {
+      "file": "frontend/src/app/admin/reservas/page.js",
+      "line": 127,
+      "content": "// Simularemos creación exitosa y daremos feedback al usuario."
+    },
+    {
+      "file": "frontend/src/app/club-digital-pro/page.js",
+      "line": 13,
+      "content": "// Simulador State"
+    },
+    {
+      "file": "frontend/src/app/club-digital-pro/page.js",
+      "line": 64,
+      "content": "// Módulos recomendados basados en la simulación"
+    },
+    {
+      "file": "frontend/src/app/club-digital-pro/page.js",
+      "line": 227,
+      "content": "{/* ── SIMULADOR DE CLUB ── */}"
+    },
+    {
+      "file": "frontend/src/app/club-digital-pro/page.js",
+      "line": 230,
+      "content": "<span className=\"text-jn-red text-[10px] font-black uppercase tracking-widest\">Simulador Interactivo"
+    },
+    {
+      "file": "frontend/src/app/club-digital-pro/page.js",
+      "line": 237,
+      "content": "{/* Opciones del Simulador */}"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/page.js",
+      "line": 48,
+      "content": "console.warn(\"API offline, loading local simulated data\", e);"
+    },
+    {
+      "file": "frontend/src/app/disciplinas/futsal/page.js",
+      "line": 49,
+      "content": "// Fallback simulated data"
+    },
+    {
+      "file": "frontend/src/app/juegos/page.js",
+      "line": 1232,
+      "content": "<p className=\"text-[10px] text-jn-red animate-pulse font-mono\">Simulando jugadas...</p>"
+    },
+    {
+      "file": "frontend/src/app/newbery-ia/page.js",
+      "line": 57,
+      "content": "// Simulate bot response"
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 18,
+      "content": "// Mercado Pago simulated modal"
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 169,
+      "content": "const handleSimulatePayment = async () => {"
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 172,
+      "content": "// Llamar al webhook simulado en el backend"
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 188,
+      "content": "showToast('Error en la simulación del webhook', 'error');"
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 191,
+      "content": "showToast('Error al simular pago', 'error');"
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 404,
+      "content": "{/* MERCADO PAGO SIMULATOR MODAL */}"
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 418,
+      "content": "Simulador Mercado Pago Checkout"
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 444,
+      "content": "<p className=\"uppercase font-black text-blue-700\">Entorno Sandbox / Simulado</p>"
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 445,
+      "content": "<p className=\"mt-0.5 text-blue-600 font-semibold\">Esta integración está en modo de prueba. Haz clic "
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 452,
+      "content": "onClick={handleSimulatePayment}"
+    },
+    {
+      "file": "frontend/src/app/portal/cuotas/page.js",
+      "line": 456,
+      "content": "{loading ? 'Procesando Pago...' : 'Simular Pago Exitoso'}"
+    },
+    {
+      "file": "frontend/src/app/portal/page.js",
+      "line": 15,
+      "content": "// Fallback a datos simulados para demo si no hay token"
+    },
+    {
+      "file": "frontend/src/app/portal/page.js",
+      "line": 88,
+      "content": "<p className=\"text-gray-500 text-xs mt-1\">Estás explorando el portal con un perfil simulado. Iniciá "
+    },
+    {
+      "file": "frontend/src/app/reservas/page.js",
+      "line": 152,
+      "content": "console.warn(\"Utilizando simulación offline de checkout MP\");"
+    },
+    {
+      "file": "frontend/src/app/reservas/page.js",
+      "line": 154,
+      "content": "// Simular guardado local y checkout de MercadoPago"
+    },
+    {
+      "file": "frontend/src/app/reservas/page.js",
+      "line": 164,
+      "content": "// Simulamos la redirección exitosa de MercadoPago"
+    },
+    {
+      "file": "frontend/src/app/reservas/page.js",
+      "line": 166,
+      "content": "// Redirigimos localmente simulando el éxito"
+    },
+    {
+      "file": "frontend/src/components/FloatingIA.js",
+      "line": 46,
+      "content": "// Simulate bot response"
+    },
+    {
+      "file": "frontend/src/components/Newbery3DHero.js",
+      "line": 116,
+      "content": "// Dibujar costuras/líneas entre parches para simular cuero cosido (en gris oscuro/rojo)"
+    }
+  ]
+}

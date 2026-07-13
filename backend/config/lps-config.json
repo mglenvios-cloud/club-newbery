@@ -1,0 +1,17 @@
+{
+  "apiUrl": "",
+  "apiKey": "",
+  "clubId": "",
+  "token": "",
+  "webhookUrl": "",
+  "mode": "pruebas",
+  "connected": false,
+  "lastSync": null,
+  "syncCount": 0,
+  "sponsors": [
+    { "id": "header", "label": "Encabezado del partido", "imageUrl": "", "linkUrl": "", "active": false },
+    { "id": "between-stats", "label": "Entre estadísticas", "imageUrl": "", "linkUrl": "", "active": false },
+    { "id": "below-player", "label": "Debajo del reproductor", "imageUrl": "", "linkUrl": "", "active": false },
+    { "id": "footer", "label": "Pie de página", "imageUrl": "", "linkUrl": "", "active": false }
+  ]
+}

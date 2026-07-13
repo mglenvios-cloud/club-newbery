@@ -1,0 +1,870 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      String   @default("SOCIO") // ADMIN, SOCIO
+  member    Member?
+  isActive  Boolean  @default(true)
+  name      String   @default("")
+  roleId    Int?
+  roleRel   Role?    @relation(fields: [roleId], references: [id])
+  clubId    Int?
+  club      Club?    @relation(fields: [clubId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Member {
+  id             Int          @id @default(autoincrement())
+  socioNumber    Int          @unique
+  firstName      String
+  lastName       String
+  dni            String       @unique
+  birthDate      DateTime
+  address        String?
+  phone          String?
+  category       String       @default("ACTIVO")
+  familyGroup    String?
+  isActive       Boolean      @default(true)
+  userId         Int          @unique
+  user           User         @relation(fields: [userId], references: [id])
+  email          String       @unique
+  sexo           String?
+  foto           String?
+  ciudad         String       @default("")
+  provincia      String       @default("")
+  codigoPostal   String       @default("")
+  estado         String       @default("ACTIVO") // ACTIVO, INACTIVO, SUSPENDIDO
+  fechaAlta      DateTime     @default(now())
+  observaciones  String       @default("")
+  clubId         Int?
+  club           Club?        @relation(fields: [clubId], references: [id])
+  tutorId        Int?
+  tutor          Tutor?       @relation(fields: [tutorId], references: [id])
+  digitalCard    DigitalCard?
+  payments       Payment[]
+  subscriptions  Subscription[]
+  bookings       Booking[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model CategoryConfig {
+  id           Int      @id @default(autoincrement())
+  name         String
+  type         String   // SOCIO, DISCIPLINA
+  price        Float
+  description  String?
+  color        String   @default("#3B82F6")
+  displayOrder Int      @default(0)
+  yearBorn     Int?
+  minAge       Int?
+  maxAge       Int?
+  isActive     Boolean  @default(true)
+  discipline   String   @default("FUTSAL")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  concept     String
+  amount      Float
+  date        DateTime @default(now())
+  status      String   @default("COMPLETED")
+  memberName  String
+  memberId    Int?
+  details     String?
+  createdAt   DateTime @default(now())
+}
+
+// ⚠️ [LEGACY - DEPRECATED]: Use el modelo oficial 'Booking' en su lugar.
+// Se mantiene únicamente por compatibilidad de base de datos a nivel de esquema.
+model CourtBooking {
+  id         Int      @id @default(autoincrement())
+  spaceName  String
+  date       DateTime
+  timeSlot   String
+  clientName String
+  price      Float
+  isPaid     Boolean  @default(false)
+  userId     Int?
+  createdAt  DateTime @default(now())
+}
+
+model Post {
+  id         Int      @id @default(autoincrement())
+  authorName String
+  authorAge  Int
+  category   String
+  content    String
+  drawingUrl String?
+  type       String   @default("TEXT")
+  isApproved Boolean  @default(false)
+  likes      Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model PlayerProfile {
+  id              Int       @id @default(autoincrement())
+  name            String
+  lastName        String    @default("")
+  dorsal          Int       @default(0)
+  jerseyNumber    Int?
+  age             Int
+  category        String
+  position        String
+  team            String
+  discipline      String    @default("FUTSAL")
+  achievements    String    @default("")
+  matchesPlayed   Int       @default(0)
+  goals           Int       @default(0)
+  assists         Int       @default(0)
+  yellowCards     Int       @default(0)
+  redCards        Int       @default(0)
+  cleanSheets     Int       @default(0)
+  season          String    @default("2026")
+  description     String    @default("")
+  birthDate       DateTime?
+  playerStatus    String    @default("ACTIVE") // ACTIVE, INJURED, SUSPENDED, INACTIVE
+  videoUrl        String?
+  photoUrl        String?
+  // Nuevos campos Fase 2
+  dni             String?
+  nationality     String    @default("Argentina")
+  dominantFoot    String    @default("DERECHA") // DERECHA, IZQUIERDA, AMBAS
+  height          Float?
+  weight          Float?
+  entryDate       DateTime?
+  observations    String    @default("")
+  bloodType       String?
+  emergencyPhone  String?
+  clubId          Int?
+  club            Club?     @relation(fields: [clubId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model News {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  category  String
+  tag       String?
+  imageUrl  String?
+  createdAt DateTime @default(now())
+}
+
+model FutsalMatch {
+  id              Int      @id @default(autoincrement())
+  category        String
+  opponent        String
+  homeTeam        String   @default("Jorge Newbery")
+  awayTeam        String   @default("")
+  referee         String   @default("")
+  attendance      Int?     @default(0)
+  date            DateTime
+  timeSlot        String
+  ourScore        Int?
+  opponentScore   Int?
+  status          String   @default("UPCOMING")
+  videoUrl        String?
+  summary         String?
+  photoGallery    String?
+  isFeatured      Boolean  @default(false)
+  competition     String   @default("AFA Primera")
+  venue           String   @default("Cancha Jorge Newbery")
+  season          String   @default("2026")
+  externalMatchId String?  @unique
+  liveStreamUrl   String?
+  provider        String   @default("LOCAL")
+  liveMinute      Int?     @default(0)
+  aiCommentary    String?
+  autoSummary     String?
+  discipline      String   @default("FUTSAL")
+  clubId          Int?
+  club            Club?    @relation(fields: [clubId], references: [id])
+  createdAt       DateTime @default(now())
+}
+
+model LiveMatchEvent {
+  id         Int      @id @default(autoincrement())
+  matchId    Int
+  type       String
+  minute     Int
+  playerName String   @default("")
+  team       String   @default("HOME")
+  detail     String   @default("")
+  createdAt  DateTime @default(now())
+}
+
+model FutsalTeam {
+  id                Int      @id @default(autoincrement())
+  name              String
+  category          String
+  discipline        String   @default("FUTSAL")
+  gender            String   @default("MASCULINO")
+  season            String   @default("2026")
+  coach             String   @default("")
+  assistantCoach    String   @default("")
+  preparadorFisico  String   @default("")
+  status            String   @default("ACTIVE")
+  trainingDays      String   @default("")
+  trainingSchedule  String   @default("")
+  location          String   @default("")
+  description       String   @default("")
+  imageUrl          String   @default("")
+  squadPhotoUrl     String   @default("")
+  colorPrimary      String   @default("#CC0000")
+  colorSecondary    String   @default("#FFFFFF")
+  clubId            Int?
+  club              Club?    @relation(fields: [clubId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model FutsalNews {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  imageUrl    String?
+  category    String
+  season      String   @default("2026")
+  published   Boolean  @default(true)
+  clubId      Int?
+  club        Club?    @relation(fields: [clubId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model FutsalMedia {
+  id              Int      @id @default(autoincrement())
+  type            String
+  title           String
+  url             String
+  category        String
+  description     String?
+  season          String   @default("2026")
+  competition     String?
+  opponent        String?
+  playerId        Int?
+  matchId         Int?
+  published       Boolean  @default(true)
+  publishedAt     DateTime? @default(now())
+  authorId        Int?
+  visibility      String   @default("PUBLIC") // PUBLIC, MEMBERS_ONLY, PRIVATE
+  featured        Boolean  @default(false)
+  views           Int      @default(0)
+  // Campos reservados para integración futura con Liga Pro Studio
+  externalMatchId String?
+  externalMediaId String?
+  streamId        String?
+  isClip          Boolean  @default(false)
+  clubId          Int?
+  club            Club?    @relation(fields: [clubId], references: [id])
+  createdAt       DateTime @default(now())
+}
+
+model Sponsor {
+  id                Int               @id @default(autoincrement())
+  name              String
+  logoUrl           String?
+  imageUrl          String?
+  description       String?
+  website           String?
+  phone             String?
+  email             String?
+  whatsapp          String?
+  instagram         String?
+  facebook          String?
+  category          String            @default("GENERAL")
+  isActive          Boolean           @default(true)
+  order             Int               @default(0)
+  clicks            Int               @default(0)
+  views             Int               @default(0)
+  address           String?
+  contractStartDate DateTime?
+  contractEndDate   DateTime?
+  status            String            @default("activo")
+  contracts         ContractHistory[]
+  clubId            Int?
+  club              Club?             @relation(fields: [clubId], references: [id])
+  createdAt         DateTime          @default(now())
+}
+
+model Banner {
+  id          Int       @id @default(autoincrement())
+  title       String
+  imageUrl    String
+  linkUrl     String?
+  locations   String    @default("[]")
+  rotation    String    @default("ALWAYS")
+  startDate   DateTime?
+  endDate     DateTime?
+  startHour   Int?
+  endHour     Int?
+  maxViews    Int?
+  order       Int       @default(0)
+  isActive    Boolean   @default(true)
+  clicks      Int       @default(0)
+  views       Int       @default(0)
+  sponsorId   Int?
+  clubId      Int?
+  club        Club?     @relation(fields: [clubId], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+model Campaign {
+  id          Int       @id @default(autoincrement())
+  title       String
+  imageUrl    String?
+  videoUrl    String?
+  linkUrl     String?
+  description String?
+  locations   String    @default("[]")
+  startDate   DateTime?
+  endDate     DateTime?
+  priority    Int       @default(0)
+  status      String    @default("ACTIVE")
+  clicks      Int       @default(0)
+  views       Int       @default(0)
+  maxViews    Int?
+  sponsorId   Int?
+  clubId      Int?
+  club        Club?     @relation(fields: [clubId], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+model SocialConfig {
+  id          Int      @id @default(autoincrement())
+  platform    String   @unique
+  handle      String?
+  url         String?
+  apiKey      String?
+  isActive    Boolean  @default(false)
+  updatedAt   DateTime @updatedAt
+}
+
+model ContractHistory {
+  id          Int      @id @default(autoincrement())
+  sponsorId   Int
+  sponsor     Sponsor  @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+  startDate   DateTime
+  endDate     DateTime
+  amount      Float?
+  notes       String?
+  createdAt   DateTime @default(now())
+}
+
+model MediaFile {
+  id        Int      @id @default(autoincrement())
+  filename  String
+  filepath  String
+  filetype  String
+  size      Int
+  category  String   // sponsors, banners, campanas, videos, documentos
+  url       String
+  createdAt DateTime @default(now())
+}
+
+model AdvertisementView {
+  id         Int      @id @default(autoincrement())
+  bannerId   Int?
+  campaignId Int?
+  sponsorId  Int?
+  type       String   // VIEW or CLICK
+  device     String?  // desktop, mobile, tablet
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+}
+
+model SocialPost {
+  id           Int      @id @default(autoincrement())
+  platform     String   // instagram, facebook, tiktok, youtube, whatsapp
+  content      String?
+  imageUrl     String?
+  linkUrl      String?
+  scheduledFor DateTime?
+  status       String   @default("PENDING") // PENDING, POSTED, FAILED
+  createdAt    DateTime @default(now())
+}
+
+
+model Training {
+  id          Int      @id @default(autoincrement())
+  date        DateTime
+  timeSlot    String
+  category    String
+  coach       String
+  court       String
+  team        String   @default("")
+  objective   String   @default("")
+  notes       String   @default("")
+  status      String   @default("SCHEDULED")
+  discipline  String   @default("FUTSAL")
+  duration    Int?     // minutos
+  attendance  Int?
+  clubId      Int?
+  club        Club?    @relation(fields: [clubId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Document {
+  id          Int      @id @default(autoincrement())
+  title       String
+  url         String
+  category    String
+  description String   @default("")
+  clubId      Int?
+  club        Club?    @relation(fields: [clubId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Coach {
+  id                Int       @id @default(autoincrement())
+  photoUrl          String?
+  name              String
+  role              String    // "ENTRENADOR", "AYUDANTE", "PF"
+  categories        String    @default("")
+  license           String?
+  phone             String?
+  email             String?
+  biography         String?
+  // Nuevos campos Fase 2
+  discipline        String    @default("FUTSAL")
+  incorporationDate DateTime?
+  curriculum        String?
+  specialization    String    @default("")
+  dni               String?
+  address           String?
+  isActive          Boolean   @default(true)
+  clubId            Int?
+  club              Club?     @relation(fields: [clubId], references: [id])
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+// ══════════════════════════════════════
+// NUEVOS MODELOS - FASE 2
+// ══════════════════════════════════════
+
+// Personal de apoyo: médico, kinesiólogo, utilero, delegado, etc.
+model TechnicalStaff {
+  id                Int       @id @default(autoincrement())
+  name              String
+  role              String    // MEDICO, KINESIOLOGO, UTILERO, DELEGADO, NUTRICIONISTA, PSICOLOGO
+  photoUrl          String?
+  phone             String?
+  email             String?
+  categories        String    @default("")
+  discipline        String    @default("FUTSAL")
+  incorporationDate DateTime?
+  notes             String    @default("")
+  isActive          Boolean   @default(true)
+  clubId            Int?
+  club              Club?     @relation(fields: [clubId], references: [id])
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+// Eventos del calendario deportivo
+model ClubEvent {
+  id          Int       @id @default(autoincrement())
+  title       String
+  type        String    // TRAINING, MATCH, MEETING, TRAVEL, OTHER, MEDICAL, TOURNAMENT
+  date        DateTime
+  endDate     DateTime?
+  timeSlot    String    @default("")
+  endTime     String    @default("")
+  location    String    @default("")
+  category    String    @default("")
+  team        String    @default("")
+  discipline  String    @default("")
+  description String    @default("")
+  color       String    @default("#EF4444")
+  isRecurring Boolean   @default(false)
+  createdBy   String    @default("Admin")
+  clubId      Int?
+  club        Club?     @relation(fields: [clubId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// Registros médicos de jugadores
+model MedicalRecord {
+  id           Int       @id @default(autoincrement())
+  playerId     Int
+  playerName   String
+  type         String    // LESION, CONSULTA, ALTA, RESTRICCION, CIRUGIA
+  description  String
+  diagnosis    String    @default("")
+  startDate    DateTime
+  endDate      DateTime?
+  expectedReturn DateTime?
+  doctor       String    @default("")
+  treatment    String    @default("")
+  restrictions String    @default("")
+  status       String    @default("ACTIVE") // ACTIVE, RECOVERED, CHRONIC
+  severity     String    @default("LEVE")   // LEVE, MODERADA, GRAVE
+  bodyPart     String    @default("")
+  notes        String    @default("")
+  clubId       Int?
+  club         Club?     @relation(fields: [clubId], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// Documentos asociados a jugadores
+model PlayerDocument {
+  id          Int       @id @default(autoincrement())
+  playerId    Int
+  playerName  String
+  title       String
+  category    String    // DNI, APTO_FISICO, FICHA_MEDICA, SEGURO, AUTORIZACION, CONTRATO, CERTIFICADO
+  url         String    @default("")
+  fileType    String    @default("PDF")
+  expiryDate  DateTime?
+  issuedDate  DateTime?
+  issuer      String    @default("")
+  status      String    @default("VALID") // VALID, EXPIRED, PENDING, REVOKED
+  notes       String    @default("")
+  clubId      Int?
+  club        Club?     @relation(fields: [clubId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// Registro de auditoría
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  action     String   // CREATE, UPDATE, DELETE, LOGIN, CONFIG_CHANGE
+  entity     String   // Player, Team, Coach, etc.
+  entityId   Int?
+  entityName String   @default("")
+  userId     Int?
+  userName   String   @default("Admin")
+  details    String   @default("")
+  ipAddress  String   @default("")
+  clubId     Int?
+  club       Club?    @relation(fields: [clubId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+// ══════════════════════════════════════
+// NUEVOS MODELOS - FASE 2.5
+// ══════════════════════════════════════
+
+model Club {
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  logoUrl         String?
+  configs         ClubConfig[]
+  seasons         Season[]
+  disciplines     Discipline[]
+  sedes           Sede[]
+  users           User[]
+  roles           Role[]
+  members         Member[]
+  membershipPlans MembershipPlan[]
+  bookings        Booking[]
+  playerProfiles  PlayerProfile[]
+  futsalMatches   FutsalMatch[]
+  futsalTeams     FutsalTeam[]
+  futsalNews      FutsalNews[]
+  futsalMedia     FutsalMedia[]
+  sponsors        Sponsor[]
+  banners         Banner[]
+  campaigns       Campaign[]
+  trainings       Training[]
+  documents       Document[]
+  coaches         Coach[]
+  technicalStaffs TechnicalStaff[]
+  clubEvents      ClubEvent[]
+  medicalRecords  MedicalRecord[]
+  playerDocuments PlayerDocument[]
+  auditLogs       AuditLog[]
+  matchEvents     MatchEvent[]
+  highlightClips  HighlightClip[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model ClubConfig {
+  id              Int       @id @default(autoincrement())
+  name            String    @default("Club Jorge Newbery")
+  shieldUrl       String?
+  colorPrimary    String    @default("#CC0000")
+  colorSecondary  String    @default("#FFFFFF")
+  address         String    @default("")
+  city            String    @default("")
+  province        String    @default("")
+  country         String    @default("Argentina")
+  phone           String    @default("")
+  email           String    @default("")
+  website         String    @default("")
+  socialFacebook  String    @default("")
+  socialInstagram String    @default("")
+  socialTwitter   String    @default("")
+  socialYoutube   String    @default("")
+  history         String    @default("")
+  foundedDate     DateTime?
+  president       String    @default("")
+  secretary       String    @default("")
+  officeHours     String    @default("")
+  clubId          Int
+  club            Club      @relation(fields: [clubId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Season {
+  id          Int      @id @default(autoincrement())
+  name        String
+  year        Int
+  startDate   DateTime
+  endDate     DateTime
+  status      String   @default("PLANIFICADA") // ACTIVE, FINISHED, PLANIFICADA
+  isActive    Boolean  @default(false)
+  isDefault   Boolean  @default(false)
+  sportYear   String   @default("")
+  clubId      Int?
+  club        Club?    @relation(fields: [clubId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Discipline {
+  id           Int      @id @default(autoincrement())
+  name         String
+  icon         String   @default("Trophy")
+  color        String   @default("#CC0000")
+  displayOrder Int      @default(0)
+  manager      String   @default("")
+  isActive     Boolean  @default(true)
+  description  String   @default("")
+  clubId       Int?
+  club         Club?    @relation(fields: [clubId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Sede {
+  id           Int        @id @default(autoincrement())
+  name         String
+  address      String
+  location     String     @default("")
+  capacity     Int        @default(0)
+  status       String     @default("ACTIVE")
+  observations String     @default("")
+  clubId       Int?
+  club         Club?      @relation(fields: [clubId], references: [id])
+  facilities   Facility[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Facility {
+  id           Int      @id @default(autoincrement())
+  name         String
+  type         String   @default("CANCHA") // CANCHA, GIMNASIO, VESTUARIO, OFICINA, SALON, QUINCHO, BUFFET, DEPOSITO, OTHER
+  capacity     Int      @default(0)
+  status       String   @default("ACTIVE") // ACTIVE, MAINTENANCE, INACTIVE
+  location     String   @default("")
+  observations String   @default("")
+  sedeId       Int
+  sede         Sede     @relation(fields: [sedeId], references: [id])
+  bookings     Booking[]
+  schedules    Schedule[]
+  priceRules   PriceRule[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String   @default("")
+  permissions String   @default("[]") // JSON string list of permissions
+  clubId      Int?
+  club        Club?    @relation(fields: [clubId], references: [id])
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Tutor {
+  id                 Int      @id @default(autoincrement())
+  nombre             String
+  apellido           String
+  DNI                String   @unique
+  telefono           String
+  email              String
+  parentesco         String
+  contactoEmergencia String   @default("")
+  socios             Member[]
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model DigitalCard {
+  id         Int      @id @default(autoincrement())
+  socioId    Int      @unique
+  socio      Member   @relation(fields: [socioId], references: [id])
+  qrCode     String   @unique
+  issuedAt   DateTime @default(now())
+  expiresAt  DateTime
+  status     String   @default("ACTIVE") // ACTIVE, EXPIRED, REVOKED
+  updatedAt  DateTime @updatedAt
+}
+
+model MembershipPlan {
+  id            Int            @id @default(autoincrement())
+  nombre        String
+  tipo          String         // SOCIO, DEPORTIVO, FAMILIAR
+  importe       Decimal
+  periodicidad  String         // MENSUAL, ANUAL, UNICO
+  moneda        String         @default("ARS")
+  activo        Boolean        @default(true)
+  clubId        Int?
+  club          Club?          @relation(fields: [clubId], references: [id])
+  payments      Payment[]
+  subscriptions Subscription[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Payment {
+  id             Int             @id @default(autoincrement())
+  socioId        Int
+  socio          Member          @relation(fields: [socioId], references: [id])
+  planId         Int?
+  plan           MembershipPlan? @relation(fields: [planId], references: [id])
+  importe        Decimal
+  moneda         String          @default("ARS")
+  metodoPago     String          // EFECTIVO, TRANSFERENCIA, TARJETA, MERCADOPAGO
+  estado         String          // PENDIENTE, PAGADO, RECHAZADO, CANCELADO
+  referenciaPago String?
+  fechaPago      DateTime?
+  mpStatus       String          @default("")
+  mpPaymentId    String          @default("")
+  mpPreferenceId String          @default("")
+  invoices       Invoice[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Invoice {
+  id              Int      @id @default(autoincrement())
+  paymentId       Int
+  payment         Payment  @relation(fields: [paymentId], references: [id])
+  numero          String   @unique
+  fechaEmision    DateTime @default(now())
+  archivoPDF      String?
+  estado          String   @default("EMITIDO") // EMITIDO, ANULADO
+  tipoComprobante String   @default("RECIBO")
+  observaciones   String   @default("")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Subscription {
+  id           Int            @id @default(autoincrement())
+  socioId      Int
+  socio        Member         @relation(fields: [socioId], references: [id])
+  planId       Int
+  plan         MembershipPlan @relation(fields: [planId], references: [id])
+  fechaInicio  DateTime
+  fechaFin     DateTime?
+  estado       String         @default("ACTIVO") // ACTIVO, VENCIDO, CANCELADO
+  proximoCobro DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model MatchBroadcast {
+  id         Int       @id @default(autoincrement())
+  matchId    Int
+  title      String
+  status     String    // PROGRAMADO, EN_VIVO, FINALIZADO
+  streamUrl  String?
+  platform   String?
+  startedAt  DateTime?
+  finishedAt DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+model MatchEvent {
+  id          Int      @id @default(autoincrement())
+  matchId     Int
+  minute      Int
+  type        String   // GOL, TARJETA, CAMBIO, ATAQUE, JUGADA_DESTACADA
+  playerId    Int?
+  description String
+  clubId      Int?
+  club        Club?    @relation(fields: [clubId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model HighlightClip {
+  id            Int      @id @default(autoincrement())
+  matchId       Int
+  mediaId       Int?
+  title         String
+  startTime     Int      // En segundos
+  endTime       Int      // En segundos
+  generatedByAI Boolean  @default(false)
+  published     Boolean  @default(true)
+  clubId        Int?
+  club          Club?    @relation(fields: [clubId], references: [id])
+  createdAt     DateTime @default(now())
+}
+
+model Booking {
+  id            Int       @id @default(autoincrement())
+  socioId       Int?
+  socio         Member?   @relation(fields: [socioId], references: [id])
+  nombreCliente String
+  telefono      String
+  email         String
+  facilityId    Int
+  facility      Facility  @relation(fields: [facilityId], references: [id])
+  fecha         DateTime
+  horaInicio    String
+  horaFin       String
+  tipoReserva   String    // SOCIO, GENERAL, EVENTO
+  estado        String    @default("PENDIENTE") // PENDIENTE, CONFIRMADA, CANCELADA, FINALIZADA
+  importe       Decimal
+  clubId        Int?
+  club          Club?     @relation(fields: [clubId], references: [id])
+  createdAt     DateTime  @default(now())
+}
+
+model Schedule {
+  id         Int      @id @default(autoincrement())
+  facilityId Int
+  facility   Facility @relation(fields: [facilityId], references: [id])
+  dayOfWeek  Int      // 0 (Domingo) a 6 (Sábado)
+  startTime  String   // e.g. "08:00"
+  endTime    String   // e.g. "22:00"
+  isBlocked  Boolean  @default(false)
+  reason     String?
+  createdAt  DateTime @default(now())
+}
+
+model PriceRule {
+  id         Int      @id @default(autoincrement())
+  facilityId Int
+  facility   Facility @relation(fields: [facilityId], references: [id])
+  userType   String   // SOCIO, GENERAL
+  isPeakHour Boolean  @default(false) // Horarios pico
+  price      Decimal
+  currency   String   @default("ARS")
+  createdAt  DateTime @default(now())
+}

@@ -1,0 +1,1425 @@
+[
+  {
+    "file": "administracionGeneral.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/club-config",
+        "line": 17,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/club-config",
+        "line": 27,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/seasons",
+        "line": 45,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/seasons",
+        "line": 55,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/seasons/:id",
+        "line": 69,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/seasons/:id",
+        "line": 86,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/disciplines",
+        "line": 104,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/disciplines",
+        "line": 114,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/disciplines/:id",
+        "line": 128,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/disciplines/:id",
+        "line": 145,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/sedes",
+        "line": 163,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/sedes",
+        "line": 173,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/sedes/:id",
+        "line": 187,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/sedes/:id",
+        "line": 204,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/facilities",
+        "line": 222,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/facilities",
+        "line": 233,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/facilities/:id",
+        "line": 247,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/facilities/:id",
+        "line": 264,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/roles",
+        "line": 282,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/roles",
+        "line": 292,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/roles/:id",
+        "line": 306,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/roles/:id",
+        "line": 323,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/users",
+        "line": 341,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/users",
+        "line": 356,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/users/:id",
+        "line": 371,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/users/:id",
+        "line": 389,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "auth.js",
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/register",
+        "line": 10,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/login",
+        "line": 49,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "categories.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 6,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 19,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "line": 41,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "line": 55,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "clubEvents.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 6,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 30,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "line": 59,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "line": 87,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "demoContact.js",
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 5,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "finanzas.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/plans",
+        "line": 42,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/plans",
+        "line": 52,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "PUT",
+        "path": "/plans/:id",
+        "line": 65,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/plans/:id",
+        "line": 82,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/payments",
+        "line": 100,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/payments",
+        "line": 120,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "PUT",
+        "path": "/payments/:id",
+        "line": 133,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/invoices/:id",
+        "line": 154,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/subscriptions",
+        "line": 252,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/subscriptions",
+        "line": 271,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "PUT",
+        "path": "/subscriptions/:id",
+        "line": 281,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/mercadopago/preference",
+        "line": 299,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/mercadopago/webhook",
+        "line": 321,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/payment-methods",
+        "line": 333,
+        "hasTry": true,
+        "hasAuth": true
+      }
+    ]
+  },
+  {
+    "file": "futsalNews.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 6,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/:id",
+        "line": 26,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 43,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "line": 69,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "line": 92,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "gemini.js",
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/chat",
+        "line": 22,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "gestionDeportiva.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/trainings",
+        "line": 16,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/trainings",
+        "line": 28,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/trainings/:id",
+        "line": 43,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/trainings/:id",
+        "line": 59,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/documents",
+        "line": 79,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/documents",
+        "line": 90,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/documents/:id",
+        "line": 105,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/coaches",
+        "line": 125,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/coaches",
+        "line": 137,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/coaches/:id",
+        "line": 152,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/coaches/:id",
+        "line": 168,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/stats",
+        "line": 188,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/search",
+        "line": 360,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "integrations.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/lps",
+        "line": 69,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/lps/full",
+        "line": 84,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/lps/status",
+        "line": 95,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "PUT",
+        "path": "/lps",
+        "line": 113,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "PUT",
+        "path": "/lps/sponsors",
+        "line": 143,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/lps/sponsors",
+        "line": 173,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/lps/sync",
+        "line": 184,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/lps/disconnect",
+        "line": 214,
+        "hasTry": true,
+        "hasAuth": true
+      }
+    ]
+  },
+  {
+    "file": "ligaProStudio.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/broadcasts",
+        "line": 45,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/broadcasts/match/:matchId",
+        "line": 56,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/broadcasts",
+        "line": 71,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "PUT",
+        "path": "/broadcasts/:id",
+        "line": 82,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/matches/:id/events",
+        "line": 97,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/matches/:id/events",
+        "line": 109,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/highlights",
+        "line": 125,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/highlights",
+        "line": 136,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "PUT",
+        "path": "/highlights/:id",
+        "line": 147,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/highlights/:id",
+        "line": 159,
+        "hasTry": true,
+        "hasAuth": true
+      }
+    ]
+  },
+  {
+    "file": "liveMatch.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 33,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/:id",
+        "line": 66,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/:id/event",
+        "line": 91,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id/event/:eventId",
+        "line": 139,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "PUT",
+        "path": "/:id/status",
+        "line": 164,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/:id/ai-commentary",
+        "line": 200,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/:id/auto-summary",
+        "line": 277,
+        "hasTry": true,
+        "hasAuth": true
+      }
+    ]
+  },
+  {
+    "file": "matches.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 6,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/:id",
+        "line": 27,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 44,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "line": 108,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "line": 169,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "media.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 43,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/:id",
+        "line": 88,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 112,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "line": 156,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "line": 208,
+        "hasTry": true,
+        "hasAuth": true
+      }
+    ]
+  },
+  {
+    "file": "medicalRecords.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 6,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 25,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "line": 58,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "line": 87,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/player/:playerId",
+        "line": 97,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "members.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 23,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/me",
+        "line": 37,
+        "hasTry": true,
+        "hasAuth": true
+      }
+    ]
+  },
+  {
+    "file": "mercadopago.js",
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/preference",
+        "line": 18,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/webhook",
+        "line": 65,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "news.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 42,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 55,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "line": 84,
+        "hasTry": true,
+        "hasAuth": true
+      }
+    ]
+  },
+  {
+    "file": "playerDocs.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 6,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 25,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "line": 57,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "line": 72,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/expiring",
+        "line": 82,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/player/:playerId",
+        "line": 100,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "players.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 6,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/:id",
+        "line": 25,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 42,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "line": 82,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "line": 119,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "posts.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 72,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/pending",
+        "line": 86,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 100,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/:id/approve",
+        "line": 133,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/:id/like",
+        "line": 148,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "line": 163,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "publicidad.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/sponsors",
+        "line": 25,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/sponsors/:id",
+        "line": 45,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/sponsors",
+        "line": 56,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/sponsors/:id",
+        "line": 82,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/sponsors/:id",
+        "line": 108,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/sponsors/:id/click",
+        "line": 118,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/banners",
+        "line": 135,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/banners/:id",
+        "line": 163,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/banners",
+        "line": 174,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/banners/:id",
+        "line": 200,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/banners/:id",
+        "line": 226,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/banners/:id/view",
+        "line": 236,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns",
+        "line": 252,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/campaigns/:id",
+        "line": 269,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns",
+        "line": 279,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/campaigns/:id",
+        "line": 306,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/campaigns/:id",
+        "line": 333,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/:id/click",
+        "line": 342,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/campaigns/:id/view",
+        "line": 354,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/social",
+        "line": 373,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/social/:platform",
+        "line": 388,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/stats",
+        "line": 422,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "reservas.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/facilities",
+        "line": 47,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/availability",
+        "line": 64,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/bookings",
+        "line": 83,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/bookings",
+        "line": 111,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "PUT",
+        "path": "/bookings/:id",
+        "line": 134,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/bookings/:id",
+        "line": 156,
+        "hasTry": true,
+        "hasAuth": true
+      }
+    ]
+  },
+  {
+    "file": "socios.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 52,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 62,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "line": 76,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "line": 93,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/tutores",
+        "line": 111,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/tutores",
+        "line": 121,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "PUT",
+        "path": "/tutores/:id",
+        "line": 135,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/tutores/:id",
+        "line": 152,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/carnets",
+        "line": 170,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/carnets/generate/:socioId",
+        "line": 180,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "GET",
+        "path": "/carnets/:id",
+        "line": 194,
+        "hasTry": true,
+        "hasAuth": true
+      }
+    ]
+  },
+  {
+    "file": "teams.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 6,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "GET",
+        "path": "/:id",
+        "line": 25,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 42,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "line": 75,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "line": 105,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "technicalStaff.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 6,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 24,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "line": 50,
+        "hasTry": true,
+        "hasAuth": false
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "line": 77,
+        "hasTry": true,
+        "hasAuth": false
+      }
+    ]
+  },
+  {
+    "file": "transactions.js",
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "line": 23,
+        "hasTry": true,
+        "hasAuth": true
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "line": 43,
+        "hasTry": true,
+        "hasAuth": true
+      }
+    ]
+  }
+]
