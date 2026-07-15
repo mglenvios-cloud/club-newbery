@@ -3,17 +3,19 @@ services:
     name: club-newbery-backend
     env: node
     plan: free
+    region: oregon              # Región más cercana a Argentina con plan free
     buildCommand: npm install && npx prisma generate && npx prisma migrate deploy
     startCommand: node index.js
+    healthCheckPath: /health    # Endpoint dedicado con verificación de DB
     envVars:
       - key: PORT
         value: 5000
       - key: DATABASE_URL
-        sync: false       # Configurar en Render Dashboard: URL de PostgreSQL
+        sync: false       # REQUERIDO: URL de PostgreSQL (Render Dashboard)
       - key: JWT_SECRET
-        sync: false       # Configurar en Render Dashboard: clave larga y aleatoria
+        sync: false       # REQUERIDO: Clave fuerte >= 64 caracteres (Render Dashboard)
       - key: MP_ACCESS_TOKEN
-        sync: false       # Configurar en Render Dashboard: token real de MercadoPago
+        sync: false       # REQUERIDO para pagos: Token real MercadoPago (Render Dashboard)
       - key: FRONTEND_URL
         value: https://frontend-indol-rho-38.vercel.app
       - key: NODE_ENV

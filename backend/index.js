@@ -131,11 +131,33 @@ app.get('/api/carnets', async (req, res) => {
   }
 });
 
-// Health check
+// Health check — usado por Render para verificar que el servicio está vivo
+app.get('/health', async (req, res) => {
+  try {
+    const prisma = require('./prismaClient');
+    await prisma.$queryRaw`SELECT 1`;
+    res.status(200).json({
+      status: 'ok',
+      message: 'API del Club Jorge Newbery operativa.',
+      version: '2.0',
+      database: 'connected',
+      timestamp: new Date().toISOString()
+    });
+  } catch (dbError) {
+    res.status(503).json({
+      status: 'error',
+      message: 'Base de datos no disponible.',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Root — información básica de la API
 app.get('/', (req, res) => {
   res.json({
     message: 'API del Club Jorge Newbery funcionando correctamente.',
     version: '2.0',
+    health: '/health',
     timestamp: new Date().toISOString()
   });
 });

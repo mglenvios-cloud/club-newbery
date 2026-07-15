@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const fs = require('fs');
@@ -355,7 +355,7 @@ router.delete('/livestreams/:id', authenticateToken, requireAdmin, async (req, r
       return res.status(404).json({ error: 'Transmisión no encontrada.' });
     }
 
-    // Cascade delete manual constraints for sqlite adapter compatibility
+    // Cascade delete manual: eliminar relaciones antes de borrar el broadcast
     await prisma.cameraStatus.deleteMany({ where: { matchBroadcastId: broadcastId } });
     await prisma.replayMarker.deleteMany({ where: { matchBroadcastId: broadcastId } });
     await prisma.streamEvent.deleteMany({ where: { matchBroadcastId: broadcastId } });
@@ -889,20 +889,15 @@ router.get('/statistics', async (req, res) => {
   }
 });
 
-// Mock YouTube API Connection flow redirect
+// YouTube API Connection — integración pendiente de implementar con OAuth2 real
 router.post('/youtube/connect', authenticateToken, requireAdmin, async (req, res) => {
-  try {
-    // Return mock success with connection details
-    res.json({
-      connected: true,
-      channelId: "UC_MockChannelNewberyTVv3",
-      channelTitle: "Jorge Newbery TV Oficial",
-      googleAccount: "prensa.jorgenewbery@gmail.com",
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-    });
-  } catch (error) {
-    res.status(550).json({ error: 'Error al conectar con YouTube.' });
-  }
+  // TODO: Implementar flujo OAuth2 real con YouTube Data API v3
+  // Requiere: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET en variables de entorno
+  res.status(501).json({
+    error: 'Integración con YouTube no implementada.',
+    message: 'Para activar la transmisión en vivo, configurar las credenciales OAuth2 de Google en las variables de entorno.',
+    requiredVars: ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET']
+  });
 });
 
 module.exports = router;
