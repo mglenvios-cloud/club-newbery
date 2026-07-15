@@ -1,6 +1,0 @@
-[
-  { "id": "MERCADOPAGO", "name": "Mercado Pago", "active": true, "description": "Aboná tus cuotas de forma instantánea y segura. Los pagos se acreditan automáticamente en el acto." },
-  { "id": "TRANSFERENCIA", "name": "Transferencia Bancaria", "active": true, "description": "Realizá una transferencia desde tu homebanking. Deberás presentar el comprobante en secretaría." },
-  { "id": "EFECTIVO", "name": "Pago en Administración (Efectivo)", "active": true, "description": "Aboná en efectivo directamente en la secretaría del club en horario administrativo." },
-  { "id": "TARJETA", "name": "Tarjeta", "active": false, "description": "Débito automático o pago con tarjeta de crédito (próximamente)." }
-]

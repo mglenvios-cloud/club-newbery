@@ -1,0 +1,63 @@
+# ─── Dependencias ─────────────────────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ─── Bases de datos locales (SQLite) ──────────────────────────────────────────
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.db.bak
+*.sqlite
+*.sqlite3
+
+# ─── Variables de entorno — NUNCA subir secretos ──────────────────────────────
+.env
+.env.local
+.env.development
+.env.test
+# .env.example    → SÍ se sube (es una plantilla sin secretos)
+# .env.production → SÍ se sube (solo contiene NEXT_PUBLIC_ que no son secretos)
+
+# ─── Next.js ──────────────────────────────────────────────────────────────────
+.next/
+out/
+build/
+
+# ─── Vercel ───────────────────────────────────────────────────────────────────
+.vercel
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+logs/
+
+# ─── Sistema operativo ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── IDEs y editores ──────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ─── Uploads locales (archivos subidos en desarrollo) ─────────────────────────
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# ─── Backups y archivos temporales ────────────────────────────────────────────
+backups/
+pre_audit_backup/
+backend/backups/
+backend/scratch/
+*.bak
+
+# ─── Prisma ───────────────────────────────────────────────────────────────────
+# El schema y las migrations SÍ deben subirse
+# Solo ignorar los archivos de query engine generados localmente
+backend/node_modules/.prisma/
