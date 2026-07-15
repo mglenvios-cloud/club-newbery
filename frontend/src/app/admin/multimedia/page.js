@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Plus, Edit, Trash, X, Check, AlertCircle, Save,
@@ -67,7 +67,7 @@ export default function AdminMultimedia() {
   // Fetching (Passes admin=true to read drafts)
   const fetchMedia = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/media?admin=true`);
+      const res = await fetch(`/api/media?admin=true`);
       if (res.ok) setMediaList(await res.json());
     } catch {
       showToast('Error al conectar con la API de multimedia', 'error');
@@ -78,14 +78,14 @@ export default function AdminMultimedia() {
 
   const fetchPlayers = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/players`);
+      const res = await fetch(`/api/players`);
       if (res.ok) setPlayers(await res.json());
     } catch {}
   }, []);
 
   const fetchMatches = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/matches`);
+      const res = await fetch(`/api/matches`);
       if (res.ok) setMatches(await res.json());
     } catch {}
   }, []);
@@ -116,7 +116,7 @@ export default function AdminMultimedia() {
     };
 
     const method = modal.editId ? 'PUT' : 'POST';
-    const url = modal.editId ? `${API_URL}/api/media/${modal.editId}` : `${API_URL}/api/media`;
+    const url = modal.editId ? `/api/media/${modal.editId}` : `/api/media`;
 
     try {
       const res = await fetch(url, {
@@ -148,7 +148,7 @@ export default function AdminMultimedia() {
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/media/${id}`, {
+      const res = await fetch(`/api/media/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

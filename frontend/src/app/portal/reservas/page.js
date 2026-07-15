@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import { Calendar, Clock, CreditCard, Plus, CheckCircle, AlertCircle, ArrowRight, Trash2, Shield } from "lucide-react";
 import Link from 'next/link';
@@ -32,7 +32,7 @@ export default function MisReservas() {
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     if (!token) return;
     try {
-      const res = await fetch(`${API_URL}/api/members/me`, {
+      const res = await fetch(`/api/members/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -50,7 +50,7 @@ export default function MisReservas() {
     if (!token) return;
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/api/reservas/bookings`, {
+      const res = await fetch(`/api/reservas/bookings`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -66,7 +66,7 @@ export default function MisReservas() {
   // Obtener canchas disponibles
   const fetchFacilities = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/reservas/facilities`);
+      const res = await fetch(`/api/reservas/facilities`);
       if (res.ok) {
         const data = await res.json();
         setFacilities(data);
@@ -92,7 +92,7 @@ export default function MisReservas() {
       setLoadingSlots(true);
       setSelectedSlot(null);
       try {
-        const res = await fetch(`${API_URL}/api/reservas/availability?facilityId=${selectedFacilityId}&date=${selectedDate}`);
+        const res = await fetch(`/api/reservas/availability?facilityId=${selectedFacilityId}&date=${selectedDate}`);
         if (res.ok) {
           const slots = await res.json();
           // Filtrar slots disponibles
@@ -132,7 +132,7 @@ export default function MisReservas() {
     };
 
     try {
-      const res = await fetch(`${API_URL}/api/reservas/bookings`, {
+      const res = await fetch(`/api/reservas/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +163,7 @@ export default function MisReservas() {
 
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     try {
-      const res = await fetch(`${API_URL}/api/reservas/bookings/${id}`, {
+      const res = await fetch(`/api/reservas/bookings/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, Check, Trash2, Clock, AlertTriangle } from 'lucide-react';
 import { apiFetch } from '@/lib/apiClient';
-import { API_URL } from '@/config';
 
 const fetch = apiFetch;
 
@@ -18,15 +17,12 @@ export default function AdminModeracion() {
         const data = await res.json();
         setPendingPosts(data);
       } else {
-        const local = localStorage.getItem('jn-posts');
-        const posts = local ? JSON.parse(local) : [];
-        setPendingPosts(posts.filter(p => !p.isApproved));
+        console.error(`[Comunidad] Error al cargar posts pendientes: ${res.status}`);
+        setPendingPosts([]);
       }
     } catch (e) {
-      console.warn("Backend offline, cargando moderación local");
-      const local = localStorage.getItem('jn-posts');
-      const posts = local ? JSON.parse(local) : [];
-      setPendingPosts(posts.filter(p => !p.isApproved));
+      console.error('[Comunidad] Error de red al cargar moderación:', e.message);
+      setPendingPosts([]);
     } finally {
       setLoading(false);
     }
@@ -45,18 +41,11 @@ export default function AdminModeracion() {
         alert("Publicación aprobada.");
         fetchPending();
       } else {
-        throw new Error("Server error");
+        throw new Error(`Error ${res.status} al aprobar`);
       }
     } catch (e) {
-      console.warn("Aprobación local offline");
-      const local = localStorage.getItem('jn-posts');
-      if (local) {
-        const posts = JSON.parse(local);
-        const updated = posts.map(p => p.id === id ? { ...p, isApproved: true } : p);
-        localStorage.setItem('jn-posts', JSON.stringify(updated));
-      }
-      setPendingPosts(prev => prev.filter(p => p.id !== id));
-      alert("Publicación aprobada localmente (Offline).");
+      console.error('[Comunidad] Error al aprobar publicación:', e.message);
+      alert("No se pudo aprobar la publicación. Por favor verifica tu conexión con el servidor.");
     }
   };
 
@@ -70,18 +59,11 @@ export default function AdminModeracion() {
         alert("Publicación rechazada y eliminada.");
         fetchPending();
       } else {
-        throw new Error("Server error");
+        throw new Error(`Error ${res.status} al rechazar`);
       }
     } catch (e) {
-      console.warn("Rechazo local offline");
-      const local = localStorage.getItem('jn-posts');
-      if (local) {
-        const posts = JSON.parse(local);
-        const updated = posts.filter(p => p.id !== id);
-        localStorage.setItem('jn-posts', JSON.stringify(updated));
-      }
-      setPendingPosts(prev => prev.filter(p => p.id !== id));
-      alert("Publicación eliminada localmente (Offline).");
+      console.error('[Comunidad] Error al rechazar publicación:', e.message);
+      alert("No se pudo rechazar la publicación. Por favor verifica tu conexión con el servidor.");
     }
   };
 

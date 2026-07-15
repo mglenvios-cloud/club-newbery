@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Settings, Shield, Trophy, Users, Calendar, Star, Building,
@@ -83,7 +83,7 @@ export default function AdministracionGeneral() {
   // Fetch functions
   const fetchClubConfig = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/admin-general/club-config`);
+      const res = await fetch(`/api/admin-general/club-config`);
       if (res.ok) {
         const data = await res.json();
         if (data.foundedDate) {
@@ -98,42 +98,42 @@ export default function AdministracionGeneral() {
 
   const fetchSeasons = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/admin-general/seasons`);
+      const res = await fetch(`/api/admin-general/seasons`);
       if (res.ok) setSeasons(await res.json());
     } catch {}
   }, []);
 
   const fetchDisciplines = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/admin-general/disciplines`);
+      const res = await fetch(`/api/admin-general/disciplines`);
       if (res.ok) setDisciplines(await res.json());
     } catch {}
   }, []);
 
   const fetchSedes = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/admin-general/sedes`);
+      const res = await fetch(`/api/admin-general/sedes`);
       if (res.ok) setSedes(await res.json());
     } catch {}
   }, []);
 
   const fetchFacilities = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/admin-general/facilities`);
+      const res = await fetch(`/api/admin-general/facilities`);
       if (res.ok) setFacilities(await res.json());
     } catch {}
   }, []);
 
   const fetchRoles = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/admin-general/roles`);
+      const res = await fetch(`/api/admin-general/roles`);
       if (res.ok) setRoles(await res.json());
     } catch {}
   }, []);
 
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/admin-general/users`);
+      const res = await fetch(`/api/admin-general/users`);
       if (res.ok) setUsers(await res.json());
     } catch {}
   }, []);
@@ -160,7 +160,7 @@ export default function AdministracionGeneral() {
   const handleSaveClubConfig = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API_URL}/api/admin-general/club-config`, {
+      const res = await fetch(`/api/admin-general/club-config`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(clubConfig)
@@ -181,8 +181,8 @@ export default function AdministracionGeneral() {
     e.preventDefault();
     const method = seasonModal.editId ? 'PUT' : 'POST';
     const url = seasonModal.editId
-      ? `${API_URL}/api/admin-general/seasons/${seasonModal.editId}`
-      : `${API_URL}/api/admin-general/seasons`;
+      ? `/api/admin-general/seasons/${seasonModal.editId}`
+      : `/api/admin-general/seasons`;
 
     try {
       const res = await fetch(url, {
@@ -206,7 +206,7 @@ export default function AdministracionGeneral() {
   const handleDeleteSeason = async (id) => {
     if (!window.confirm('¿Seguro que desea eliminar esta temporada?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/admin-general/seasons/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin-general/seasons/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Temporada eliminada');
         fetchSeasons();
@@ -218,8 +218,8 @@ export default function AdministracionGeneral() {
     e.preventDefault();
     const method = disciplineModal.editId ? 'PUT' : 'POST';
     const url = disciplineModal.editId
-      ? `${API_URL}/api/admin-general/disciplines/${disciplineModal.editId}`
-      : `${API_URL}/api/admin-general/disciplines`;
+      ? `/api/admin-general/disciplines/${disciplineModal.editId}`
+      : `/api/admin-general/disciplines`;
 
     try {
       const res = await fetch(url, {
@@ -241,7 +241,7 @@ export default function AdministracionGeneral() {
   const handleDeleteDiscipline = async (id) => {
     if (!window.confirm('¿Eliminar disciplina de forma permanente?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/admin-general/disciplines/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin-general/disciplines/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Disciplina eliminada');
         fetchDisciplines();
@@ -253,8 +253,8 @@ export default function AdministracionGeneral() {
     e.preventDefault();
     const method = sedeModal.editId ? 'PUT' : 'POST';
     const url = sedeModal.editId
-      ? `${API_URL}/api/admin-general/sedes/${sedeModal.editId}`
-      : `${API_URL}/api/admin-general/sedes`;
+      ? `/api/admin-general/sedes/${sedeModal.editId}`
+      : `/api/admin-general/sedes`;
 
     try {
       const res = await fetch(url, {
@@ -273,7 +273,7 @@ export default function AdministracionGeneral() {
   const handleDeleteSede = async (id) => {
     if (!window.confirm('¿Seguro que desea eliminar esta Sede? Esto también eliminará todos sus espacios asociados.')) return;
     try {
-      const res = await fetch(`${API_URL}/api/admin-general/sedes/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin-general/sedes/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Sede eliminada');
         fetchSedes();
@@ -286,8 +286,8 @@ export default function AdministracionGeneral() {
     e.preventDefault();
     const method = facilityModal.editId ? 'PUT' : 'POST';
     const url = facilityModal.editId
-      ? `${API_URL}/api/admin-general/facilities/${facilityModal.editId}`
-      : `${API_URL}/api/admin-general/facilities`;
+      ? `/api/admin-general/facilities/${facilityModal.editId}`
+      : `/api/admin-general/facilities`;
 
     try {
       const res = await fetch(url, {
@@ -310,7 +310,7 @@ export default function AdministracionGeneral() {
   const handleDeleteFacility = async (id) => {
     if (!window.confirm('¿Eliminar instalación?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/admin-general/facilities/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin-general/facilities/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Instalación eliminada');
         fetchFacilities();
@@ -323,8 +323,8 @@ export default function AdministracionGeneral() {
     e.preventDefault();
     const method = userModal.editId ? 'PUT' : 'POST';
     const url = userModal.editId
-      ? `${API_URL}/api/admin-general/users/${userModal.editId}`
-      : `${API_URL}/api/admin-general/users`;
+      ? `/api/admin-general/users/${userModal.editId}`
+      : `/api/admin-general/users`;
 
     try {
       const res = await fetch(url, {
@@ -346,7 +346,7 @@ export default function AdministracionGeneral() {
   const handleDeleteUser = async (id) => {
     if (!window.confirm('¿Eliminar este usuario del sistema?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/admin-general/users/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin-general/users/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Usuario eliminado');
         fetchUsers();
@@ -358,8 +358,8 @@ export default function AdministracionGeneral() {
     e.preventDefault();
     const method = roleModal.editId ? 'PUT' : 'POST';
     const url = roleModal.editId
-      ? `${API_URL}/api/admin-general/roles/${roleModal.editId}`
-      : `${API_URL}/api/admin-general/roles`;
+      ? `/api/admin-general/roles/${roleModal.editId}`
+      : `/api/admin-general/roles`;
 
     try {
       const res = await fetch(url, {
@@ -378,7 +378,7 @@ export default function AdministracionGeneral() {
   const handleDeleteRole = async (id) => {
     if (!window.confirm('¿Seguro de eliminar este rol?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/admin-general/roles/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin-general/roles/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Rol eliminado');
         fetchRoles();

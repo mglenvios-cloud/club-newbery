@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 
@@ -9,7 +9,7 @@ const digitalCardsService = require('../modules/socios/services/digitalCards.ser
 const validators = require('../modules/socios/validators/socios.validators');
 const { logError } = require('../modules/gestionDeportiva/utils/errorLogger');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_jn_2026';
+const { JWT_SECRET } = require('../config/env');
 
 // Middleware para verificar token JWT
 const authenticateToken = (req, res, next) => {

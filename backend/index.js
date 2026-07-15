@@ -3,6 +3,10 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
+// ─── Validación de variables de entorno (debe ser lo primero) ─────────────────
+const { PORT, FRONTEND_URL, NODE_ENV } = require('./config/env');
+
+
 const authRoutes = require('./routes/auth');
 const memberRoutes = require('./routes/members');
 const categoryRoutes = require('./routes/categories');
@@ -37,10 +41,34 @@ const reservasRoutes = require('./routes/reservas');
 const newberytvRoutes = require('./routes/newberytv');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-// Middlewares
-app.use(cors());
+// ─── CORS — Lista blanca de orígenes permitidos ────────────────────────────────
+const allowedOrigins = [
+  FRONTEND_URL,
+  // En desarrollo local, permitir localhost
+  ...(NODE_ENV !== 'production' ? [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://127.0.0.1:3000',
+  ] : []),
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Permitir peticiones sin origin (curl, Postman, mobile apps)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    console.error(`[CORS] Origen bloqueado: ${origin}`);
+    return callback(new Error(`CORS: Origen no autorizado: ${origin}`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200,
+}));
+
 app.use(express.json());
 
 // Routes — existentes
@@ -79,8 +107,7 @@ app.use('/api/newberytv', newberytvRoutes);
 // Servir archivos estáticos subidos de publicidad/sponsors
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Enlaces directos y legados para Módulo Comercial (publicidad, sponsors, banners, campañas, etc.)
-app.use('/api', publicidadRoutes);
+// Módulo Comercial — ruta específica
 app.use('/api/publicidad', publicidadRoutes);
 
 

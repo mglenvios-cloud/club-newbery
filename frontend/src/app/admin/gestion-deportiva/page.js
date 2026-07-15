@@ -7,12 +7,43 @@ import {
   Wifi, WifiOff, Database, Server, Zap, Circle
 } from 'lucide-react';
 import { apiFetch } from '@/lib/apiClient';
-import { API_URL } from '@/config';
+import { API_URL, DEMO_MODE } from '@/config';
 import MediaUploadUniversal from '@/components/MediaUploadUniversal';
 
 const fetch = apiFetch;
 
-// ─── DEMO DATA ELIMINATED ─────────────────────────────────────────────────────
+// ─── DEMO DATA FOR DEVELOPMENT ONLY ───────────────────────────────────────────
+const DEMO_TEAMS = [
+  { id: 1, name: 'Primera (Demo)', category: 'Primera Masculina', season: '2026', coach: 'Prof. Martínez', assistantCoach: 'Prof. López', preparadorFisico: 'Prof. García', status: 'ACTIVE', description: 'Equipo de primera división masculino', imageUrl: '' },
+  { id: 2, name: 'Reserva (Demo)', category: 'Reserva Masculina', season: '2026', coach: 'Prof. Rodríguez', assistantCoach: '', preparadorFisico: '', status: 'ACTIVE', description: 'Equipo de reserva masculino', imageUrl: '' }
+];
+const DEMO_CATEGORIES = [
+  { id: 1, name: 'Categoría 2012 (Demo)', type: 'DISCIPLINA', price: 3500, description: 'Jugadores nacidos en 2012' }
+];
+const DEMO_PLAYERS = [
+  { id: 1, name: 'Lucas (Demo)', lastName: 'González', dorsal: 1, age: 22, category: 'Primera Masculina', position: 'Arquero', team: 'Primera', matchesPlayed: 18, goals: 0, assists: 2, yellowCards: 1, redCards: 0, cleanSheets: 9, playerStatus: 'ACTIVE', birthDate: '2004-07-15T00:00:00.000Z', photoUrl: null }
+];
+const DEMO_COACHES = [
+  { id: 1, name: 'Carlos Martínez (Demo)', role: 'ENTRENADOR', categories: 'Primera, Reserva', license: 'ATFA Pro', phone: '351-555-0101', email: 'cmartinez@newbery.com', biography: 'DT con 10 años de experiencia en futsal de alto rendimiento.', photoUrl: null }
+];
+const DEMO_MATCHES = [
+  { id: 1, category: 'Primera Masculina', opponent: 'Talleres (Demo)', homeTeam: 'Jorge Newbery', awayTeam: 'Talleres', date: new Date(Date.now() + 7*24*60*60*1000).toISOString(), timeSlot: '20:00', ourScore: null, opponentScore: null, status: 'UPCOMING', competition: 'AFA Primera', venue: 'Cancha Jorge Newbery', season: '2026', isFeatured: true }
+];
+const DEMO_STATS = {
+  totalTeams: 2,
+  totalCategories: 1,
+  totalPlayers: 1,
+  totalCoaches: 1,
+  totalAssistants: 0,
+  totalPFs: 0,
+  trainingsToday: 0,
+  injuredPlayers: 0,
+  suspendedPlayers: 0,
+  upcomingMatches: [],
+  weeklyTrainings: [],
+  birthdays: [],
+  publishedNews: 0
+};
 
 // ─── FETCH WITH RETRY ─────────────────────────────────────────────────────────
 async function fetchWithRetry(url, options = {}, maxRetries = 3) {
@@ -178,7 +209,6 @@ export default function AdminGestionDeportiva() {
         setUsingDemoData(false);
         showToast('⚠️ API no disponible — usando datos en caché', 'warn');
       } else {
-        // No usar datos de demostración
         setStats(null);
         setPlayers([]);
         setTrainings([]);
@@ -190,7 +220,7 @@ export default function AdminGestionDeportiva() {
         setUsingDemoData(false);
         showToast('🔌 API offline — No se pudieron cargar los datos', 'error');
       }
-      setFailedEndpoints([`Servidor en ${API_URL} no responde`]);
+      setFailedEndpoints([`Servidor no responde`]);
       setLoading(false);
       setSkeletonLoading(false);
       return;
@@ -198,14 +228,14 @@ export default function AdminGestionDeportiva() {
 
     // API online — obtener datos reales en paralelo
     const [statsData, playersData, trainingsData, docsData, teamsData, coachesData, catsData, matchesData] = await Promise.all([
-      tryFetch('Stats deportivos', `${API_URL}/api/gestion-deportiva/stats`),
-      tryFetch('Jugadores', `${API_URL}/api/players`),
-      tryFetch('Entrenamientos', `${API_URL}/api/gestion-deportiva/trainings`),
-      tryFetch('Documentos', `${API_URL}/api/gestion-deportiva/documents`),
-      tryFetch('Equipos', `${API_URL}/api/teams`),
-      tryFetch('Entrenadores', `${API_URL}/api/gestion-deportiva/coaches`),
-      tryFetch('Categorías', `${API_URL}/api/categories`),
-      tryFetch('Partidos', `${API_URL}/api/matches`),
+      tryFetch('Stats deportivos', `/api/gestion-deportiva/stats`),
+      tryFetch('Jugadores', `/api/players`),
+      tryFetch('Entrenamientos', `/api/gestion-deportiva/trainings`),
+      tryFetch('Documentos', `/api/gestion-deportiva/documents`),
+      tryFetch('Equipos', `/api/teams`),
+      tryFetch('Entrenadores', `/api/gestion-deportiva/coaches`),
+      tryFetch('Categorías', `/api/categories`),
+      tryFetch('Partidos', `/api/matches`),
     ]);
 
     const newStats     = statsData    || null;
@@ -237,7 +267,7 @@ export default function AdminGestionDeportiva() {
     setTimeout(() => setSyncPulse(false), 2000);
 
     if (failed.length > 0) {
-      console.warn('[API] Endpoints con errores:', failed);
+      console.error('[GestionDeportiva] Endpoints con errores:', failed);
       if (!silent) showToast(`⚠️ ${failed.length} endpoint(s) con error`, 'warn');
     }
 
@@ -257,7 +287,7 @@ export default function AdminGestionDeportiva() {
     e.preventDefault();
     if (!teamForm.name) return showToast('El nombre del equipo es obligatorio', 'error');
     const method = teamModal.editId ? 'PUT' : 'POST';
-    const url = teamModal.editId ? `${API_URL}/api/teams/${teamModal.editId}` : `${API_URL}/api/teams`;
+    const url = teamModal.editId ? `/api/teams/${teamModal.editId}` : `/api/teams`;
 
     try {
       const res = await fetch(url, {
@@ -278,7 +308,7 @@ export default function AdminGestionDeportiva() {
   const handleDeleteTeam = async (id) => {
     if (!window.confirm('¿Seguro de eliminar este equipo?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/teams/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/teams/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Equipo eliminado');
         fetchAllData();
@@ -291,7 +321,7 @@ export default function AdminGestionDeportiva() {
     e.preventDefault();
     if (!playerForm.name || !playerForm.category) return showToast('Nombre y Categoría obligatorios', 'error');
     const method = playerModal.editId ? 'PUT' : 'POST';
-    const url = playerModal.editId ? `${API_URL}/api/players/${playerModal.editId}` : `${API_URL}/api/players`;
+    const url = playerModal.editId ? `/api/players/${playerModal.editId}` : `/api/players`;
 
     try {
       const res = await fetch(url, {
@@ -310,7 +340,7 @@ export default function AdminGestionDeportiva() {
   const handleDeletePlayer = async (id) => {
     if (!window.confirm('¿Eliminar jugador de los planteles?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/players/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/players/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Jugador eliminado');
         fetchAllData();
@@ -323,7 +353,7 @@ export default function AdminGestionDeportiva() {
     e.preventDefault();
     if (!coachForm.name || !coachForm.role) return showToast('Nombre y Cargo obligatorios', 'error');
     const method = coachModal.editId ? 'PUT' : 'POST';
-    const url = coachModal.editId ? `${API_URL}/api/gestion-deportiva/coaches/${coachModal.editId}` : `${API_URL}/api/gestion-deportiva/coaches`;
+    const url = coachModal.editId ? `/api/gestion-deportiva/coaches/${coachModal.editId}` : `/api/gestion-deportiva/coaches`;
 
     try {
       const res = await fetch(url, {
@@ -342,7 +372,7 @@ export default function AdminGestionDeportiva() {
   const handleDeleteCoach = async (id) => {
     if (!window.confirm('¿Eliminar de la plantilla técnica?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/gestion-deportiva/coaches/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/gestion-deportiva/coaches/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Personal técnico eliminado');
         fetchAllData();
@@ -355,7 +385,7 @@ export default function AdminGestionDeportiva() {
     e.preventDefault();
     if (!categoryForm.name || categoryForm.price === undefined) return showToast('Nombre y precio requeridos', 'error');
     const method = categoryModal.editId ? 'PUT' : 'POST';
-    const url = categoryModal.editId ? `${API_URL}/api/categories/${categoryModal.editId}` : `${API_URL}/api/categories`;
+    const url = categoryModal.editId ? `/api/categories/${categoryModal.editId}` : `/api/categories`;
 
     try {
       const res = await fetch(url, {
@@ -374,7 +404,7 @@ export default function AdminGestionDeportiva() {
   const handleDeleteCategory = async (id) => {
     if (!window.confirm('¿Eliminar esta categoría?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/categories/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Categoría eliminada');
         fetchAllData();
@@ -387,7 +417,7 @@ export default function AdminGestionDeportiva() {
     e.preventDefault();
     if (!matchForm.opponent || !matchForm.date || !matchForm.timeSlot) return showToast('Oponente, fecha y hora requeridos', 'error');
     const method = matchModal.editId ? 'PUT' : 'POST';
-    const url = matchModal.editId ? `${API_URL}/api/matches/${matchModal.editId}` : `${API_URL}/api/matches`;
+    const url = matchModal.editId ? `/api/matches/${matchModal.editId}` : `/api/matches`;
 
     try {
       const res = await fetch(url, {
@@ -406,7 +436,7 @@ export default function AdminGestionDeportiva() {
   const handleDeleteMatch = async (id) => {
     if (!window.confirm('¿Seguro de eliminar este partido?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/matches/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/matches/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Partido eliminado');
         fetchAllData();
@@ -418,7 +448,7 @@ export default function AdminGestionDeportiva() {
   const handleSaveTraining = async (e) => {
     e.preventDefault();
     const method = trainingModal.editId ? 'PUT' : 'POST';
-    const url = trainingModal.editId ? `${API_URL}/api/gestion-deportiva/trainings/${trainingModal.editId}` : `${API_URL}/api/gestion-deportiva/trainings`;
+    const url = trainingModal.editId ? `/api/gestion-deportiva/trainings/${trainingModal.editId}` : `/api/gestion-deportiva/trainings`;
 
     try {
       const res = await fetch(url, {
@@ -437,7 +467,7 @@ export default function AdminGestionDeportiva() {
   const handleDeleteTraining = async (id) => {
     if (!window.confirm('¿Cancelar este entrenamiento?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/gestion-deportiva/trainings/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/gestion-deportiva/trainings/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Entrenamiento cancelado');
         fetchAllData();
@@ -449,7 +479,7 @@ export default function AdminGestionDeportiva() {
   const handleSaveDoc = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API_URL}/api/gestion-deportiva/documents`, {
+      const res = await fetch(`/api/gestion-deportiva/documents`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(docForm)
@@ -465,7 +495,7 @@ export default function AdminGestionDeportiva() {
   const handleDeleteDoc = async (id) => {
     if (!window.confirm('¿Eliminar este archivo?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/gestion-deportiva/documents/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/gestion-deportiva/documents/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Documento eliminado');
         fetchAllData();
@@ -481,7 +511,7 @@ export default function AdminGestionDeportiva() {
     const targetDorsal = e.target.dorsal.value;
 
     try {
-      const res = await fetch(`${API_URL}/api/players/${assignModal.player.id}`, {
+      const res = await fetch(`/api/players/${assignModal.player.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

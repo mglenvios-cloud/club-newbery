@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { PlayCircle, Users, Clock, Video, Calendar, Shield, X, Maximize2, Tv, ChevronRight, Award, User } from 'lucide-react';
@@ -13,6 +13,7 @@ import StreamingStatus from '@/components/newbery-tv/StreamingStatus';
 import { config } from '@/components/newbery-tv/config';
 
 import { API_URL } from '@/config';
+import { apiFetch } from '@/lib/apiClient';
 
 export default function NewberyTv() {
   const [media, setMedia] = useState([]);
@@ -51,7 +52,7 @@ export default function NewberyTv() {
   // Fetch Live Match
   const fetchLiveMatch = useCallback(async () => {
     try {
-      const tvRes = await fetch(`${API_URL}/api/newberytv/livestreams`);
+      const tvRes = await fetch(`/api/newberytv/livestreams`);
       if (tvRes.ok) {
         const streams = await tvRes.json();
         const activeStream = streams.find(s => s.status === 'EN_VIVO');
@@ -85,7 +86,7 @@ export default function NewberyTv() {
         }
       }
 
-      const res = await fetch(`${API_URL}/api/live`);
+      const res = await apiFetch('/api/live');
       if (res.ok) {
         const data = await res.json();
         if (data && data.match) {
@@ -95,7 +96,7 @@ export default function NewberyTv() {
         }
       }
     } catch {
-      console.warn("API de partidos en vivo offline.");
+      console.error('[NewberyTV] Error al cargar partido en vivo.');
     } finally {
       setLoadingLive(false);
     }
@@ -105,26 +106,26 @@ export default function NewberyTv() {
   const fetchMedia = useCallback(async () => {
     setLoading(true);
     try {
-      let url = `${API_URL}/api/media?`;
+      let url = '/api/media?';
       if (activeCategory !== 'ALL') url += `category=${encodeURIComponent(activeCategory)}&`;
       if (search) url += `search=${encodeURIComponent(search)}&`;
       if (activePlayer) url += `playerId=${activePlayer}&`;
       if (activeSeason !== 'ALL') url += `season=${encodeURIComponent(activeSeason)}&`;
       if (activeCompetition !== 'ALL') url += `competition=${encodeURIComponent(activeCompetition)}&`;
 
-      const res = await fetch(url);
+      const res = await apiFetch(url);
       let data = [];
       if (res.ok) {
         data = await res.json();
       }
 
       // Fetch from Newbery TV module too!
-      let tvUrl = `${API_URL}/api/newberytv/videos?`;
+      let tvUrl = '/api/newberytv/videos?';
       if (activeSeason !== 'ALL') tvUrl += `season=${encodeURIComponent(activeSeason)}&`;
       if (activeCategory !== 'ALL') tvUrl += `category=${encodeURIComponent(activeCategory)}&`;
       if (search) tvUrl += `search=${encodeURIComponent(search)}&`;
       
-      const resTv = await fetch(tvUrl);
+      const resTv = await apiFetch(tvUrl);
       if (resTv.ok) {
         const tvVideos = await resTv.json();
         const mappedTv = tvVideos.map(v => ({
@@ -152,7 +153,7 @@ export default function NewberyTv() {
         });
       }
     } catch {
-      console.warn("API de multimedia offline.");
+      console.error('[NewberyTV] Error al cargar multimedia.');
     } finally {
       setLoading(false);
     }
@@ -160,7 +161,7 @@ export default function NewberyTv() {
 
   // Fetch Players on Mount
   useEffect(() => {
-    fetch(`${API_URL}/api/players`)
+    apiFetch('/api/players')
       .then(res => res.ok && res.json())
       .then(data => data && setPlayers(data))
       .catch(() => {});
@@ -186,7 +187,7 @@ export default function NewberyTv() {
       return;
     }
     setLoadingStats(true);
-    fetch(`${API_URL}/api/live/${activeVideo.matchId}`)
+    apiFetch(`/api/live/${activeVideo.matchId}`)
       .then(res => res.ok && res.json())
       .then(data => {
         if (data) {
@@ -200,7 +201,7 @@ export default function NewberyTv() {
 
   // Play Video Handlers (saving to localStorage for Resume Watch functionality)
   const handlePlayVideo = (item) => {
-    fetch(`${API_URL}/api/media/${item.id}`).catch(() => {});
+    apiFetch(`/api/media/${item.id}`).catch(() => {});
     setAiSummary('');
     setVideoSpeed(1);
     setVideoQuality('Auto');
@@ -250,7 +251,7 @@ export default function NewberyTv() {
     setGeneratingAi(true);
     setAiSummary('');
     try {
-      const res = await fetch(`${API_URL}/api/live/${matchId}/auto-summary`, { method: 'POST' });
+      const res = await apiFetch(`/api/live/${matchId}/auto-summary`, { method: 'POST' });
       if (res.ok) {
         const data = await res.json();
         setAiSummary(data.summary);

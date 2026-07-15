@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Heart, Send, Sparkles, Smile, PenTool, CheckCircle, ShieldAlert, Award } from 'lucide-react';
 import ClubShield from '@/components/ClubShield';
 import { API_URL } from '@/config';
+import { apiFetch } from '@/lib/apiClient';
 
 export default function MiVidaSocial() {
   const [posts, setPosts] = useState([]);
@@ -27,7 +28,7 @@ export default function MiVidaSocial() {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const res = await fetch(API_URL + '/api/posts');
+      const res = await fetch('/api/posts');
       if (res.ok) {
         const data = await res.json();
         setPosts(data);
@@ -130,7 +131,7 @@ export default function MiVidaSocial() {
     };
 
     try {
-      const res = await fetch(API_URL + '/api/posts', {
+      const res = await fetch('/api/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -160,14 +161,14 @@ export default function MiVidaSocial() {
 
   const handleLike = async (id) => {
     try {
-      const res = await fetch(API_URL + `/api/posts/${id}/like`, { method: 'POST' });
+      const res = await apiFetch(`/api/posts/${id}/like`, { method: 'POST' });
       if (res.ok) {
         fetchPosts();
       } else {
-        console.error("Error al registrar me gusta");
+        console.error(`[MiVida] Error al registrar me gusta: ${res.status}`);
       }
     } catch (e) {
-      console.error("Error de red al registrar me gusta:", e);
+      console.error('[MiVida] Error de red al registrar me gusta:', e.message);
     }
   };
 

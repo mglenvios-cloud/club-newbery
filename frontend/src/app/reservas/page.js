@@ -2,7 +2,8 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { Calendar, Clock, CreditCard, ChevronRight, User, CheckCircle, AlertCircle } from "lucide-react";
 import { useSearchParams } from 'next/navigation';
-import { API_URL } from '@/config';
+import { API_URL, DEMO_MODE } from '@/config';
+import { apiFetch } from '@/lib/apiClient';
 
 function ReservasContent() {
   const searchParams = useSearchParams();
@@ -27,13 +28,15 @@ function ReservasContent() {
   useEffect(() => {
     async function loadFacilities() {
       try {
-        const res = await fetch(API_URL + '/api/reservas/facilities');
+        const res = await apiFetch('/api/reservas/facilities');
         if (res.ok) {
           const data = await res.json();
           setFacilities(data);
+        } else {
+          console.error(`[Reservas] Error al cargar instalaciones: ${res.status}`);
         }
       } catch (err) {
-        console.error("Error al cargar instalaciones:", err);
+        console.error('[Reservas] Error de red al cargar instalaciones:', err.message);
       }
     }
     loadFacilities();
@@ -115,8 +118,8 @@ function ReservasContent() {
     };
 
     try {
-      // 1. Registrar Reserva Pendiente en el Backend usando el endpoint unificado de reservas
-      const bookingRes = await fetch(API_URL + '/api/reservas/bookings', {
+      // 1. Registrar Reserva Pendiente en el Backend
+      const bookingRes = await apiFetch('/api/reservas/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bookingPayload)
@@ -126,7 +129,7 @@ function ReservasContent() {
         const booking = await bookingRes.json();
         
         // 2. Crear Preferencia de MercadoPago
-        const mpRes = await fetch(API_URL + '/api/payments/preference', {
+        const mpRes = await apiFetch('/api/payments/preference', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -141,7 +144,7 @@ function ReservasContent() {
 
         if (mpRes.ok) {
           const mpData = await mpRes.json();
-          // Redirigir al Checkout Sandbox/Producción de MercadoPago
+          // Redirigir al Checkout de MercadoPago
           window.location.href = mpData.init_point;
         } else {
           throw new Error("Error en pasarela de pago");
@@ -150,23 +153,8 @@ function ReservasContent() {
         throw new Error("Error al registrar reserva");
       }
     } catch (error) {
-      console.warn("Utilizando simulación offline de checkout MP");
-      
-      // Simular guardado local y checkout de MercadoPago
-      const mockBooking = {
-        id: Date.now(),
-        ...legacyPayload
-      };
-      
-      const localBookings = localStorage.getItem('jn-bookings');
-      const list = localBookings ? JSON.parse(localBookings) : [];
-      localStorage.setItem('jn-bookings', JSON.stringify([...list, mockBooking]));
-
-      // Simulamos la redirección exitosa de MercadoPago
-      setTimeout(() => {
-        // Redirigimos localmente simulando el éxito
-        window.location.href = `${window.location.origin}/reservas?status=success`;
-      }, 1500);
+      console.error('[Reservas] Error al procesar la reserva:', error.message);
+      alert("No se pudo realizar la reserva. Por favor, verifica tu conexión o intenta más tarde.");
     }
   };
 

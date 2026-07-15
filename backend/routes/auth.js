@@ -1,10 +1,10 @@
-const express = require('express');
+﻿const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const prisma = require('../prismaClient');
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_jn_2026';
+const { JWT_SECRET } = require('../config/env');
 
 // Registro de Usuario y Socio
 router.post('/register', async (req, res) => {

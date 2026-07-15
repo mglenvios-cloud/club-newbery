@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const fs = require('fs');
@@ -7,7 +7,7 @@ const prisma = require('../prismaClient');
 const { logError } = require('../modules/gestionDeportiva/utils/errorLogger');
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_jn_2026';
+const { JWT_SECRET } = require('../config/env');
 
 // Mapeo de categorías a carpetas físicas en backend/uploads
 const CATEGORY_FOLDERS = {

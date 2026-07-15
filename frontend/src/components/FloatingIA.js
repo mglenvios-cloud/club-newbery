@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, X, Send, Sparkles, BookOpen, Trophy } from 'lucide-react';
 import Link from 'next/link';
-import { API_URL } from '@/config';
+import { apiFetch } from '@/lib/apiClient';
 
 export default function FloatingIA() {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +29,7 @@ export default function FloatingIA() {
     setIsTyping(true);
 
     try {
-      const res = await fetch(API_URL + '/api/ai/chat', {
+      const res = await apiFetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text, mode: 'club' })
@@ -40,11 +40,11 @@ export default function FloatingIA() {
         setMessages(prev => [...prev, { text: data.text, isBot: true }]);
         setIsTyping(false);
       } else {
-        throw new Error("Error in API");
+        throw new Error(`Error ${res.status} en API de IA`);
       }
     } catch (e) {
-      console.warn("Utilizando respuesta local offline para FloatingIA");
-      // Simulate bot response
+      console.error('[FloatingIA] Error al contactar API de IA:', e.message);
+      // Respuesta local de contingencia cuando el backend no responde
       setTimeout(() => {
         let reply = "";
         const lower = text.toLowerCase();

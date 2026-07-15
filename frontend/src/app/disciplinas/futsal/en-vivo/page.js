@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import {
@@ -134,7 +134,7 @@ export default function PartidoEnVivo() {
   // ── Fetch datos del partido en vivo
   const fetchLiveData = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/live`);
+      const res = await fetch(`/api/live`);
       if (res.ok) {
         const data = await res.json();
         setLiveData(data);
@@ -151,7 +151,7 @@ export default function PartidoEnVivo() {
   // ── Fetch sponsors
   const fetchSponsors = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/integrations/lps/sponsors`);
+      const res = await fetch(`/api/integrations/lps/sponsors`);
       if (res.ok) setSponsors(await res.json());
     } catch {}
   }, []);
@@ -161,7 +161,7 @@ export default function PartidoEnVivo() {
     if (!liveData.match) return;
     setLoadingAI(true);
     try {
-      const res = await fetch(`${API_URL}/api/live/${liveData.match.id}/ai-commentary`, { method: 'POST' });
+      const res = await fetch(`/api/live/${liveData.match.id}/ai-commentary`, { method: 'POST' });
       if (res.ok) {
         const data = await res.json();
         setAiCommentary(data.commentary);
@@ -175,7 +175,7 @@ export default function PartidoEnVivo() {
     if (!liveData.match) return;
     setLoadingAI(true);
     try {
-      const res = await fetch(`${API_URL}/api/live/${liveData.match.id}/auto-summary`, { method: 'POST' });
+      const res = await fetch(`/api/live/${liveData.match.id}/auto-summary`, { method: 'POST' });
       if (res.ok) {
         const data = await res.json();
         setLiveData(prev => ({ ...prev, match: { ...prev.match, autoSummary: data.summary } }));

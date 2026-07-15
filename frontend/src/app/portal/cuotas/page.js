@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   CreditCard, Check, AlertCircle, FileText, ExternalLink,
@@ -35,7 +35,7 @@ export default function MisCuotasSocio() {
 
       // 1. Obtener socio actual
       let socioData = null;
-      const socioRes = await fetch(`${API_URL}/api/members/me`, {
+      const socioRes = await fetch(`/api/members/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -44,7 +44,7 @@ export default function MisCuotasSocio() {
         setSocio(socioData);
 
         // 2. Obtener sus pagos
-        const paymentsRes = await fetch(`${API_URL}/api/finanzas/payments?socioId=${socioData.id}`, {
+        const paymentsRes = await fetch(`/api/finanzas/payments?socioId=${socioData.id}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (paymentsRes.ok) {
@@ -52,7 +52,7 @@ export default function MisCuotasSocio() {
         }
 
         // 3. Obtener medios de pago dinámicos
-        const methodsRes = await fetch(`${API_URL}/api/finanzas/payment-methods`, {
+        const methodsRes = await fetch(`/api/finanzas/payment-methods`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (methodsRes.ok) {
@@ -91,7 +91,7 @@ export default function MisCuotasSocio() {
       }
 
       // 1. Generar la preferencia de Mercado Pago en el backend
-      const res = await fetch(`${API_URL}/api/finanzas/mercadopago/preference`, {
+      const res = await fetch(`/api/finanzas/mercadopago/preference`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ export default function MisCuotasSocio() {
     setLoading(true);
     try {
       // Llamar al webhook simulado en el backend
-      const res = await fetch(`${API_URL}/api/finanzas/mercadopago/webhook`, {
+      const res = await fetch(`/api/finanzas/mercadopago/webhook`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -155,7 +155,7 @@ export default function MisCuotasSocio() {
         return;
       }
 
-      const res = await fetch(`${API_URL}/api/finanzas/invoices/${invoiceId}`, {
+      const res = await fetch(`/api/finanzas/invoices/${invoiceId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

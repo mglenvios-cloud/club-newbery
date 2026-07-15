@@ -5,6 +5,7 @@ import { Trophy, Calendar, Users, ChevronRight, Activity, PlayCircle, Eye, Newsp
 import FutsalScene3D from '@/components/FutsalScene3D';
 import ClubShield from '@/components/ClubShield';
 import { API_URL } from '@/config';
+import { apiFetch } from '@/lib/apiClient';
 
 export default function FutsalAFA() {
   const [selectedDivision, setSelectedDivision] = useState("Primera Masculina"); // "Primera Masculina" or "Primera Femenina"
@@ -24,32 +25,31 @@ export default function FutsalAFA() {
     setLoading(true);
     try {
       // 1. Fetch Players
-      const resPlayers = await fetch(`${API_URL}/api/players`);
+      const resPlayers = await apiFetch('/api/players');
       const dataPlayers = resPlayers.ok ? await resPlayers.json() : [];
       setPlayers(dataPlayers.filter(p => p.team === 'Futsal AFA' || p.category.toLowerCase().includes('futsal')));
 
       // 2. Fetch Matches
-      const resMatches = await fetch(`${API_URL}/api/matches`);
+      const resMatches = await apiFetch('/api/matches');
       const dataMatches = resMatches.ok ? await resMatches.json() : [];
       setMatches(dataMatches);
 
       // 3. Fetch News
-      const resNews = await fetch(`${API_URL}/api/futsal-news`);
+      const resNews = await apiFetch('/api/futsal-news');
       const dataNews = resNews.ok ? await resNews.json() : [];
       setNews(dataNews.filter(n => n.published));
 
       // 4. Fetch Media
-      const resMedia = await fetch(`${API_URL}/api/media`);
+      const resMedia = await apiFetch('/api/media');
       const dataMedia = resMedia.ok ? await resMedia.json() : [];
       setMedia(dataMedia);
 
     } catch (e) {
-      console.warn("API offline, loading local simulated data", e);
-      // Fallback simulated data
-      setPlayers(fallbackPlayers);
-      setMatches(fallbackMatches);
-      setNews(fallbackNews);
-      setMedia(fallbackMedia);
+      console.error('[Futsal] Error al cargar datos:', e.message);
+      setPlayers([]);
+      setMatches([]);
+      setNews([]);
+      setMedia([]);
     } finally {
       setLoading(false);
     }

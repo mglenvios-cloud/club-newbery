@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { API_URL } from '@/config';
@@ -15,7 +15,7 @@ export default function PortalHome() {
         return;
       }
       try {
-        const res = await fetch(`${API_URL}/api/members/me`, {
+        const res = await fetch(`/api/members/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {

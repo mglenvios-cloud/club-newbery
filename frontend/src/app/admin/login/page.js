@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ShieldAlert } from "lucide-react";
@@ -8,8 +8,8 @@ import { API_URL } from "@/config";
 const fetch = apiFetch;
 
 export default function AdminLogin() {
-  const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("admin");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -20,7 +20,7 @@ export default function AdminLogin() {
     setLoading(true);
     try {
       let data;
-      const res = await fetch(`${API_URL}/api/auth/login`, {
+      const res = await fetch(`/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: username.trim(), password: password.trim() })
@@ -72,7 +72,7 @@ export default function AdminLogin() {
             <ShieldAlert size={32} className="text-white" />
           </div>
           <h1 className="text-3xl font-black text-white tracking-tight">Acceso Restringido</h1>
-          <p className="text-gray-400 mt-2 text-center text-sm">Panel exclusivo para administración del Club Jorge Newbery. (admin / admin)</p>
+          <p className="text-gray-400 mt-2 text-center text-sm">Panel exclusivo para administración del Club Jorge Newbery.</p>
         </div>
 
         {error && (

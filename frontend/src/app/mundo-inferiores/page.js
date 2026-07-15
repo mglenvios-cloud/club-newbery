@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Search, Users2, ChevronRight, Activity, Award } from 'lucide-react';
 import ClubShield from '@/components/ClubShield';
 import { API_URL } from '@/config';
+import { apiFetch } from '@/lib/apiClient';
 
 export default function MundoInferiores() {
   const [players, setPlayers] = useState([]);
@@ -14,15 +15,17 @@ export default function MundoInferiores() {
   const fetchPlayers = async () => {
     try {
       setLoading(true);
-      const res = await fetch(API_URL + '/api/players');
+      const res = await apiFetch('/api/players');
       if (res.ok) {
         const data = await res.json();
         setPlayers(data);
       } else {
-        console.error("Error al obtener jugadores del servidor");
+        console.error(`[MundoInferiores] Error al obtener jugadores: ${res.status}`);
+        setPlayers([]);
       }
     } catch (e) {
-      console.error("Error de conexión al cargar jugadores:", e);
+      console.error('[MundoInferiores] Error de red al cargar jugadores:', e.message);
+      setPlayers([]);
     } finally {
       setLoading(false);
     }

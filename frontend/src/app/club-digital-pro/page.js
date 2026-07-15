@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState } from 'react';
 import {
   Trophy, Tv, Users, Activity, Brain, Image as ImageIcon,
@@ -39,7 +39,7 @@ export default function ClubDigitalPro() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch(`${API_URL}/api/demo-contact`, {
+      const res = await fetch(`/api/demo-contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)

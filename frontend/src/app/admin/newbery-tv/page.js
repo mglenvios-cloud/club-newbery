@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef } from 'react';
 import { 
@@ -82,19 +82,19 @@ export default function NewberyTvAdmin() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const channelRes = await fetch(`${API_URL}/api/newberytv/channel`);
+      const channelRes = await fetch(`/api/newberytv/channel`);
       if (channelRes.ok) {
         const data = await channelRes.json();
         setChannel(data);
       }
 
-      const streamsRes = await fetch(`${API_URL}/api/newberytv/livestreams`);
+      const streamsRes = await fetch(`/api/newberytv/livestreams`);
       if (streamsRes.ok) {
         const data = await streamsRes.json();
         setLivestreams(data);
       }
 
-      let videosUrl = `${API_URL}/api/newberytv/videos`;
+      let videosUrl = `/api/newberytv/videos`;
       if (selectedFolder !== 'ALL') {
         videosUrl += `?folder=${encodeURIComponent(selectedFolder)}`;
       }
@@ -104,19 +104,19 @@ export default function NewberyTvAdmin() {
         setVideos(data);
       }
 
-      const statsRes = await fetch(`${API_URL}/api/newberytv/statistics`);
+      const statsRes = await fetch(`/api/newberytv/statistics`);
       if (statsRes.ok) {
         const data = await statsRes.json();
         setStatistics(data);
       }
 
-      const sponsorsRes = await fetch(`${API_URL}/api/sponsors`);
+      const sponsorsRes = await fetch(`/api/sponsors`);
       if (sponsorsRes.ok) {
         const data = await sponsorsRes.json();
         setSponsors(data);
       }
 
-      const playlistsRes = await fetch(`${API_URL}/api/newberytv/playlists`);
+      const playlistsRes = await fetch(`/api/newberytv/playlists`);
       if (playlistsRes.ok) {
         const data = await playlistsRes.json();
         setPlaylists(data);
@@ -137,7 +137,7 @@ export default function NewberyTvAdmin() {
     e.preventDefault();
     const token = getAdminToken();
     try {
-      const res = await fetch(`${API_URL}/api/newberytv/channel`, {
+      const res = await fetch(`/api/newberytv/channel`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -158,7 +158,7 @@ export default function NewberyTvAdmin() {
   const handleConnectYoutube = async () => {
     const token = getAdminToken();
     try {
-      const res = await fetch(`${API_URL}/api/newberytv/youtube/connect`, {
+      const res = await fetch(`/api/newberytv/youtube/connect`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -178,7 +178,7 @@ export default function NewberyTvAdmin() {
     e.preventDefault();
     const token = getAdminToken();
     try {
-      const res = await fetch(`${API_URL}/api/newberytv/livestreams`, {
+      const res = await fetch(`/api/newberytv/livestreams`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -203,7 +203,7 @@ export default function NewberyTvAdmin() {
   const handleUpdateStreamState = async (broadcast, fields) => {
     const token = getAdminToken();
     try {
-      const res = await fetch(`${API_URL}/api/newberytv/livestreams/${broadcast.id}`, {
+      const res = await fetch(`/api/newberytv/livestreams/${broadcast.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -228,7 +228,7 @@ export default function NewberyTvAdmin() {
     if (!confirm("¿Seguro que desea eliminar esta transmisión?")) return;
     const token = getAdminToken();
     try {
-      const res = await fetch(`${API_URL}/api/newberytv/livestreams/${id}`, {
+      const res = await fetch(`/api/newberytv/livestreams/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -258,7 +258,7 @@ export default function NewberyTvAdmin() {
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/newberytv/livestreams/${selectedBroadcast.id}/events`, {
+      const res = await fetch(`/api/newberytv/livestreams/${selectedBroadcast.id}/events`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -279,7 +279,7 @@ export default function NewberyTvAdmin() {
         setEventPlayer('');
         setEventDetail('');
         // Refresh selected broadcast to show updated timeline/scorecard
-        const refreshRes = await fetch(`${API_URL}/api/newberytv/livestreams`);
+        const refreshRes = await fetch(`/api/newberytv/livestreams`);
         if (refreshRes.ok) {
           const list = await refreshRes.json();
           setLivestreams(list);
@@ -298,7 +298,7 @@ export default function NewberyTvAdmin() {
     const token = getAdminToken();
     const newStatus = currentStatus === 'ACTIVE' ? 'OFFLINE' : 'ACTIVE';
     try {
-      const res = await fetch(`${API_URL}/api/newberytv/livestreams/${selectedBroadcast.id}/cameras`, {
+      const res = await fetch(`/api/newberytv/livestreams/${selectedBroadcast.id}/cameras`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -308,7 +308,7 @@ export default function NewberyTvAdmin() {
       });
       if (res.ok) {
         // Refresh list
-        const refreshRes = await fetch(`${API_URL}/api/newberytv/livestreams`);
+        const refreshRes = await fetch(`/api/newberytv/livestreams`);
         if (refreshRes.ok) {
           const list = await refreshRes.json();
           setLivestreams(list);
@@ -328,7 +328,7 @@ export default function NewberyTvAdmin() {
     const title = prompt("Título de la repetición (ej: Atajada del arquero local):");
     if (!title) return;
     try {
-      const res = await fetch(`${API_URL}/api/newberytv/livestreams/${selectedBroadcast.id}/replays`, {
+      const res = await fetch(`/api/newberytv/livestreams/${selectedBroadcast.id}/replays`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -337,7 +337,7 @@ export default function NewberyTvAdmin() {
         body: JSON.stringify({ minute: eventMinute, title })
       });
       if (res.ok) {
-        const refreshRes = await fetch(`${API_URL}/api/newberytv/livestreams`);
+        const refreshRes = await fetch(`/api/newberytv/livestreams`);
         if (refreshRes.ok) {
           const list = await refreshRes.json();
           setLivestreams(list);
@@ -526,7 +526,7 @@ export default function NewberyTvAdmin() {
         resolve();
       });
 
-      xhr.open('POST', `${API_URL}/api/newberytv/videos/upload`);
+      xhr.open('POST', `/api/newberytv/videos/upload`);
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
       xhr.send(formData);
 
@@ -547,7 +547,7 @@ export default function NewberyTvAdmin() {
     e.preventDefault();
     const token = getAdminToken();
     try {
-      const res = await fetch(`${API_URL}/api/newberytv/playlists`, {
+      const res = await fetch(`/api/newberytv/playlists`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -570,7 +570,7 @@ export default function NewberyTvAdmin() {
     if (!confirm('¿Estás seguro de eliminar esta lista de reproducción?')) return;
     const token = getAdminToken();
     try {
-      const res = await fetch(`${API_URL}/api/newberytv/playlists/${id}`, {
+      const res = await fetch(`/api/newberytv/playlists/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -596,7 +596,7 @@ export default function NewberyTvAdmin() {
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/newberytv/playlists/${playlistId}`, {
+      const res = await fetch(`/api/newberytv/playlists/${playlistId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -616,7 +616,7 @@ export default function NewberyTvAdmin() {
     if (!confirm('¿Estás seguro de eliminar este video físicamente de la biblioteca?')) return;
     const token = getAdminToken();
     try {
-      const res = await fetch(`${API_URL}/api/newberytv/videos/${id}`, {
+      const res = await fetch(`/api/newberytv/videos/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

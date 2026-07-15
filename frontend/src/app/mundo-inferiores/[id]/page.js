@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Trophy, Activity, Calendar, Star, Users, ArrowLeft, PlayCircle, Award } from 'lucide-react';
 import ClubShield from '@/components/ClubShield';
+import { API_URL, DEMO_MODE } from '@/config';
 
 const mockPlayers = {
   "1": { name: "Thiago Medina", age: 11, category: "2015", position: "Ala", team: "Futsal AFA Sub-11", achievements: ["Goleador", "Compañero ⭐", "Fair Play"], matchesPlayed: 14, goals: 12, assists: 8, videoUrl: "https://www.youtube.com/watch?v=mock1", bio: "Thiago comenzó en la escuelita a los 5 años. Se destaca por su gran velocidad de regate y su visión de juego asistiendo a sus compañeros." },
@@ -15,12 +16,27 @@ const mockPlayers = {
 export default async function PlayerProfilePage({ params }) {
   const p = await params;
   const id = p.id;
-  const player = mockPlayers[id];
+  
+  let player = null;
+  if (DEMO_MODE) {
+    player = mockPlayers[id];
+  }
+
+  if (!player) {
+    try {
+      const res = await fetch(`${API_URL}/api/players/${id}`, { cache: 'no-store' });
+      if (res.ok) {
+        player = await res.json();
+      }
+    } catch (e) {
+      console.error("Error fetching player profile from DB:", e);
+    }
+  }
 
   if (!player) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-center p-6 text-jn-black">
-        <ClubShield className="w-16 h-20 mb-4 animate-bounce" animate={false} />
+        <ClubShield className="w-16 h-20 mb-4" animate={false} />
         <h2 className="text-2xl font-black">Jugador no encontrado</h2>
         <p className="text-sm text-gray-500 mt-2">La ficha digital solicitada no existe o fue dada de baja.</p>
         <Link href="/mundo-inferiores" className="mt-6 bg-jn-black text-white hover:bg-jn-red px-6 py-2.5 rounded-full font-bold text-xs uppercase transition-colors">
@@ -29,6 +45,13 @@ export default async function PlayerProfilePage({ params }) {
       </div>
     );
   }
+
+  // Safe mapping of achievements
+  const achievementsList = typeof player.achievements === 'string'
+    ? (player.achievements ? player.achievements.split(',').map(s => s.trim()) : [])
+    : (Array.isArray(player.achievements) ? player.achievements : []);
+
+  const bioText = player.bio || player.description || "Sin descripción técnica cargada.";
 
   return (
     <div className="min-h-screen bg-gray-50 text-jn-black pb-20 animate-fade-in">
@@ -70,21 +93,23 @@ export default async function PlayerProfilePage({ params }) {
           </div>
 
           {/* Vitrina de Insignias/Logros */}
-          <div className="bg-white p-6 rounded-3xl border border-gray-150 shadow-sm space-y-4">
-            <h3 className="font-black text-sm text-jn-black uppercase tracking-wider flex items-center gap-1.5">
-              <Trophy className="text-yellow-500" size={16} /> Insignias Digitales
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {player.achievements.map((ach, idx) => (
-                <span 
-                  key={idx}
-                  className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider inline-block"
-                >
-                  ✨ {ach}
-                </span>
-              ))}
+          {achievementsList.length > 0 && (
+            <div className="bg-white p-6 rounded-3xl border border-gray-150 shadow-sm space-y-4">
+              <h3 className="font-black text-sm text-jn-black uppercase tracking-wider flex items-center gap-1.5">
+                <Trophy className="text-yellow-500" size={16} /> Insignias Digitales
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {achievementsList.map((ach, idx) => (
+                  <span 
+                    key={idx}
+                    className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider inline-block"
+                  >
+                    ✨ {ach}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* COLUMNA DERECHA: ESTADÍSTICAS Y BIO */}
@@ -99,15 +124,15 @@ export default async function PlayerProfilePage({ params }) {
             <div className="grid grid-cols-3 gap-4 text-center">
               <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
                 <p className="text-[10px] text-gray-400 font-bold uppercase">Partidos Jugados</p>
-                <p className="text-3xl font-black text-jn-black mt-1">{player.matchesPlayed}</p>
+                <p className="text-3xl font-black text-jn-black mt-1">{player.matchesPlayed || 0}</p>
               </div>
               <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
                 <p className="text-[10px] text-gray-400 font-bold uppercase">Goles / Logros</p>
-                <p className="text-3xl font-black text-jn-red mt-1">{player.goals}</p>
+                <p className="text-3xl font-black text-jn-red mt-1">{player.goals || 0}</p>
               </div>
               <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
                 <p className="text-[10px] text-gray-400 font-bold uppercase">Asistencias</p>
-                <p className="text-3xl font-black text-jn-black mt-1">{player.assists}</p>
+                <p className="text-3xl font-black text-jn-black mt-1">{player.assists || 0}</p>
               </div>
             </div>
           </div>
@@ -115,7 +140,7 @@ export default async function PlayerProfilePage({ params }) {
           {/* Biografía de Juego */}
           <div className="bg-white p-8 rounded-3xl border border-gray-150 shadow-sm space-y-4">
             <h3 className="font-black text-lg text-jn-black uppercase tracking-wider">Perfil Técnico</h3>
-            <p className="text-sm text-gray-600 leading-relaxed font-light">{player.bio}</p>
+            <p className="text-sm text-gray-600 leading-relaxed font-light">{bioText}</p>
           </div>
 
           {/* Video de Jugadas Destacadas */}

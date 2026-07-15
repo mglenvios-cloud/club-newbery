@@ -1,18 +1,24 @@
 const { PrismaClient } = require('@prisma/client');
-const { PrismaBetterSqlite3 } = require('@prisma/adapter-better-sqlite3');
 require('dotenv').config();
 
-let dbUrl = process.env.DATABASE_URL;
+/**
+ * ─── Prisma Client — PostgreSQL ───────────────────────────────────────────────
+ *
+ * La conexión se obtiene exclusivamente desde DATABASE_URL.
+ * config/env.js garantiza que esta variable esté definida antes de que
+ * cualquier ruta sea cargada.
+ */
 
-if (process.env.APP_ENV === 'TEST') {
-  dbUrl = 'file:./test.db';
-  console.log('🧪 [ENV: TEST] Utilizando base de datos aislada test.db');
-} else {
-  dbUrl = dbUrl || 'file:./dev.db';
-  console.log('🚀 [ENV: PROD] Utilizando base de datos principal dev.db');
+const nodeEnv = process.env.NODE_ENV || 'development';
+
+const prisma = new PrismaClient({
+  log: nodeEnv === 'development'
+    ? ['error', 'warn']
+    : ['error'],
+});
+
+if (nodeEnv !== 'production') {
+  console.log(`[Prisma] Conectando a base de datos (${nodeEnv})`);
 }
-
-const adapter = new PrismaBetterSqlite3({ url: dbUrl });
-const prisma = new PrismaClient({ adapter });
 
 module.exports = prisma;

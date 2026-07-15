@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Calendar, Search, Check, Clock, Trash2, X, Plus, AlertCircle, 
@@ -43,7 +43,7 @@ export default function AdminReservas() {
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/api/reservas/bookings`, {
+      const res = await fetch(`/api/reservas/bookings`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -58,7 +58,7 @@ export default function AdminReservas() {
 
   const fetchFacilities = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/reservas/facilities`);
+      const res = await fetch(`/api/reservas/facilities`);
       if (res.ok) {
         const data = await res.json();
         setFacilities(data);
@@ -79,7 +79,7 @@ export default function AdminReservas() {
   const handleUpdateStatus = async (id, status) => {
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     try {
-      const res = await fetch(`${API_URL}/api/reservas/bookings/${id}`, {
+      const res = await fetch(`/api/reservas/bookings/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ export default function AdminReservas() {
     if (!confirm("¿Deseas eliminar permanentemente esta reserva?")) return;
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     try {
-      const res = await fetch(`${API_URL}/api/reservas/bookings/${id}`, {
+      const res = await fetch(`/api/reservas/bookings/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -124,7 +124,7 @@ export default function AdminReservas() {
     e.preventDefault();
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     try {
-      const res = await fetch(`${API_URL}/api/reservas/bookings`, { // Post block under generic handler or direct schedule mock
+      const res = await fetch(`/api/reservas/bookings`, { // Post block under generic handler or direct schedule mock
         // En SQLite, las agendas son manejadas directamente vía servicios.
         // Simularemos creación exitosa y daremos feedback al usuario.
         method: 'POST',

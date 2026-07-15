@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useCallback } from 'react';
 
 import { API_URL } from '@/config';
@@ -22,8 +22,8 @@ export default function SponsorBanner({ location, className = '', variant = 'ban
   const fetchBanners = useCallback(async () => {
     try {
       const endpoint = type === 'campaign'
-        ? `${API_URL}/api/publicidad/campaigns?location=${encodeURIComponent(location)}&status=ACTIVE`
-        : `${API_URL}/api/publicidad/banners?location=${encodeURIComponent(location)}&active=true`;
+        ? `/api/publicidad/campaigns?location=${encodeURIComponent(location)}&status=ACTIVE`
+        : `/api/publicidad/banners?location=${encodeURIComponent(location)}&active=true`;
       const res = await fetch(endpoint);
       if (res.ok) {
         const data = await res.json();
@@ -31,8 +31,8 @@ export default function SponsorBanner({ location, className = '', variant = 'ban
         // Registrar view del primer banner al cargarlo
         if (data.length > 0) {
           const viewEndpoint = type === 'campaign'
-            ? `${API_URL}/api/publicidad/campaigns/${data[0].id}/view`
-            : `${API_URL}/api/publicidad/banners/${data[0].id}/view`;
+            ? `/api/publicidad/campaigns/${data[0].id}/view`
+            : `/api/publicidad/banners/${data[0].id}/view`;
           fetch(viewEndpoint, { method: 'POST' }).catch(() => {});
         }
       }
@@ -62,8 +62,8 @@ export default function SponsorBanner({ location, className = '', variant = 'ban
     // Registrar click
     try {
       const clickEndpoint = type === 'campaign'
-        ? `${API_URL}/api/publicidad/campaigns/${banner.id}/click`
-        : `${API_URL}/api/publicidad/banners/${banner.id}/click`;
+        ? `/api/publicidad/campaigns/${banner.id}/click`
+        : `/api/publicidad/banners/${banner.id}/click`;
       await fetch(clickEndpoint, { method: 'POST' });
     } catch {}
     if (banner.linkUrl) {

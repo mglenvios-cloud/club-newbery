@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const jwt = require('jsonwebtoken');
 const prisma = require('../prismaClient');
 const router = express.Router();
@@ -11,7 +11,7 @@ const subscriptionsService = require('../modules/finanzas/services/subscriptions
 const validators = require('../modules/finanzas/validators/payments.validators');
 const { logError } = require('../modules/gestionDeportiva/utils/errorLogger');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_jn_2026';
+const { JWT_SECRET } = require('../config/env');
 
 // Middleware para verificar token JWT
 const authenticateToken = (req, res, next) => {

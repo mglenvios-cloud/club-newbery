@@ -96,32 +96,37 @@ export default function AdminFutsal() {
     setLoading(true);
     try {
       // Fetch Teams
-      const resTeams = await fetch(`${API_URL}/api/teams`);
+      const resTeams = await fetch(`/api/teams`);
       const dataTeams = resTeams.ok ? await resTeams.json() : [];
       setTeams(dataTeams);
 
       // Fetch Players
-      const resPlayers = await fetch(`${API_URL}/api/players`);
+      const resPlayers = await fetch(`/api/players`);
       const dataPlayers = resPlayers.ok ? await resPlayers.json() : [];
       setPlayers(dataPlayers.filter(p => p.team === 'Futsal AFA' || p.category.toLowerCase().includes('futsal')));
 
       // Fetch Matches
-      const resMatches = await fetch(`${API_URL}/api/matches`);
+      const resMatches = await fetch(`/api/matches`);
       const dataMatches = resMatches.ok ? await resMatches.json() : [];
       setMatches(dataMatches);
 
       // Fetch Media
-      const resMedia = await fetch(`${API_URL}/api/media`);
+      const resMedia = await fetch(`/api/media`);
       const dataMedia = resMedia.ok ? await resMedia.json() : [];
       setMedia(dataMedia);
 
       // Fetch News
-      const resNews = await fetch(`${API_URL}/api/futsal-news`);
+      const resNews = await fetch(`/api/futsal-news`);
       const dataNews = resNews.ok ? await resNews.json() : [];
       setFutsalNews(dataNews);
 
     } catch (e) {
-      console.warn("Failed fetching data from backend, showing local/mock stats.", e);
+      console.error('[Futsal Admin] Error al cargar datos del backend:', e.message);
+      setPlayers([]);
+      setTeams([]);
+      setMatches([]);
+      setMedia([]);
+      setNews([]);
       showNotification("error", "Error conectando con la API, usando datos locales");
     } finally {
       setLoading(false);
@@ -136,7 +141,7 @@ export default function AdminFutsal() {
   // TEAM CRUD OPERATIONS
   const handleSaveTeam = async (e) => {
     e.preventDefault();
-    const url = editTarget ? `${API_URL}/api/teams/${editTarget.id}` : `${API_URL}/api/teams`;
+    const url = editTarget ? `/api/teams/${editTarget.id}` : `/api/teams`;
     const method = editTarget ? 'PUT' : 'POST';
 
     try {
@@ -162,7 +167,7 @@ export default function AdminFutsal() {
   const handleDeleteTeam = async (id) => {
     if (!confirm('¿Estás seguro de eliminar esta categoría/equipo?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/teams/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/teams/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showNotification('success', 'Categoría eliminada');
         fetchData();
@@ -193,7 +198,7 @@ export default function AdminFutsal() {
   // PLAYER CRUD OPERATIONS
   const handleSavePlayer = async (e) => {
     e.preventDefault();
-    const url = editTarget ? `${API_URL}/api/players/${editTarget.id}` : `${API_URL}/api/players`;
+    const url = editTarget ? `/api/players/${editTarget.id}` : `/api/players`;
     const method = editTarget ? 'PUT' : 'POST';
 
     try {
@@ -219,7 +224,7 @@ export default function AdminFutsal() {
   const handleDeletePlayer = async (id) => {
     if (!confirm('¿Seguro que deseas eliminar este jugador?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/players/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/players/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showNotification('success', 'Jugador eliminado');
         fetchData();
@@ -255,7 +260,7 @@ export default function AdminFutsal() {
   // MATCH CRUD OPERATIONS
   const handleSaveMatch = async (e) => {
     e.preventDefault();
-    const url = editTarget ? `${API_URL}/api/matches/${editTarget.id}` : `${API_URL}/api/matches`;
+    const url = editTarget ? `/api/matches/${editTarget.id}` : `/api/matches`;
     const method = editTarget ? 'PUT' : 'POST';
 
     try {
@@ -286,7 +291,7 @@ export default function AdminFutsal() {
   const handleDeleteMatch = async (id) => {
     if (!confirm('¿Seguro de eliminar este partido?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/matches/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/matches/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showNotification('success', 'Partido eliminado');
         fetchData();
@@ -324,7 +329,7 @@ export default function AdminFutsal() {
   // MEDIA CRUD OPERATIONS
   const handleSaveMedia = async (e) => {
     e.preventDefault();
-    const url = editTarget ? `${API_URL}/api/media/${editTarget.id}` : `${API_URL}/api/media`;
+    const url = editTarget ? `/api/media/${editTarget.id}` : `/api/media`;
     const method = editTarget ? 'PUT' : 'POST';
 
     try {
@@ -350,7 +355,7 @@ export default function AdminFutsal() {
   const handleDeleteMedia = async (id) => {
     if (!confirm('¿Seguro de eliminar este archivo multimedia?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/media/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/media/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showNotification('success', 'Archivo eliminado');
         fetchData();
@@ -379,7 +384,7 @@ export default function AdminFutsal() {
   // NEWS CRUD OPERATIONS
   const handleSaveNews = async (e) => {
     e.preventDefault();
-    const url = editTarget ? `${API_URL}/api/futsal-news/${editTarget.id}` : `${API_URL}/api/futsal-news`;
+    const url = editTarget ? `/api/futsal-news/${editTarget.id}` : `/api/futsal-news`;
     const method = editTarget ? 'PUT' : 'POST';
 
     try {
@@ -405,7 +410,7 @@ export default function AdminFutsal() {
   const handleDeleteNews = async (id) => {
     if (!confirm('¿Seguro de eliminar esta noticia?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/futsal-news/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/futsal-news/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showNotification('success', 'Noticia eliminada');
         fetchData();
@@ -419,7 +424,7 @@ export default function AdminFutsal() {
 
   const handleToggleNewsPublished = async (item) => {
     try {
-      const res = await fetch(`${API_URL}/api/futsal-news/${item.id}`, {
+      const res = await fetch(`/api/futsal-news/${item.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...item, published: !item.published })

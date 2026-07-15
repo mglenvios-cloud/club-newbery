@@ -7,7 +7,8 @@ import ClubShield from "@/components/ClubShield";
 
 const Newbery3DHero = dynamic(() => import('@/components/Newbery3DHero'), { ssr: false });
 
-import { API_URL } from '@/config';
+import { API_URL, DEMO_MODE } from '@/config';
+import { apiFetch } from '@/lib/apiClient';
 
 export default function Home() {
   const [activeTabCalendar, setActiveTabCalendar] = useState("Lunes");
@@ -47,18 +48,19 @@ export default function Home() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await fetch(API_URL + '/api/news');
+        const res = await apiFetch('/api/news');
         if (res.ok) {
           const data = await res.json();
           // Filtrar noticias para excluir disciplinas no activas en el club
           const filtered = data.filter(item => item.category !== 'BASQUET' && item.category !== 'HOCKEY');
           setNews(filtered.slice(0, 3));
         } else {
-          setNews(defaultFallbackNews);
+          console.error(`[Home] Error al cargar noticias: ${res.status}`);
+          setNews(DEMO_MODE ? defaultFallbackNews : []);
         }
       } catch (e) {
-        console.warn("Backend offline, usando novedades predefinidas.");
-        setNews(defaultFallbackNews);
+        console.error('[Home] Error de red al cargar noticias:', e.message);
+        setNews(DEMO_MODE ? defaultFallbackNews : []);
       } finally {
         setNewsLoading(false);
       }
@@ -70,7 +72,7 @@ export default function Home() {
   useEffect(() => {
     const fetchSponsor = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/publicidad/sponsors?category=PRINCIPAL&active=true`);
+        const res = await apiFetch('/api/publicidad/sponsors?category=PRINCIPAL&active=true');
         if (res.ok) {
           const data = await res.json();
           if (data.length > 0) setSponsorPrincipal(data[0]);
@@ -80,7 +82,7 @@ export default function Home() {
 
     const fetchHomeMedia = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/media`);
+        const res = await apiFetch('/api/media');
         if (res.ok) {
           const data = await res.json();
           const videos = data.filter(d => d.type === 'VIDEO');
@@ -104,7 +106,7 @@ export default function Home() {
   const handleSponsorClick = async () => {
     if (!sponsorPrincipal) return;
     try {
-      await fetch(`${API_URL}/api/publicidad/sponsors/${sponsorPrincipal.id}/click`, { method: 'POST' });
+      await apiFetch(`/api/publicidad/sponsors/${sponsorPrincipal.id}/click`, { method: 'POST' });
     } catch {}
     if (sponsorPrincipal.website) window.open(sponsorPrincipal.website, '_blank', 'noopener noreferrer');
   };

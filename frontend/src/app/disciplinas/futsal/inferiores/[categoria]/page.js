@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Trophy, Calendar, Users, Activity, PlayCircle, Eye, Newspaper, Video, Image as ImageIcon, Heart } from 'lucide-react';
 import Link from 'next/link';
-import { API_URL } from '@/config';
+import { API_URL, DEMO_MODE } from '@/config';
 
 export default function CategoriaPage() {
   const params = useParams();
@@ -75,11 +75,18 @@ export default function CategoriaPage() {
       }
     } catch (e) {
       console.warn("Failed fetching from backend, loading fallback content", e);
-      // Fallback
-      setPlayers(getFallbackPlayers(catInfo.name));
-      setMatches(getFallbackMatches(catInfo.name));
-      setMedia(fallbackMedia);
-      setNews(fallbackNews);
+      if (DEMO_MODE) {
+        // Fallback
+        setPlayers(getFallbackPlayers(catInfo.name));
+        setMatches(getFallbackMatches(catInfo.name));
+        setMedia(fallbackMedia);
+        setNews(fallbackNews);
+      } else {
+        setPlayers([]);
+        setMatches([]);
+        setMedia([]);
+        setNews([]);
+      }
     } finally {
       setLoading(false);
     }

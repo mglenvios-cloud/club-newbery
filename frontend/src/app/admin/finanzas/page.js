@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   TrendingUp, CreditCard, AlertTriangle, Plus, Search, Filter,
@@ -45,14 +45,14 @@ export default function GestionFinanzas() {
 
   const fetchPlans = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/finanzas/plans`);
+      const res = await fetch(`/api/finanzas/plans`);
       if (res.ok) setPlans(await res.json());
     } catch {}
   }, []);
 
   const fetchPayments = useCallback(async () => {
     try {
-      let url = `${API_URL}/api/finanzas/payments`;
+      let url = `/api/finanzas/payments`;
       const params = [];
       if (statusFilter !== 'ALL') params.push(`estado=${statusFilter}`);
       if (dateFilter) params.push(`fechaDesde=${dateFilter}`);
@@ -65,7 +65,7 @@ export default function GestionFinanzas() {
 
   const fetchSocios = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/socios`);
+      const res = await fetch(`/api/socios`);
       if (res.ok) setSocios(await res.json());
     } catch {}
   }, []);
@@ -85,8 +85,8 @@ export default function GestionFinanzas() {
     e.preventDefault();
     const method = planModal.editId ? 'PUT' : 'POST';
     const url = planModal.editId
-      ? `${API_URL}/api/finanzas/plans/${planModal.editId}`
-      : `${API_URL}/api/finanzas/plans`;
+      ? `/api/finanzas/plans/${planModal.editId}`
+      : `/api/finanzas/plans`;
 
     try {
       const res = await fetch(url, {
@@ -110,7 +110,7 @@ export default function GestionFinanzas() {
   const handleDeletePlan = async (id) => {
     if (!window.confirm('¿Seguro que desea desactivar este plan de cuotas?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/finanzas/plans/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/finanzas/plans/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Plan desactivado (Baja lógica)');
         fetchPlans();
@@ -121,7 +121,7 @@ export default function GestionFinanzas() {
   const handleCreatePayment = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API_URL}/api/finanzas/payments`, {
+      const res = await fetch(`/api/finanzas/payments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(paymentForm)
@@ -139,7 +139,7 @@ export default function GestionFinanzas() {
 
   const handleUpdatePaymentStatus = async (id, newStatus) => {
     try {
-      const res = await fetch(`${API_URL}/api/finanzas/payments/${id}`, {
+      const res = await fetch(`/api/finanzas/payments/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: newStatus })
@@ -490,7 +490,7 @@ export default function GestionFinanzas() {
                           )}
                           {p.invoices?.length > 0 && (
                             <a
-                              href={`${API_URL}/api/finanzas/invoices/${p.invoices[0].id}`}
+                              href={`/api/finanzas/invoices/${p.invoices[0].id}`}
                               target="_blank"
                               rel="noreferrer"
                               className="p-1 border hover:bg-gray-50 rounded bg-white text-gray-500 flex items-center justify-center"

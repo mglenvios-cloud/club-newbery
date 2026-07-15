@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { User, CreditCard, Activity, Calendar, Tv } from "lucide-react";
@@ -15,7 +15,7 @@ export default function PortalLayout({ children }) {
       const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
       if (!token) return;
       try {
-        const res = await fetch(`${API_URL}/api/members/me`, {
+        const res = await fetch(`/api/members/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {

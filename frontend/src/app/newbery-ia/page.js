@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, Send, BookOpen, Trophy, School, HelpCircle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { API_URL } from '@/config';
+import { apiFetch } from '@/lib/apiClient';
 
 export default function NewberyIAFull() {
   const [mode, setMode] = useState("club"); // club, school, sports, trivia
@@ -40,7 +40,7 @@ export default function NewberyIAFull() {
     setIsTyping(true);
 
     try {
-      const res = await fetch(API_URL + '/api/ai/chat', {
+      const res = await apiFetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text, mode })
@@ -49,63 +49,14 @@ export default function NewberyIAFull() {
       if (res.ok) {
         const data = await res.json();
         setMessages(prev => [...prev, { text: data.text, isBot: true }]);
-        setIsTyping(false);
       } else {
-        throw new Error("Error in API");
+        throw new Error(`Error ${res.status} en API de IA`);
       }
     } catch (e) {
-      console.warn("Utilizando respuesta local offline para NewberyIAFull");
-      // Simulate bot response
-      setTimeout(() => {
-        let reply = "";
-        const lower = text.toLowerCase();
-
-        // MODO: CONSULTAS CLUB
-        if (mode === "club") {
-          if (lower.includes("horario")) {
-            reply = "El club abre de Lunes a Viernes de 17:00 a 22:00 hs. La oficina de secretaría atiende de 18:00 a 20:30 hs para trámites presenciales.";
-          } else if (lower.includes("ubicacion") || lower.includes("donde") || lower.includes("direccion")) {
-            reply = "Nuestra sede central queda en Alpatacal 3026, Villa Devoto. ¡Es un predio seguro con buffet familiar y canchas techadas!";
-          } else if (lower.includes("cuota") || lower.includes("pagar") || lower.includes("asociarse")) {
-            reply = "Podés asociarte online en la sección 'Hacete Socio' del menú principal. La cuota mensual varía según la categoría: \n- Infantil: $6.000\n- Cadete: $8.000\n- Activo: $12.000";
-          } else {
-            reply = "Esa información específica no la tengo al alcance inmediato, pero podés consultar en secretaría llamando al 4503-4567 o acercándote al club de 18 a 20:30 hs.";
-          }
-        } 
-        // MODO: AYUDA ESCOLAR
-        else if (mode === "school") {
-          if (lower.includes("x") || lower.includes("multiplicar") || lower.includes("+") || lower.includes("cuenta")) {
-            reply = "¡Las matemáticas son divertidas! 🧮 Por ejemplo, si tenés 8 pelotas y cada una vale 7 monedas, hacés 8 x 7 = 56 monedas en total. ¡Probá escribiéndome otra cuenta!";
-          } else if (lower.includes("geografia") || lower.includes("pais") || lower.includes("capital")) {
-            reply = "🌍 ¿Sabías que la capital de Argentina es Buenos Aires? Y que el monte más alto de América es el Aconcagua, situado en Mendoza. ¡La geografía es increíble!";
-          } else {
-            reply = "📚 ¡Excelente pregunta de estudio! Para aprenderlo rápido, recordá leer con atención, hacer un dibujo explicativo y explicárselo a un compañero. ¿Querés que hagamos otro ejercicio?";
-          }
-        } 
-        // MODO: REGLAS Y EJERCICIOS
-        else if (mode === "sports") {
-          if (lower.includes("futsal") || lower.includes("futbol")) {
-            reply = "⚽ En Futsal AFA juegan 5 contra 5 en una cancha de parquet o cemento de 40x20 metros. El partido dura 20 minutos netos por lado y los cambios son ilimitados. ¡Es súper dinámico!";
-          } else if (lower.includes("ejercicio") || lower.includes("entrenar") || lower.includes("casa")) {
-            reply = "🏃‍♂️ ¡Desafío de ejercicio en casa! Hagamos esto:\n1. 10 saltos de estrella (abriendo brazos y piernas).\n2. Mantener equilibrio en un solo pie por 15 segundos.\n3. 5 sentadillas lentas.\n¡Tomá agua y repetilo 2 veces para estar listo para el entrenamiento!";
-          } else {
-            reply = "Deportes en Newbery: Ofrecemos Futsal, Patín Artístico, Vóley y Artes Marciales. ¿De cuál querés aprender las reglas?";
-          }
-        } 
-        // MODO: TRIVIAS Y DESAFÍOS
-        else if (mode === "trivia" || lower.includes("empezar") || lower.includes("trivia")) {
-          if (lower.includes("futsal") || lower.includes("pelota") || lower.includes("empezar")) {
-            reply = "🏆 Pregunta de Trivia: ¿Cuántos jugadores de un mismo equipo entran a la cancha al inicio de un partido de Futsal? \n\nA) 11 jugadores \nB) 5 jugadores \nC) 7 jugadores \n\n¡Respondé A, B o C!";
-          } else if (lower.includes("b") || lower.includes("5")) {
-            reply = "🎉 ¡EXCELENTE! Respuesta correcta. Se juegan 5 vs 5. Sumaste 20 XP a tu perfil de la comunidad digital Jorge Newbery 🪙.";
-          } else {
-            reply = "¡Casi! La respuesta correcta era la B (5 jugadores). ¿Querés que probemos con otra pregunta? Escribí 'otra'.";
-          }
-        }
-
-        setMessages(prev => [...prev, { text: reply, isBot: true }]);
-        setIsTyping(false);
-      }, 1000);
+      console.error('[NewberyIA] Error al obtener respuesta de IA:', e.message);
+      setMessages(prev => [...prev, { text: '⚠️ No se pudo obtener respuesta de la IA. Por favor, verifica tu conexión con el servidor.', isBot: true }]);
+    } finally {
+      setIsTyping(false);
     }
   };
 

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export function middleware(request) {
+export function proxy(request) {
   // Solo aplicamos protección a la ruta /admin (excepto /admin/login)
   if (request.nextUrl.pathname.startsWith('/admin') && !request.nextUrl.pathname.startsWith('/admin/login')) {
     
@@ -15,21 +15,14 @@ export function middleware(request) {
 
     try {
       const token = tokenCookie.value;
-      let payload;
-      if (token === 'mock_admin_token') {
-        payload = { role: 'ADMIN', exp: Math.floor(Date.now() / 1000) + 86400 };
-      } else if (token === 'mock_futsal_token') {
-        payload = { role: 'FUTSAL', exp: Math.floor(Date.now() / 1000) + 86400 };
-      } else {
-        const parts = token.split('.');
-        if (parts.length !== 3) {
-          throw new Error('Formato JWT inválido');
-        }
-
-        // Decodificar payload en Base64Url
-        const payloadJson = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
-        payload = JSON.parse(payloadJson);
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        throw new Error('Formato JWT inválido');
       }
+
+      // Decodificar payload en Base64Url
+      const payloadJson = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
+      const payload = JSON.parse(payloadJson);
 
       // Validar expiración (exp está en segundos)
       const isExpired = payload.exp ? (payload.exp * 1000 < Date.now()) : true;

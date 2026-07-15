@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, 
@@ -38,33 +38,33 @@ export default function AdminDashboard() {
     setLoading(true);
 
 
-    const pSocios = fetch(`${API_URL}/api/socios`)
+    const pSocios = fetch(`/api/socios`)
       .then(res => { if (!res.ok) throw new Error(); return res.json(); })
       .then(data => { setSocios(data); setSociosError(false); })
       .catch(() => setSociosError(true));
 
-    const pReservas = fetch(`${API_URL}/api/reservas/bookings`)
+    const pReservas = fetch(`/api/reservas/bookings`)
       .then(res => { if (!res.ok) throw new Error(); return res.json(); })
       .then(data => { setReservas(data); setReservasError(false); })
       .catch(() => setReservasError(true));
 
-    const pTransactions = fetch(`${API_URL}/api/transactions`)
+    const pTransactions = fetch(`/api/transactions`)
       .then(res => { if (!res.ok) throw new Error(); return res.json(); })
       .then(data => { setTransactions(data); setTransactionsError(false); })
       .catch(() => setTransactionsError(true));
 
-    const pPayments = fetch(`${API_URL}/api/finanzas/payments`)
+    const pPayments = fetch(`/api/finanzas/payments`)
       .then(res => { if (!res.ok) throw new Error(); return res.json(); })
       .then(data => { setPayments(data); setPaymentsError(false); })
       .catch(() => setPaymentsError(true));
 
 
-    const pNews = fetch(`${API_URL}/api/news`)
+    const pNews = fetch(`/api/news`)
       .then(res => { if (!res.ok) throw new Error(); return res.json(); })
       .then(data => { setNews(data); setNewsError(false); })
       .catch(() => setNewsError(true));
 
-    const pMedia = fetch(`${API_URL}/api/media`)
+    const pMedia = fetch(`/api/media`)
       .then(res => { if (!res.ok) throw new Error(); return res.json(); })
       .then(data => { setMedia(data); setMediaError(false); })
       .catch(() => setMediaError(true));

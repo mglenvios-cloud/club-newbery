@@ -3,14 +3,18 @@ services:
     name: club-newbery-backend
     env: node
     plan: free
-    buildCommand: npm install && npx prisma db push
+    buildCommand: npm install && npx prisma generate && npx prisma migrate deploy
     startCommand: node index.js
     envVars:
       - key: PORT
         value: 5000
       - key: DATABASE_URL
-        value: file:./dev.db
+        sync: false       # Configurar en Render Dashboard: URL de PostgreSQL
       - key: JWT_SECRET
-        sync: false
+        sync: false       # Configurar en Render Dashboard: clave larga y aleatoria
       - key: MP_ACCESS_TOKEN
-        sync: false
+        sync: false       # Configurar en Render Dashboard: token real de MercadoPago
+      - key: FRONTEND_URL
+        value: https://frontend-indol-rho-38.vercel.app
+      - key: NODE_ENV
+        value: production

@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const jwt = require('jsonwebtoken');
 const { logError } = require('../modules/gestionDeportiva/utils/errorLogger');
 
@@ -15,7 +15,7 @@ const {
 } = require('../modules/ligaProStudio/validators/ligaPro.validators');
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_jn_2026';
+const { JWT_SECRET } = require('../config/env');
 
 // Middleware to authenticate JWT
 const authenticateToken = (req, res, next) => {

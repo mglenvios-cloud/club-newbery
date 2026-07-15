@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Upload, Link as LinkIcon, Camera, Image as ImageIcon, 
@@ -6,6 +6,7 @@ import {
   Trash2, Play, Volume2, Video, Loader2, ArrowRight
 } from 'lucide-react';
 import { API_URL } from '@/config';
+import { apiFetch } from '@/lib/apiClient';
 
 /**
  * Componente Universal de Gestión de Archivos para Club Jorge Newbery Digital
@@ -73,15 +74,16 @@ export default function MediaUploadUniversal({
   const fetchLibrary = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
-      const res = await fetch(`${API_URL}/api/media?library=true&category=${libCategoryFilter}&type=${libTypeFilter}&search=${searchQuery}&sortBy=${libSortBy}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const res = await apiFetch(
+        `/api/media?library=true&category=${libCategoryFilter}&type=${libTypeFilter}&search=${searchQuery}&sortBy=${libSortBy}`
+      );
       if (res.ok) {
         setLibraryFiles(await res.json());
+      } else {
+        console.error('[MediaUpload] Error al cargar biblioteca:', res.status);
       }
     } catch (e) {
-      console.error('Error al cargar biblioteca:', e);
+      console.error('[MediaUpload] Error al cargar biblioteca:', e.message);
     } finally {
       setLoading(false);
     }
@@ -316,7 +318,7 @@ export default function MediaUploadUniversal({
       setErrorMsg('Error de red al intentar subir el archivo.');
     });
 
-    xhr.open('POST', `${API_URL}/api/media/upload`);
+    xhr.open('POST', `/api/media/upload`);
     xhr.setRequestHeader('Authorization', `Bearer ${token}`);
     xhr.send(formData);
   };
@@ -436,7 +438,7 @@ export default function MediaUploadUniversal({
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
       
-      const res = await fetch(`${API_URL}/api/media/upload-url`, {
+      const res = await fetch(`/api/media/upload-url`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -486,7 +488,7 @@ export default function MediaUploadUniversal({
 
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
-      const res = await fetch(`${API_URL}/api/media/${fileId}?type=file`, {
+      const res = await fetch(`/api/media/${fileId}?type=file`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

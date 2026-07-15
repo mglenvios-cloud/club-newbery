@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useCallback } from "react";
 import {
   Plug, Wifi, WifiOff, RefreshCw, Save, Radio, Settings,
@@ -140,7 +140,7 @@ export default function LigaProStudioPage() {
           if (nextVal % 60 === 0 && selectedMatchId) {
             const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
             const min = Math.floor(nextVal / 60);
-            fetch(`${API_URL}/api/live/${selectedMatchId}/status`, {
+            fetch(`/api/live/${selectedMatchId}/status`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
@@ -179,7 +179,7 @@ export default function LigaProStudioPage() {
   const fetchStatus = useCallback(async () => {
     try {
       setLoadingStatus(true);
-      const res = await fetch(`${API_URL}/api/integrations/lps/status`);
+      const res = await fetch(`/api/integrations/lps/status`);
       if (res.ok) setStatus(await res.json());
     } catch {
       setStatus({ connected: false, mode: "test", lastSync: null, syncCount: 0, hasCredentials: false });
@@ -191,7 +191,7 @@ export default function LigaProStudioPage() {
   const fetchConfig = useCallback(async () => {
     try {
       setLoadingConfig(true);
-      const res = await fetch(`${API_URL}/api/integrations/lps/full`, {
+      const res = await fetch(`/api/integrations/lps/full`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token') || localStorage.getItem('jn-auth-token')}`
         }
@@ -226,16 +226,16 @@ export default function LigaProStudioPage() {
 
   const fetchStudioData = useCallback(async () => {
     try {
-      const mRes = await fetch(`${API_URL}/api/matches`);
+      const mRes = await fetch(`/api/matches`);
       if (mRes.ok) setMatches(await mRes.json());
 
-      const pRes = await fetch(`${API_URL}/api/players`);
+      const pRes = await fetch(`/api/players`);
       if (pRes.ok) setPlayers(await pRes.json());
 
-      const bRes = await fetch(`${API_URL}/api/liga-pro-studio/broadcasts`);
+      const bRes = await fetch(`/api/liga-pro-studio/broadcasts`);
       if (bRes.ok) setBroadcasts(await bRes.json());
 
-      const hRes = await fetch(`${API_URL}/api/liga-pro-studio/highlights`);
+      const hRes = await fetch(`/api/liga-pro-studio/highlights`);
       if (hRes.ok) setHighlights(await hRes.json());
     } catch (e) {
       console.error("Error al cargar datos del Studio:", e);
@@ -260,7 +260,7 @@ export default function LigaProStudioPage() {
 
     const loadMatchBroadcastAndEvents = async () => {
       try {
-        const bRes = await fetch(`${API_URL}/api/liga-pro-studio/broadcasts/match/${selectedMatchId}`);
+        const bRes = await fetch(`/api/liga-pro-studio/broadcasts/match/${selectedMatchId}`);
         if (bRes.ok) {
           const data = await bRes.json();
           setActiveBroadcast(data);
@@ -281,7 +281,7 @@ export default function LigaProStudioPage() {
           });
         }
 
-        const eRes = await fetch(`${API_URL}/api/liga-pro-studio/matches/${selectedMatchId}/events`);
+        const eRes = await fetch(`/api/liga-pro-studio/matches/${selectedMatchId}/events`);
         if (eRes.ok) setLiveEvents(await eRes.json());
 
         const mSelected = matches.find(m => m.id === parseInt(selectedMatchId, 10));
@@ -302,8 +302,8 @@ export default function LigaProStudioPage() {
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     const method = activeBroadcast ? "PUT" : "POST";
     const url = activeBroadcast
-      ? `${API_URL}/api/liga-pro-studio/broadcasts/${activeBroadcast.id}`
-      : `${API_URL}/api/liga-pro-studio/broadcasts`;
+      ? `/api/liga-pro-studio/broadcasts/${activeBroadcast.id}`
+      : `/api/liga-pro-studio/broadcasts`;
 
     const body = {
       ...broadcastForm,
@@ -338,7 +338,7 @@ export default function LigaProStudioPage() {
     if (!activeBroadcast) return;
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     try {
-      const res = await fetch(`${API_URL}/api/liga-pro-studio/broadcasts/${activeBroadcast.id}`, {
+      const res = await fetch(`/api/liga-pro-studio/broadcasts/${activeBroadcast.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -351,7 +351,7 @@ export default function LigaProStudioPage() {
         setActiveBroadcast(data);
         setBroadcastForm(prev => ({ ...prev, status: "EN_VIVO" }));
         setTimerActive(true);
-        await fetch(`${API_URL}/api/live/${selectedMatchId}/status`, {
+        await fetch(`/api/live/${selectedMatchId}/status`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -369,7 +369,7 @@ export default function LigaProStudioPage() {
     if (!activeBroadcast) return;
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     try {
-      const res = await fetch(`${API_URL}/api/liga-pro-studio/broadcasts/${activeBroadcast.id}`, {
+      const res = await fetch(`/api/liga-pro-studio/broadcasts/${activeBroadcast.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -382,7 +382,7 @@ export default function LigaProStudioPage() {
         setActiveBroadcast(data);
         setBroadcastForm(prev => ({ ...prev, status: "FINALIZADO" }));
         setTimerActive(false);
-        await fetch(`${API_URL}/api/live/${selectedMatchId}/status`, {
+        await fetch(`/api/live/${selectedMatchId}/status`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -410,7 +410,7 @@ export default function LigaProStudioPage() {
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/live/${selectedMatchId}/status`, {
+      const res = await fetch(`/api/live/${selectedMatchId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -468,7 +468,7 @@ export default function LigaProStudioPage() {
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/live/${selectedMatchId}/event`, {
+      const res = await fetch(`/api/live/${selectedMatchId}/event`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -488,9 +488,9 @@ export default function LigaProStudioPage() {
         setShowEventModal(null);
         setQuickEventForm({ playerId: "", playerName: "", cardColor: "YELLOW", playerInId: "", playerInName: "", detail: "" });
 
-        const eRes = await fetch(`${API_URL}/api/liga-pro-studio/matches/${selectedMatchId}/events`);
+        const eRes = await fetch(`/api/liga-pro-studio/matches/${selectedMatchId}/events`);
         if (eRes.ok) setLiveEvents(await eRes.json());
-        const mRes = await fetch(`${API_URL}/api/matches`);
+        const mRes = await fetch(`/api/matches`);
         if (mRes.ok) setMatches(await mRes.json());
       } else {
         const err = await res.json();
@@ -506,7 +506,7 @@ export default function LigaProStudioPage() {
     setCurrentPeriod(p);
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     try {
-      await fetch(`${API_URL}/api/live/${selectedMatchId}/event`, {
+      await fetch(`/api/live/${selectedMatchId}/event`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -523,7 +523,7 @@ export default function LigaProStudioPage() {
         setTimerActive(false);
       }
 
-      const eRes = await fetch(`${API_URL}/api/liga-pro-studio/matches/${selectedMatchId}/events`);
+      const eRes = await fetch(`/api/liga-pro-studio/matches/${selectedMatchId}/events`);
       if (eRes.ok) setLiveEvents(await eRes.json());
       showNotification("success", `Período cambiado a ${p}`);
     } catch {}
@@ -538,7 +538,7 @@ export default function LigaProStudioPage() {
     const pName = pl ? `${pl.name} ${pl.lastName}` : "";
 
     try {
-      const res = await fetch(`${API_URL}/api/live/${selectedMatchId}/event`, {
+      const res = await fetch(`/api/live/${selectedMatchId}/event`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -556,7 +556,7 @@ export default function LigaProStudioPage() {
       if (res.ok) {
         showNotification("success", "Evento registrado correctamente.");
         setEventForm({ minute: 0, type: "GOL", playerId: "", description: "" });
-        const eRes = await fetch(`${API_URL}/api/liga-pro-studio/matches/${selectedMatchId}/events`);
+        const eRes = await fetch(`/api/liga-pro-studio/matches/${selectedMatchId}/events`);
         if (eRes.ok) setLiveEvents(await eRes.json());
       } else {
         const err = await res.json();
@@ -572,7 +572,7 @@ export default function LigaProStudioPage() {
     setGeneratingCommentary(true);
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     try {
-      const res = await fetch(`${API_URL}/api/live/${selectedMatchId}/ai-commentary`, {
+      const res = await fetch(`/api/live/${selectedMatchId}/ai-commentary`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`
@@ -617,7 +617,7 @@ export default function LigaProStudioPage() {
 
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     try {
-      const res = await fetch(`${API_URL}/api/liga-pro-studio/highlights`, {
+      const res = await fetch(`/api/liga-pro-studio/highlights`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -648,7 +648,7 @@ export default function LigaProStudioPage() {
     if (!confirm("¿Deseas eliminar este clip de la producción?")) return;
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     try {
-      const res = await fetch(`${API_URL}/api/liga-pro-studio/highlights/${id}`, {
+      const res = await fetch(`/api/liga-pro-studio/highlights/${id}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
       });
@@ -677,7 +677,7 @@ export default function LigaProStudioPage() {
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     try {
       setSavingConfig(true);
-      const res = await fetch(`${API_URL}/api/integrations/lps`, {
+      const res = await fetch(`/api/integrations/lps`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -700,7 +700,7 @@ export default function LigaProStudioPage() {
     const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
     try {
       setSavingSponsors(true);
-      const res = await fetch(`${API_URL}/api/integrations/lps/sponsors`, {
+      const res = await fetch(`/api/integrations/lps/sponsors`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, Users, Shield, Award, Trophy, ChevronRight, Clock } from 'lucide-react';
 import { apiFetch } from '@/lib/apiClient';
@@ -55,7 +55,7 @@ export default function GlobalSearch({ onNavigate, players = [], teams = [], coa
     debounceRef.current = setTimeout(async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${API_URL}/api/gestion-deportiva/search?q=${encodeURIComponent(query)}`);
+        const res = await fetch(`/api/gestion-deportiva/search?q=${encodeURIComponent(query)}`);
         if (res.ok) {
           setResults(await res.json());
         } else {
