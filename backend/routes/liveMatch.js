@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const prisma = require('../prismaClient');
@@ -20,9 +20,9 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Middleware to enforce ADMIN or OPERADOR roles
+// Middleware to enforce ADMIN, OPERADOR or SUPER_ADMIN roles
 const requireAdminOrOperator = (req, res, next) => {
-  if (!req.user || (req.user.role !== 'ADMIN' && req.user.role !== 'OPERADOR')) {
+  if (!req.user || (req.user.role !== 'ADMIN' && req.user.role !== 'OPERADOR' && req.user.role !== 'SUPER_ADMIN')) {
     return res.status(403).json({ error: 'Acceso denegado. Se requieren permisos de administrador o productor operador.' });
   }
   next();

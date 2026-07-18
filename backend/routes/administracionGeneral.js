@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config/env');
 
 const clubConfigService = require('../modules/administracionGeneral/services/clubConfig.service');
 const seasonsService = require('../modules/administracionGeneral/services/seasons.service');
@@ -9,6 +11,28 @@ const usersService = require('../modules/administracionGeneral/services/users.se
 
 const validators = require('../modules/administracionGeneral/validators/administracionGeneral.validators');
 const { logError } = require('../modules/gestionDeportiva/utils/errorLogger');
+
+// Middleware para verificar token JWT
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+};
+
+// Middleware para verificar que sea ADMIN o SUPER_ADMIN
+const requireAdmin = (req, res, next) => {
+  if (!req.user || (req.user.role !== 'ADMIN' && req.user.role !== 'SUPER_ADMIN')) {
+    return res.status(403).json({ error: 'Acceso denegado. Se requieren permisos de administrador.' });
+  }
+  next();
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN GENERAL DEL CLUB
@@ -24,7 +48,7 @@ router.get('/club-config', async (req, res) => {
   }
 });
 
-router.put('/club-config', async (req, res) => {
+router.put('/club-config', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const validationError = validators.validateClubConfig(req.body);
     if (validationError) {
@@ -52,7 +76,7 @@ router.get('/seasons', async (req, res) => {
   }
 });
 
-router.post('/seasons', async (req, res) => {
+router.post('/seasons', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const validationError = validators.validateSeason(req.body);
     if (validationError) {
@@ -66,7 +90,7 @@ router.post('/seasons', async (req, res) => {
   }
 });
 
-router.put('/seasons/:id', async (req, res) => {
+router.put('/seasons/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const idError = validators.validateId(id);
@@ -83,7 +107,7 @@ router.put('/seasons/:id', async (req, res) => {
   }
 });
 
-router.delete('/seasons/:id', async (req, res) => {
+router.delete('/seasons/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const idError = validators.validateId(id);
@@ -111,7 +135,7 @@ router.get('/disciplines', async (req, res) => {
   }
 });
 
-router.post('/disciplines', async (req, res) => {
+router.post('/disciplines', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const validationError = validators.validateDiscipline(req.body);
     if (validationError) {
@@ -125,7 +149,7 @@ router.post('/disciplines', async (req, res) => {
   }
 });
 
-router.put('/disciplines/:id', async (req, res) => {
+router.put('/disciplines/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const idError = validators.validateId(id);
@@ -142,7 +166,7 @@ router.put('/disciplines/:id', async (req, res) => {
   }
 });
 
-router.delete('/disciplines/:id', async (req, res) => {
+router.delete('/disciplines/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const idError = validators.validateId(id);
@@ -170,7 +194,7 @@ router.get('/sedes', async (req, res) => {
   }
 });
 
-router.post('/sedes', async (req, res) => {
+router.post('/sedes', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const validationError = validators.validateSede(req.body);
     if (validationError) {
@@ -184,7 +208,7 @@ router.post('/sedes', async (req, res) => {
   }
 });
 
-router.put('/sedes/:id', async (req, res) => {
+router.put('/sedes/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const idError = validators.validateId(id);
@@ -201,7 +225,7 @@ router.put('/sedes/:id', async (req, res) => {
   }
 });
 
-router.delete('/sedes/:id', async (req, res) => {
+router.delete('/sedes/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const idError = validators.validateId(id);
@@ -230,7 +254,7 @@ router.get('/facilities', async (req, res) => {
   }
 });
 
-router.post('/facilities', async (req, res) => {
+router.post('/facilities', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const validationError = validators.validateFacility(req.body);
     if (validationError) {
@@ -244,7 +268,7 @@ router.post('/facilities', async (req, res) => {
   }
 });
 
-router.put('/facilities/:id', async (req, res) => {
+router.put('/facilities/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const idError = validators.validateId(id);
@@ -261,7 +285,7 @@ router.put('/facilities/:id', async (req, res) => {
   }
 });
 
-router.delete('/facilities/:id', async (req, res) => {
+router.delete('/facilities/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const idError = validators.validateId(id);
@@ -279,7 +303,7 @@ router.delete('/facilities/:id', async (req, res) => {
 // ROLES
 // ═══════════════════════════════════════════════════════════════════════════
 
-router.get('/roles', async (req, res) => {
+router.get('/roles', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const roles = await usersService.getAllRoles(1);
     res.json(roles);
@@ -289,7 +313,7 @@ router.get('/roles', async (req, res) => {
   }
 });
 
-router.post('/roles', async (req, res) => {
+router.post('/roles', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const validationError = validators.validateRole(req.body);
     if (validationError) {
@@ -303,7 +327,7 @@ router.post('/roles', async (req, res) => {
   }
 });
 
-router.put('/roles/:id', async (req, res) => {
+router.put('/roles/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const idError = validators.validateId(id);
@@ -320,7 +344,7 @@ router.put('/roles/:id', async (req, res) => {
   }
 });
 
-router.delete('/roles/:id', async (req, res) => {
+router.delete('/roles/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const idError = validators.validateId(id);
@@ -338,7 +362,7 @@ router.delete('/roles/:id', async (req, res) => {
 // USUARIOS (USERS)
 // ═══════════════════════════════════════════════════════════════════════════
 
-router.get('/users', async (req, res) => {
+router.get('/users', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const users = await usersService.getAllUsers(1);
     // Remover contraseñas por seguridad
@@ -353,7 +377,7 @@ router.get('/users', async (req, res) => {
   }
 });
 
-router.post('/users', async (req, res) => {
+router.post('/users', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const validationError = validators.validateUser(req.body, false);
     if (validationError) {
@@ -368,7 +392,7 @@ router.post('/users', async (req, res) => {
   }
 });
 
-router.put('/users/:id', async (req, res) => {
+router.put('/users/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const idError = validators.validateId(id);
@@ -386,7 +410,7 @@ router.put('/users/:id', async (req, res) => {
   }
 });
 
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const idError = validators.validateId(id);

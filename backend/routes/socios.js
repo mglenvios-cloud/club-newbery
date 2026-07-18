@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 
@@ -25,9 +25,9 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Middleware para verificar que sea ADMIN
+// Middleware para verificar que sea ADMIN o SUPER_ADMIN
 const requireAdmin = (req, res, next) => {
-  if (req.user.role !== 'ADMIN') {
+  if (req.user.role !== 'ADMIN' && req.user.role !== 'SUPER_ADMIN') {
     return res.status(403).json({ error: 'Acceso denegado. Se requieren permisos de administrador.' });
   }
   next();
@@ -35,7 +35,7 @@ const requireAdmin = (req, res, next) => {
 
 // Middleware para verificar que sea ADMIN o Staff (FUTSAL, OPERADOR)
 const requireAdminOrStaff = (req, res, next) => {
-  if (!['ADMIN', 'FUTSAL', 'OPERADOR'].includes(req.user.role)) {
+  if (!['ADMIN', 'FUTSAL', 'OPERADOR', 'SUPER_ADMIN'].includes(req.user.role)) {
     return res.status(403).json({ error: 'Acceso denegado. Se requieren permisos de administrador o personal de staff.' });
   }
   next();

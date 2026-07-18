@@ -4,33 +4,18 @@ import { Trophy, Activity, Calendar, Star, Users, ArrowLeft, PlayCircle, Award }
 import ClubShield from '@/components/ClubShield';
 import { API_URL, DEMO_MODE } from '@/config';
 
-const mockPlayers = {
-  "1": { name: "Thiago Medina", age: 11, category: "2015", position: "Ala", team: "Futsal AFA Sub-11", achievements: ["Goleador", "Compañero ⭐", "Fair Play"], matchesPlayed: 14, goals: 12, assists: 8, videoUrl: "https://www.youtube.com/watch?v=mock1", bio: "Thiago comenzó en la escuelita a los 5 años. Se destaca por su gran velocidad de regate y su visión de juego asistiendo a sus compañeros." },
-  "2": { name: "Mateo Rossi", age: 10, category: "2016", position: "Cierre", team: "Futsal AFA Sub-10", achievements: ["Fair Play ⭐", "Asistencia Perfecta"], matchesPlayed: 12, goals: 3, assists: 9, videoUrl: "https://www.youtube.com/watch?v=mock2", bio: "Mateo es un defensa sólido, siempre ordenando al equipo desde el fondo y entregando pases precisos." },
-  "3": { name: "Bautista Castro", age: 11, category: "2015", position: "Ala", team: "Futsal AFA Sub-11", achievements: ["Mejor Compañero 🤝", "Esfuerzo Escolar"], matchesPlayed: 10, goals: 8, assists: 4, videoUrl: "https://www.youtube.com/watch?v=mock3", bio: "Bautista comenzó en la escuelita. Es un ala de gran velocidad, muy cooperativo en la marca y destacado en el colegio." },
-  "4": { name: "Benjamín Rossi", age: 8, category: "2018", position: "Ala", team: "Futsal Promocional B", achievements: ["Goleador Semillero", "Velocidad"], matchesPlayed: 8, goals: 10, assists: 2, videoUrl: null, bio: "Benja es una de las grandes promesas de la categoría promocional, muy movedizo y definidor." },
-  "5": { name: "Juana Rossi", age: 10, category: "2016", position: "Solo Libre", team: "Patín Competición", achievements: ["Medalla de Oro 🥇", "Expresión Artística"], matchesPlayed: 6, goals: 0, assists: 0, videoUrl: "https://www.youtube.com/watch?v=mock5", bio: "Juana brilla sobre las ruedas. Su perseverancia la llevó a ganar el metropolitano de patín artístico libre." },
-  "6": { name: "Delfina Solari", age: 11, category: "2015", position: "Show Grupal", team: "Patín Competición", achievements: ["Esfuerzo Escolar 📚", "Asistencia Perfecta"], matchesPlayed: 8, goals: 0, assists: 0, videoUrl: null, bio: "Delfi es la referente del grupo show de patín, coordinando a sus compañeras con liderazgo y constancia." }
-};
-
 export default async function PlayerProfilePage({ params }) {
   const p = await params;
   const id = p.id;
   
   let player = null;
-  if (DEMO_MODE) {
-    player = mockPlayers[id];
-  }
-
-  if (!player) {
-    try {
-      const res = await fetch(`${API_URL}/api/players/${id}`, { cache: 'no-store' });
-      if (res.ok) {
-        player = await res.json();
-      }
-    } catch (e) {
-      console.error("Error fetching player profile from DB:", e);
+  try {
+    const res = await fetch(`${API_URL}/api/players/${id}`, { cache: 'no-store' });
+    if (res.ok) {
+      player = await res.json();
     }
+  } catch (e) {
+    console.error("Error fetching player profile from DB:", e);
   }
 
   if (!player) {

@@ -643,12 +643,14 @@ router.post('/statistics/event', async (req, res) => {
 // GET /api/statistics (y /api/publicidad/stats)
 router.get('/statistics', async (req, res) => {
   try {
+    const now = new Date();
     const [
       totalSponsors, activeSponsors,
       totalBanners, activeBanners,
       totalCampaigns, activeCampaigns,
       allBanners, allSponsors, allCampaigns,
-      viewsList
+      viewsList,
+      activeContracts
     ] = await Promise.all([
       prisma.sponsor.count(),
       prisma.sponsor.count({ where: { isActive: true } }),
@@ -659,10 +661,15 @@ router.get('/statistics', async (req, res) => {
       prisma.banner.findMany({ orderBy: { clicks: 'desc' } }),
       prisma.sponsor.findMany({ orderBy: { clicks: 'desc' } }),
       prisma.campaign.findMany({ orderBy: { clicks: 'desc' } }),
-      prisma.advertisementView.findMany()
+      prisma.advertisementView.findMany(),
+      prisma.contractHistory.findMany({
+        where: {
+          startDate: { lte: now },
+          endDate: { gte: now }
+        }
+      })
     ]);
 
-    const now = new Date();
     const scheduledBanners = allBanners.filter(b =>
       b.rotation === 'SCHEDULED' && b.startDate && new Date(b.startDate) > now
     ).length;
@@ -709,6 +716,8 @@ router.get('/statistics', async (req, res) => {
       return { date: label, clicks: dayClicks };
     });
 
+    const realEarnings = activeContracts.reduce((sum, contract) => sum + (contract.amount || 0), 0);
+
     res.json({
       totalSponsors, activeSponsors,
       totalBanners, activeBanners,
@@ -718,7 +727,7 @@ router.get('/statistics', async (req, res) => {
       topBanner, topSponsor, topCampaign,
       clicksByDay,
       deviceStats,
-      earnings: activeSponsors * 25000 // Estimación comercial demo
+      earnings: realEarnings
     });
   } catch (error) {
     console.error('[Publicidad] Error stats:', error);

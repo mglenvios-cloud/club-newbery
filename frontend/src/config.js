@@ -12,17 +12,22 @@
  * Siempre importar desde este archivo o usar apiFetch de @/lib/apiClient.
  */
 
-if (!process.env.NEXT_PUBLIC_API_URL && process.env.NODE_ENV === 'production') {
-  // En producción esta variable es obligatoria. Si no está configurada en Vercel,
-  // todas las llamadas a la API fallarán.
-  console.error(
-    '[Config] CRITICAL: NEXT_PUBLIC_API_URL no está definida. ' +
-    'Configurarla en Vercel → Settings → Environment Variables.'
-  );
+if (!process.env.NEXT_PUBLIC_API_URL) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      '🚨 CONFIGURATION ERROR: The environment variable NEXT_PUBLIC_API_URL is NOT defined! ' +
+      'Please configure it in Vercel → Settings → Environment Variables pointing to your production backend ' +
+      '(e.g., https://club-newbery-backend.onrender.com).'
+    );
+  } else {
+    console.warn(
+      '⚠️ WARNING: NEXT_PUBLIC_API_URL is not defined. Defaulting to http://localhost:5000 for local development.'
+    );
+  }
 }
 
 /** URL base del backend. Se obtiene únicamente de la variable de entorno. */
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 /**
  * Ambiente de ejecución actual.
@@ -30,8 +35,4 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
  */
 export const APP_ENV = process.env.NEXT_PUBLIC_APP_ENV || process.env.NODE_ENV || 'production';
 
-/**
- * Modo demo — SOLO para desarrollo local con NEXT_PUBLIC_DEMO_MODE=true.
- * En producción siempre es false, nunca se muestran datos simulados.
- */
-export const DEMO_MODE = APP_ENV === 'development' && process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+export const DEMO_MODE = false;

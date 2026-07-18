@@ -833,23 +833,4 @@ export default function FutsalAFA() {
   );
 }
 
-// Fallback datasets for categories if offline
-const fallbackPlayers = [
-  { id: 101, name: "Lucas", lastName: "González", dorsal: 1, age: 24, category: "Primera Masculina", position: "Arquero", team: "Futsal AFA", achievements: "Valla Invicta", matchesPlayed: 18, goals: 0, assists: 1, yellowCards: 2, redCards: 0, cleanSheets: 6, season: "2026", description: "Lucas es el referente del arco de Newbery, seguro por arriba y ágil de reflejos.", birthDate: "1998-05-12", playerStatus: "ACTIVE", photoUrl: null },
-  { id: 102, name: "Maximiliano", lastName: "Rodríguez", dorsal: 5, age: 28, category: "Primera Masculina", position: "Cierre", team: "Futsal AFA", achievements: "Capitán", matchesPlayed: 17, goals: 4, assists: 6, yellowCards: 4, redCards: 1, cleanSheets: 0, season: "2026", description: "El capitán del equipo. Líder absoluto en la zona defensiva y organizador del ataque.", birthDate: "1997-03-24", playerStatus: "ACTIVE", photoUrl: null },
-  { id: 103, name: "Pablo", lastName: "Gómez", dorsal: 10, age: 23, category: "Primera Masculina", position: "Ala", team: "Futsal AFA", achievements: "Goleador", matchesPlayed: 18, goals: 16, assists: 12, yellowCards: 3, redCards: 0, cleanSheets: 0, season: "2026", description: "La joya creativa del plantel. Gran regate en espacios reducidos y alta definición.", birthDate: "2002-08-11", playerStatus: "ACTIVE", photoUrl: null },
-  { id: 104, name: "Facundo", lastName: "Silva", dorsal: 9, age: 26, category: "Primera Masculina", position: "Pivot", team: "Futsal AFA", achievements: "Goleador", matchesPlayed: 16, goals: 12, assists: 4, yellowCards: 2, redCards: 0, cleanSheets: 0, season: "2026", description: "Delantero potente que juega muy bien de espaldas al arco y define de primera.", birthDate: "1999-11-05", playerStatus: "ACTIVE", photoUrl: null }
-];
 
-const fallbackMatches = [
-  { id: 201, category: "Primera Masculina", opponent: "San Lorenzo", homeTeam: "Jorge Newbery", awayTeam: "San Lorenzo", referee: "Patricio Loustau", attendance: 450, date: "2026-07-15", timeSlot: "21:30", ourScore: null, opponentScore: null, status: "UPCOMING", videoUrl: null, summary: null, photoGallery: null, isFeatured: true, competition: "AFA Primera", venue: "Cancha Jorge Newbery", season: "2026", externalMatchId: null, liveStreamUrl: null, provider: "LOCAL" },
-  { id: 202, category: "Primera Masculina", opponent: "17 de Agosto", homeTeam: "Jorge Newbery", awayTeam: "17 de Agosto", referee: "Néstor Pitana", attendance: 400, date: "2026-06-25", timeSlot: "20:00", ourScore: 4, opponentScore: 2, status: "FINISHED", videoUrl: "https://youtube.com/watch?v=mock", summary: "Gran triunfo en casa con 3 goles de Pablo Gómez.", photoGallery: null, isFeatured: false, competition: "AFA Primera", venue: "Cancha Jorge Newbery", season: "2026", externalMatchId: null, liveStreamUrl: null, provider: "LOCAL" }
-];
-
-const fallbackNews = [
-  { id: 301, title: "Inauguración de la nueva cancha de Futsal", description: "Piso sintético de última generación ya está listo para todas las divisiones inferiores del club.", imageUrl: null, category: "Primera Masculina", season: "2026", published: true }
-];
-
-const fallbackMedia = [
-  { id: 401, type: "VIDEO", title: "Resumen Goles vs 17 de Agosto", url: "/images/action.png", category: "Primera", description: "Mirá los 4 goles oficiales en la victoria por el torneo oficial AFA." }
-];

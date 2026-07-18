@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const prisma = require('../prismaClient');
 const jwt = require('jsonwebtoken');
 
@@ -21,7 +21,7 @@ const authenticateToken = (req, res, next) => {
 
 // Obtener todos los socios (Solo ADMIN)
 router.get('/', authenticateToken, async (req, res) => {
-  if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Acceso denegado' });
+  if (req.user.role !== 'ADMIN' && req.user.role !== 'SUPER_ADMIN') return res.status(403).json({ error: 'Acceso denegado' });
 
   try {
     const members = await prisma.member.findMany({
@@ -35,7 +35,7 @@ router.get('/', authenticateToken, async (req, res) => {
 
 // Obtener el perfil del socio logueado (Permitido para SOCIO y ADMIN)
 router.get('/me', authenticateToken, async (req, res) => {
-  if (req.user.role !== 'SOCIO' && req.user.role !== 'ADMIN') {
+  if (req.user.role !== 'SOCIO' && req.user.role !== 'ADMIN' && req.user.role !== 'SUPER_ADMIN') {
     return res.status(403).json({ error: 'Acceso denegado. Solo permitido para socios.' });
   }
   try {
@@ -45,7 +45,7 @@ router.get('/me', authenticateToken, async (req, res) => {
     });
     
     if (!member) {
-      if (req.user.role === 'ADMIN') {
+      if (req.user.role === 'ADMIN' || req.user.role === 'SUPER_ADMIN') {
         // Retornar socio virtual para el administrador para que pueda ver el portal sin fallos
         return res.json({
           id: 9999,

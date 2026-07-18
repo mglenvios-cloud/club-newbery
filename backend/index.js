@@ -51,7 +51,7 @@ const allowedOrigins = [
     'http://localhost:3001',
     'http://127.0.0.1:3000',
   ] : []),
-].filter(Boolean);
+].filter(Boolean).map(url => url.replace(/\/$/, ''));
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -70,6 +70,55 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+// ─── Middleware Global de Auditoría ──────────────────────────────────────────
+const prisma = require('./prismaClient');
+app.use((req, res, next) => {
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+    const originalJson = res.json;
+    res.json = function (body) {
+      res.json = originalJson;
+      const result = res.statusCode >= 200 && res.statusCode < 300 ? 'SUCCESS' : `FAILED (${res.statusCode})`;
+      const moduleName = req.baseUrl ? req.baseUrl.replace('/api/', '').toUpperCase() : req.path.split('/')[2]?.toUpperCase() || 'GENERAL';
+      
+      const userId = req.user ? parseInt(req.user.userId || req.user.dbUserId) || null : null;
+      const userName = req.user ? req.user.email || `User #${req.user.userId}` : 'Anónimo';
+      const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+      
+      let entityId = null;
+      if (req.params && req.params.id) {
+        entityId = parseInt(req.params.id) || null;
+      } else if (body && body.id) {
+        entityId = parseInt(body.id) || null;
+      }
+      
+      const detailsStr = JSON.stringify({
+        path: req.originalUrl,
+        body: req.body ? { ...req.body, password: req.body.password ? '***' : undefined } : null,
+        result
+      });
+      
+      prisma.auditLog.create({
+        data: {
+          action: req.method,
+          entity: moduleName,
+          entityId,
+          entityName: `${req.method} ${req.originalUrl}`,
+          userId,
+          userName,
+          details: detailsStr.substring(0, 1000),
+          ipAddress: ip,
+          clubId: req.user ? req.user.clubId || 1 : 1
+        }
+      }).catch(err => {
+        console.error('[AuditLog Error]', err.message);
+      });
+      
+      return originalJson.call(this, body);
+    };
+  }
+  next();
+});
 
 // Routes — existentes
 app.use('/api/auth', authRoutes);

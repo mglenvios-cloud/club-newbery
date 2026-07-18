@@ -75,18 +75,10 @@ export default function CategoriaPage() {
       }
     } catch (e) {
       console.warn("Failed fetching from backend, loading fallback content", e);
-      if (DEMO_MODE) {
-        // Fallback
-        setPlayers(getFallbackPlayers(catInfo.name));
-        setMatches(getFallbackMatches(catInfo.name));
-        setMedia(fallbackMedia);
-        setNews(fallbackNews);
-      } else {
-        setPlayers([]);
-        setMatches([]);
-        setMedia([]);
-        setNews([]);
-      }
+      setPlayers([]);
+      setMatches([]);
+      setMedia([]);
+      setNews([]);
     } finally {
       setLoading(false);
     }
@@ -378,22 +370,4 @@ export default function CategoriaPage() {
   );
 }
 
-// Fallback datasets for categories if offline
-const getFallbackPlayers = (catName) => [
-  { id: 501, name: "Thiago", lastName: "Medina", dorsal: 10, category: catName, position: "Ala", achievements: "Goleador, Compañero ⭐", matchesPlayed: 14, goals: 12, assists: 8, cleanSheets: 0, playerStatus: "ACTIVE", description: "Thiago es veloz de regate y tiene gran visión para habilitar a sus compañeros." },
-  { id: 502, name: "Mateo", lastName: "Rossi", dorsal: 2, category: catName, position: "Cierre", achievements: "Fair Play ⭐", matchesPlayed: 12, goals: 3, assists: 9, cleanSheets: 0, playerStatus: "ACTIVE", description: "Defensor ordenado y firme desde el fondo, muy respetuoso con árbitros y rivales." },
-  { id: 503, name: "Benjamín", lastName: "Fernández", dorsal: 1, category: catName, position: "Arquero", achievements: "Valla Invicta", matchesPlayed: 10, goals: 0, assists: 1, cleanSheets: 4, playerStatus: "ACTIVE", description: "Arquero ágil que domina muy bien el achique en jugadas de uno contra uno." }
-];
 
-const getFallbackMatches = (catName) => [
-  { id: 601, category: catName, opponent: "River Plate", homeTeam: "Jorge Newbery", awayTeam: "River Plate", referee: "G. Vigliano", attendance: 120, date: "2026-06-20", timeSlot: "17:30", ourScore: 5, opponentScore: 3, status: "FINISHED", videoUrl: "https://youtube.com/watch?v=mock", summary: "Gran triunfo sobre el final con una ráfaga de goles de contraataque.", photoGallery: null, isFeatured: true, competition: "Torneo Oficial", venue: "Cancha Jorge Newbery", season: "2026" },
-  { id: 602, category: catName, opponent: "Platense", homeTeam: "Jorge Newbery", awayTeam: "Platense", referee: "A. Beligoy", attendance: 80, date: "2026-07-12", timeSlot: "18:00", ourScore: null, opponentScore: null, status: "UPCOMING", videoUrl: null, summary: null, photoGallery: null, isFeatured: false, competition: "Torneo Oficial", venue: "Cancha Auxiliar Platense", season: "2026" }
-];
-
-const fallbackMedia = [
-  { id: 701, type: "PHOTO", title: "Festejo del Equipo", url: "/images/fans.png", category: "Inferiores", description: "El equipo celebrando el triunfo en el vestuario." }
-];
-
-const fallbackNews = [
-  { id: 801, title: "Próximo entrenamiento suspendido por lluvia", description: "El entrenamiento del miércoles se pasa a la cancha techada de parquet por malas condiciones climáticas.", category: "Inferiores", season: "2026", published: true }
-];

@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const jwt = require('jsonwebtoken');
 const prisma = require('../prismaClient');
 const router = express.Router();
@@ -27,9 +27,9 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Middleware para verificar que sea ADMIN
+// Middleware para verificar que sea ADMIN o SUPER_ADMIN
 const requireAdmin = (req, res, next) => {
-  if (req.user.role !== 'ADMIN') {
+  if (req.user.role !== 'ADMIN' && req.user.role !== 'SUPER_ADMIN') {
     return res.status(403).json({ error: 'Acceso denegado. Se requieren permisos de administrador.' });
   }
   next();
@@ -100,7 +100,7 @@ router.delete('/plans/:id', authenticateToken, requireAdmin, async (req, res) =>
 router.get('/payments', authenticateToken, async (req, res) => {
   try {
     // Si no es ADMIN, restringimos a consultar sus propios pagos
-    const isStaff = ['ADMIN', 'FUTSAL', 'OPERADOR'].includes(req.user.role);
+    const isStaff = ['ADMIN', 'FUTSAL', 'OPERADOR', 'SUPER_ADMIN'].includes(req.user.role);
     if (!isStaff) {
       const socio = await prisma.member.findUnique({ where: { userId: req.user.userId } });
       if (!socio) {
@@ -161,7 +161,7 @@ router.get('/invoices/:id', authenticateToken, async (req, res) => {
     if (!invoice) return res.status(404).json({ error: 'Comprobante no encontrado.' });
 
     // Si no es ADMIN ni personal de staff, verificar pertenencia del comprobante
-    const isStaff = ['ADMIN', 'FUTSAL', 'OPERADOR'].includes(req.user.role);
+    const isStaff = ['ADMIN', 'FUTSAL', 'OPERADOR', 'SUPER_ADMIN'].includes(req.user.role);
     if (!isStaff) {
       const socio = await prisma.member.findUnique({ where: { userId: req.user.userId } });
       if (!socio || invoice.payment.socioId !== socio.id) {
@@ -252,7 +252,7 @@ router.get('/invoices/:id', authenticateToken, async (req, res) => {
 router.get('/subscriptions', authenticateToken, async (req, res) => {
   try {
     // Si no es ADMIN, restringimos a consultar sus propias suscripciones
-    if (req.user.role !== 'ADMIN') {
+    if (req.user.role !== 'ADMIN' && req.user.role !== 'SUPER_ADMIN') {
       const socio = await prisma.member.findUnique({ where: { userId: req.user.userId } });
       if (!socio) {
         return res.status(403).json({ error: 'Acceso denegado. No posee un perfil de socio vinculado.' });
@@ -302,7 +302,7 @@ router.post('/mercadopago/preference', authenticateToken, async (req, res) => {
     if (!paymentId) return res.status(400).json({ error: 'El ID del pago es obligatorio.' });
     
     // Si no es ADMIN, verificar que el pago le pertenezca a este socio
-    if (req.user.role !== 'ADMIN') {
+    if (req.user.role !== 'ADMIN' && req.user.role !== 'SUPER_ADMIN') {
       const socio = await prisma.member.findUnique({ where: { userId: req.user.userId } });
       const payment = await prisma.payment.findUnique({ where: { id: parseInt(paymentId) } });
       if (!socio || !payment || payment.socioId !== socio.id) {

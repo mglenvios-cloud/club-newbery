@@ -56,11 +56,11 @@ export default function Home() {
           setNews(filtered.slice(0, 3));
         } else {
           console.error(`[Home] Error al cargar noticias: ${res.status}`);
-          setNews(DEMO_MODE ? defaultFallbackNews : []);
+          setNews([]);
         }
       } catch (e) {
         console.error('[Home] Error de red al cargar noticias:', e.message);
-        setNews(DEMO_MODE ? defaultFallbackNews : []);
+        setNews([]);
       } finally {
         setNewsLoading(false);
       }
@@ -111,11 +111,7 @@ export default function Home() {
     if (sponsorPrincipal.website) window.open(sponsorPrincipal.website, '_blank', 'noopener noreferrer');
   };
 
-  const defaultFallbackNews = [
-    { id: 1, title: "Inauguración de la nueva cancha de Futsal", content: "Piso sintético de última generación ya está listo para todas las divisiones inferiores del club.", category: "FUTSAL", tag: "IMPORTANTE" },
-    { id: 2, title: "Gran Medallero en el Festival Metropolitano de Patín", content: "Nuestras chicas de Patín Artístico se llevaron el Oro en la categoría grupal show.", category: "PATIN", tag: "LOGRO" },
-    { id: 3, title: "Futsal AFA: Gran convocatoria al plantel profesional", content: "Abiertas las pruebas de jugadores para inferiores y primera división.", category: "FUTSAL", tag: "EVENTO" }
-  ];
+  // Las noticias se obtienen exclusivamente de la base de datos real del backend.
 
   // Datos del Calendario de Actividades
   const dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];

@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const jwt = require('jsonwebtoken');
 const { logError } = require('../modules/gestionDeportiva/utils/errorLogger');
 
@@ -33,7 +33,7 @@ const authenticateToken = (req, res, next) => {
 
 // Middleware to enforce admin or operator role
 const requireAdmin = (req, res, next) => {
-  if (!req.user || (req.user.role !== 'ADMIN' && req.user.role !== 'OPERADOR')) {
+  if (!req.user || (req.user.role !== 'ADMIN' && req.user.role !== 'OPERADOR' && req.user.role !== 'SUPER_ADMIN')) {
     return res.status(403).json({ error: 'Acceso denegado. Se requieren permisos de administrador o productor operador.' });
   }
   next();

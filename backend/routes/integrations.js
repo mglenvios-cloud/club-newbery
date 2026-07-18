@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
@@ -24,7 +24,7 @@ const authenticateToken = (req, res, next) => {
 
 // Middleware to require admin
 const requireAdmin = (req, res, next) => {
-  if (!req.user || req.user.role !== 'ADMIN') {
+  if (!req.user || (req.user.role !== 'ADMIN' && req.user.role !== 'SUPER_ADMIN')) {
     return res.status(403).json({ error: 'Acceso denegado. Permisos de administrador requeridos.' });
   }
   next();

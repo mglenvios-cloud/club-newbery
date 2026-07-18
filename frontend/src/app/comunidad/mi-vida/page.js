@@ -47,11 +47,7 @@ export default function MiVidaSocial() {
     initCanvas();
   }, []);
 
-  const defaultMockPosts = [
-    { id: 1, authorName: "Bautista Castro", authorAge: 11, category: "COLEGIO", content: "¡Me saqué un 10 en matemáticas! Estudié mucho ayer después del entrenamiento de Futsal. ⚽📚", drawingUrl: null, type: "TEXT", likes: 24, createdAt: new Date().toISOString() },
-    { id: 2, authorName: "Mateo Rossi", authorAge: 10, category: "DIBUJO", content: "Miren mi dibujo de la camiseta de Jorge Newbery, ¡vamos rojo y negro!", drawingUrl: "MOCK_DRAWING_DATA", type: "DRAWING", likes: 32, createdAt: new Date().toISOString() },
-    { id: 3, authorName: "Thiago Medina", authorAge: 11, category: "METAS", content: "Mi meta para este año es mejorar mis pases con la zurda en futsal. ¡Y meter un gol de Fair Play!", drawingUrl: null, type: "TEXT", likes: 18, createdAt: new Date().toISOString() }
-  ];
+
 
   // DRAWING CANVAS ACTIONS
   const initCanvas = () => {

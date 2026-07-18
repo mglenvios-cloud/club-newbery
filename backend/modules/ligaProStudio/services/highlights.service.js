@@ -17,8 +17,11 @@ const createHighlight = async ({ matchId, mediaId, title, startTime, endTime, ge
   const match = await prisma.futsalMatch.findUnique({ where: { id: mId } });
   const isPub = published !== false && published !== 'false';
   
-  // Obtener URL de stream base o mock
-  const streamUrl = match?.videoUrl || match?.liveStreamUrl || 'https://youtube.com/watch?v=mock_stream';
+  // Obtener URL de stream base
+  const streamUrl = match?.videoUrl || match?.liveStreamUrl;
+  if (!streamUrl) {
+    throw new Error('El partido no posee una transmisión grabada o en vivo asociada para generar clips.');
+  }
   const clipUrl = `${streamUrl}#t=${startTime},${endTime}`;
 
   // 1. Crear registro FutsalMedia
@@ -79,7 +82,10 @@ const updateHighlight = async (id, data) => {
     };
     if (data.startTime !== undefined || data.endTime !== undefined) {
       const match = await prisma.futsalMatch.findUnique({ where: { id: updated.matchId } });
-      const streamUrl = match?.videoUrl || match?.liveStreamUrl || 'https://youtube.com/watch?v=mock_stream';
+      const streamUrl = match?.videoUrl || match?.liveStreamUrl;
+      if (!streamUrl) {
+        throw new Error('El partido no posee una transmisión grabada o en vivo asociada.');
+      }
       mediaData.url = `${streamUrl}#t=${updated.startTime},${updated.endTime}`;
     }
     await prisma.futsalMedia.update({

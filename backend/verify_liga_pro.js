@@ -58,7 +58,8 @@ async function run() {
         ourScore: 0,
         opponentScore: 0,
         status: 'UPCOMING',
-        competition: 'Liga Oficial AFA'
+        competition: 'Liga Oficial AFA',
+        videoUrl: 'https://youtube.com/watch?v=real_match_video'
       }
     });
     testMatchId = testMatch.id;

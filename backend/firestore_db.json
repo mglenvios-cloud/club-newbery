@@ -1,0 +1,1452 @@
+{
+  "counters": {
+    "club": 1,
+    "user": 6,
+    "clubConfig": 1,
+    "futsalMatch": 5,
+    "futsalNews": 2,
+    "futsalMedia": 3,
+    "advertisementView": 10,
+    "news": 3,
+    "sede": 1,
+    "facility": 3,
+    "sponsor": 3,
+    "playerProfile": 8,
+    "socialConfig": 1,
+    "transaction": 3,
+    "member": 6,
+    "tutor": 2,
+    "digitalCard": 2,
+    "membershipPlan": 3,
+    "subscription": 6,
+    "payment": 6,
+    "invoice": 4,
+    "channel": 1,
+    "liveStream": 3,
+    "matchBroadcast": 3,
+    "cameraStatus": 10,
+    "broadcastSponsor": 2,
+    "streamEvent": 2,
+    "replayMarker": 2,
+    "video": 2,
+    "matchEvent": 1,
+    "highlightClip": 1,
+    "contractHistory": 4,
+    "mediaFile": 1,
+    "banner": 1,
+    "campaign": 1,
+    "booking": 3,
+    "liveMatchEvent": 4,
+    "auditLog": 17
+  },
+  "club": [
+    {
+      "id": 1,
+      "name": "Club Jorge Newbery",
+      "logoUrl": "/images/escudo.png",
+      "createdAt": "2026-07-10T21:47:20.808Z",
+      "updatedAt": "2026-07-10T21:47:20.808Z"
+    }
+  ],
+  "user": [
+    {
+      "id": 1,
+      "email": "martin.perez.47542096@example.com",
+      "password": "$2b$10$yflxX.GqEydUsO21rnEdVOsTjSOaP2i6dGbcFXkjAVSCkP4eIKvri",
+      "role": "SOCIO",
+      "isActive": true,
+      "name": "Martin Perez",
+      "clubId": 1
+    },
+    {
+      "id": 2,
+      "email": "julian.alvarez@example.com",
+      "password": "$2b$10$yflxX.GqEydUsO21rnEdVOsTjSOaP2i6dGbcFXkjAVSCkP4eIKvri",
+      "role": "SOCIO",
+      "isActive": true,
+      "name": "Julian Alvarez",
+      "clubId": 1
+    },
+    {
+      "id": 3,
+      "email": "sofia.martinez@example.com",
+      "password": "$2b$10$yflxX.GqEydUsO21rnEdVOsTjSOaP2i6dGbcFXkjAVSCkP4eIKvri",
+      "role": "SOCIO",
+      "isActive": true,
+      "name": "Sofia Martinez",
+      "clubId": 1
+    },
+    {
+      "id": 4,
+      "email": "lucas.beltran@example.com",
+      "password": "$2b$10$yflxX.GqEydUsO21rnEdVOsTjSOaP2i6dGbcFXkjAVSCkP4eIKvri",
+      "role": "SOCIO",
+      "isActive": false,
+      "name": "Lucas Beltran",
+      "clubId": 1
+    },
+    {
+      "id": 5,
+      "email": "valentina.ortiz@example.com",
+      "password": "$2b$10$yflxX.GqEydUsO21rnEdVOsTjSOaP2i6dGbcFXkjAVSCkP4eIKvri",
+      "role": "SOCIO",
+      "isActive": false,
+      "name": "Valentina Ortiz",
+      "clubId": 1
+    }
+  ],
+  "clubConfig": [
+    {
+      "id": 1,
+      "name": "Club Jorge Newbery",
+      "shieldUrl": "/images/escudo.png",
+      "colorPrimary": "#CC0000",
+      "colorSecondary": "#FFFFFF",
+      "address": "Calle Ficticia 1234",
+      "city": "Buenos Aires",
+      "province": "CABA",
+      "country": "Argentina",
+      "phone": "011-4567-8910",
+      "email": "contacto@jorgenewbery.com.ar",
+      "website": "www.jorgenewbery.com.ar",
+      "socialFacebook": "https://facebook.com/clubjorgenewbery",
+      "socialInstagram": "https://instagram.com/clubjorgenewbery",
+      "socialTwitter": "",
+      "socialYoutube": "",
+      "history": "El Club Jorge Newbery fue fundado en 1916 con el objetivo de fomentar la actividad deportiva, social y cultural del barrio.",
+      "foundedDate": "1916-10-12T00:00:00.000Z",
+      "president": "Claudio González",
+      "secretary": "María Paz López",
+      "officeHours": "Lunes a Viernes de 09:00 a 18:00 hs",
+      "clubId": 1,
+      "createdAt": "2026-07-10T21:47:20.849Z",
+      "updatedAt": "2026-07-10T21:47:20.849Z"
+    }
+  ],
+  "futsalMatch": [
+    {
+      "id": 1,
+      "category": "Primera Masculina",
+      "opponent": "Pinocho",
+      "homeTeam": "Jorge Newbery",
+      "awayTeam": "Pinocho",
+      "date": "2026-07-18T09:52:34.304Z",
+      "timeSlot": "20:30",
+      "ourScore": 2,
+      "opponentScore": 1,
+      "status": "LIVE",
+      "competition": "Torneo Local AFA",
+      "venue": "Cancha Jorge Newbery",
+      "isFeatured": true,
+      "liveMinute": 15,
+      "liveStreamUrl": "https://youtube.com/live/fake-stream-url",
+      "clubId": 1
+    },
+    {
+      "id": 2,
+      "category": "Primera Masculina",
+      "opponent": "San Lorenzo",
+      "homeTeam": "Jorge Newbery",
+      "awayTeam": "San Lorenzo",
+      "date": "2026-07-23T09:52:34.319Z",
+      "timeSlot": "21:30",
+      "status": "UPCOMING",
+      "competition": "AFA Primera",
+      "venue": "Cancha Jorge Newbery",
+      "isFeatured": false,
+      "clubId": 1
+    },
+    {
+      "id": 3,
+      "category": "Primera Masculina",
+      "opponent": "Boca Juniors",
+      "homeTeam": "Boca Juniors",
+      "awayTeam": "Jorge Newbery",
+      "date": "2026-07-11T09:52:34.322Z",
+      "timeSlot": "20:00",
+      "ourScore": 4,
+      "opponentScore": 3,
+      "status": "FINISHED",
+      "competition": "AFA Primera",
+      "venue": "Estadio La Bombonerita",
+      "isFeatured": true,
+      "clubId": 1
+    },
+    {
+      "id": 4,
+      "category": "Primera Femenina",
+      "opponent": "Ferro",
+      "homeTeam": "Jorge Newbery",
+      "awayTeam": "Ferro",
+      "date": "2026-07-14T09:52:34.325Z",
+      "timeSlot": "16:00",
+      "ourScore": 5,
+      "opponentScore": 2,
+      "status": "FINISHED",
+      "competition": "Torneo Femenino AFA",
+      "venue": "Cancha Jorge Newbery",
+      "isFeatured": false,
+      "clubId": 1
+    }
+  ],
+  "futsalNews": [
+    {
+      "id": 1,
+      "title": "Sebastián López, convocado a la Selección Argentina de Futsal",
+      "description": "El ala estrella del club formará parte del plantel de entrenamientos de cara a las eliminatorias de la Copa América.",
+      "category": "Primera Masculina",
+      "clubId": 1
+    },
+    {
+      "id": 2,
+      "title": "Fixture de Play-offs AFA Confirmado",
+      "description": "Jorge Newbery disputará los cuartos de final frente a Pinocho a ida y vuelta en sedes neutrales.",
+      "category": "Primera Masculina",
+      "clubId": 1
+    }
+  ],
+  "futsalMedia": [
+    {
+      "id": 1,
+      "type": "VIDEO",
+      "title": "Resumen Completo: Victoria en el Superclásico del Barrio",
+      "url": "https://youtube.com/watch/fake-video-1",
+      "category": "Primera",
+      "description": "Reviví los goles de López y Russo para conseguir los tres puntos vitales en el torneo.",
+      "visibility": "PUBLIC",
+      "featured": true,
+      "views": 145,
+      "clubId": 1
+    },
+    {
+      "id": 2,
+      "type": "PHOTO",
+      "title": "Entrenamiento Físico y Táctico - Pretemporada 2026",
+      "url": "/images/action.png",
+      "category": "Primera",
+      "description": "El plantel entrena bajo las órdenes del Prof. Martínez de cara a la segunda fase.",
+      "visibility": "PUBLIC",
+      "featured": false,
+      "views": 320,
+      "clubId": 1
+    }
+  ],
+  "advertisementView": [
+    {
+      "id": 1,
+      "bannerId": 1,
+      "campaignId": 1,
+      "sponsorId": 2,
+      "type": "VIEW",
+      "device": "desktop",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-07-12T15:49:00.271Z"
+    },
+    {
+      "id": 2,
+      "bannerId": 1,
+      "campaignId": 1,
+      "sponsorId": 2,
+      "type": "CLICK",
+      "device": "mobile",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-07-12T15:49:00.323Z"
+    },
+    {
+      "id": 3,
+      "bannerId": 2,
+      "campaignId": 2,
+      "sponsorId": 3,
+      "type": "VIEW",
+      "device": "desktop",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-07-17T20:11:23.342Z"
+    },
+    {
+      "id": 4,
+      "bannerId": 2,
+      "campaignId": 2,
+      "sponsorId": 3,
+      "type": "CLICK",
+      "device": "mobile",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-07-17T20:11:23.362Z"
+    },
+    {
+      "id": 5,
+      "type": "VIEW",
+      "bannerId": 1,
+      "campaignId": 1,
+      "sponsorId": 3,
+      "device": "desktop",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": 6,
+      "type": "CLICK",
+      "bannerId": 1,
+      "campaignId": 1,
+      "sponsorId": 3,
+      "device": "mobile",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": 7,
+      "type": "VIEW",
+      "bannerId": 1,
+      "campaignId": 1,
+      "sponsorId": 3,
+      "device": "desktop",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": 8,
+      "type": "CLICK",
+      "bannerId": 1,
+      "campaignId": 1,
+      "sponsorId": 3,
+      "device": "mobile",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": 9,
+      "type": "VIEW",
+      "bannerId": 1,
+      "campaignId": 1,
+      "sponsorId": 3,
+      "device": "desktop",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": 10,
+      "type": "CLICK",
+      "bannerId": 1,
+      "campaignId": 1,
+      "sponsorId": 3,
+      "device": "mobile",
+      "ipAddress": "127.0.0.1"
+    }
+  ],
+  "news": [
+    {
+      "id": 1,
+      "title": "Inauguración de la nueva cancha de Futsal",
+      "content": "El piso de parquet flotante de última generación ya está listo para todas las divisiones formativas e inferiores.",
+      "category": "FUTSAL",
+      "tag": "IMPORTANTE",
+      "imageUrl": "/images/action.png"
+    },
+    {
+      "id": 2,
+      "title": "Gran Medallero en el Metropolitano de Patín",
+      "content": "Nuestras representantes consiguieron el Oro en la categoría grupal show en un certamen repleto de público.",
+      "category": "PATIN",
+      "tag": "LOGRO",
+      "imageUrl": "/images/futsal_hero.png"
+    },
+    {
+      "id": 3,
+      "title": "Prueba de Jugadores para las Inferiores",
+      "content": "Se abren las inscripciones y convocatorias para los chicos nacidos entre 2010 y 2018 para sumarse al club.",
+      "category": "FUTSAL",
+      "tag": "CONVOCATORIA",
+      "imageUrl": "/images/fans.png"
+    }
+  ],
+  "sede": [
+    {
+      "id": 1,
+      "name": "Sede Central Villa Devoto",
+      "address": "Calle Alpatacal 3026, CABA",
+      "capacity": 1200,
+      "status": "ACTIVE",
+      "clubId": 1
+    }
+  ],
+  "facility": [
+    {
+      "id": 1,
+      "name": "Cancha Parquet Principal",
+      "type": "CANCHA",
+      "capacity": 800,
+      "status": "ACTIVE",
+      "sedeId": 1
+    },
+    {
+      "id": 2,
+      "name": "Microestadio Césped Sintético",
+      "type": "CANCHA",
+      "capacity": 400,
+      "status": "ACTIVE",
+      "sedeId": 1
+    }
+  ],
+  "sponsor": [
+    {
+      "id": 1,
+      "name": "Sponsor Oficial Newbery",
+      "logoUrl": "https://example.com/logo.png",
+      "imageUrl": null,
+      "description": null,
+      "website": null,
+      "phone": null,
+      "email": null,
+      "whatsapp": null,
+      "instagram": null,
+      "facebook": null,
+      "category": "PRINCIPAL",
+      "isActive": true,
+      "order": 1,
+      "clicks": 0,
+      "views": 0,
+      "address": null,
+      "contractStartDate": null,
+      "contractEndDate": null,
+      "status": "activo",
+      "clubId": null,
+      "createdAt": "2026-07-11T11:58:37.425Z"
+    },
+    {
+      "id": 2,
+      "name": "Coca Cola Company Test",
+      "category": "PRINCIPAL",
+      "address": "Av. Del Libertador 5555, CABA",
+      "contractStartDate": null,
+      "contractEndDate": null
+    }
+  ],
+  "playerProfile": [
+    {
+      "id": 1,
+      "name": "Lucas",
+      "lastName": "González",
+      "dorsal": 1,
+      "age": 22,
+      "category": "Primera Masculina",
+      "position": "Arquero",
+      "team": "Futsal AFA",
+      "discipline": "FUTSAL",
+      "matchesPlayed": 18,
+      "goals": 0,
+      "assists": 2,
+      "cleanSheets": 9,
+      "yellowCards": 1,
+      "redCards": 0,
+      "playerStatus": "ACTIVE",
+      "season": "2026",
+      "description": "Arquero titular defendiendo con honor los colores de Villa Devoto.",
+      "clubId": 1
+    },
+    {
+      "id": 2,
+      "name": "Matías",
+      "lastName": "Rodríguez",
+      "dorsal": 5,
+      "age": 24,
+      "category": "Primera Masculina",
+      "position": "Cierre",
+      "team": "Futsal AFA",
+      "discipline": "FUTSAL",
+      "matchesPlayed": 20,
+      "goals": 3,
+      "assists": 7,
+      "cleanSheets": 0,
+      "yellowCards": 1,
+      "redCards": 0,
+      "playerStatus": "ACTIVE",
+      "season": "2026",
+      "description": "Cierre titular defendiendo con honor los colores de Villa Devoto.",
+      "clubId": 1
+    },
+    {
+      "id": 3,
+      "name": "Sebastián",
+      "lastName": "López",
+      "dorsal": 10,
+      "age": 25,
+      "category": "Primera Masculina",
+      "position": "Ala",
+      "team": "Futsal AFA",
+      "discipline": "FUTSAL",
+      "matchesPlayed": 22,
+      "goals": 15,
+      "assists": 11,
+      "cleanSheets": 0,
+      "yellowCards": 0,
+      "redCards": 1,
+      "playerStatus": "ACTIVE",
+      "season": "2026",
+      "description": "Ala titular defendiendo con honor los colores de Villa Devoto.",
+      "clubId": 1
+    },
+    {
+      "id": 4,
+      "name": "Diego",
+      "lastName": "Martínez",
+      "dorsal": 9,
+      "age": 23,
+      "category": "Primera Masculina",
+      "position": "Pivot",
+      "team": "Futsal AFA",
+      "discipline": "FUTSAL",
+      "matchesPlayed": 19,
+      "goals": 12,
+      "assists": 4,
+      "cleanSheets": 0,
+      "yellowCards": 2,
+      "redCards": 1,
+      "playerStatus": "INJURED",
+      "season": "2026",
+      "description": "Pivot titular defendiendo con honor los colores de Villa Devoto.",
+      "clubId": 1
+    },
+    {
+      "id": 5,
+      "name": "Gabriel",
+      "lastName": "Peralta",
+      "dorsal": 8,
+      "age": 21,
+      "category": "Primera Masculina",
+      "position": "Ala",
+      "team": "Futsal AFA",
+      "discipline": "FUTSAL",
+      "matchesPlayed": 15,
+      "goals": 7,
+      "assists": 6,
+      "cleanSheets": 0,
+      "yellowCards": 3,
+      "redCards": 0,
+      "playerStatus": "ACTIVE",
+      "season": "2026",
+      "description": "Ala titular defendiendo con honor los colores de Villa Devoto.",
+      "clubId": 1
+    },
+    {
+      "id": 6,
+      "name": "Florencia",
+      "lastName": "Russo",
+      "dorsal": 1,
+      "age": 23,
+      "category": "Primera Femenina",
+      "position": "Arquero",
+      "team": "Futsal AFA",
+      "discipline": "FUTSAL",
+      "matchesPlayed": 12,
+      "goals": 0,
+      "assists": 0,
+      "cleanSheets": 6,
+      "yellowCards": 0,
+      "redCards": 0,
+      "playerStatus": "ACTIVE",
+      "season": "2026",
+      "description": "Arquero titular defendiendo con honor los colores de Villa Devoto.",
+      "clubId": 1
+    },
+    {
+      "id": 7,
+      "name": "Camila",
+      "lastName": "Gómez",
+      "dorsal": 10,
+      "age": 21,
+      "category": "Primera Femenina",
+      "position": "Ala",
+      "team": "Futsal AFA",
+      "discipline": "FUTSAL",
+      "matchesPlayed": 14,
+      "goals": 18,
+      "assists": 9,
+      "cleanSheets": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "playerStatus": "ACTIVE",
+      "season": "2026",
+      "description": "Ala titular defendiendo con honor los colores de Villa Devoto.",
+      "clubId": 1
+    },
+    {
+      "id": 8,
+      "name": "Belen",
+      "lastName": "Méndez",
+      "dorsal": 7,
+      "age": 24,
+      "category": "Primera Femenina",
+      "position": "Pivot",
+      "team": "Futsal AFA",
+      "discipline": "FUTSAL",
+      "matchesPlayed": 14,
+      "goals": 10,
+      "assists": 5,
+      "cleanSheets": 0,
+      "yellowCards": 0,
+      "redCards": 0,
+      "playerStatus": "ACTIVE",
+      "season": "2026",
+      "description": "Pivot titular defendiendo con honor los colores de Villa Devoto.",
+      "clubId": 1
+    }
+  ],
+  "socialConfig": [
+    {
+      "id": 1,
+      "platform": "TIKTOK",
+      "handle": null,
+      "url": null,
+      "apiKey": null,
+      "isActive": false,
+      "updatedAt": "2026-07-11T17:50:42.579Z"
+    }
+  ],
+  "transaction": [
+    {
+      "id": 1,
+      "concept": "CUOTA_SOCIAL",
+      "amount": 12500,
+      "date": "2026-06-10T14:30:00.000Z",
+      "status": "COMPLETED",
+      "memberName": "Martin Perez",
+      "memberId": 1
+    },
+    {
+      "id": 2,
+      "concept": "CUOTA_SOCIAL",
+      "amount": 12500,
+      "date": "2026-06-10T14:30:00.000Z",
+      "status": "COMPLETED",
+      "memberName": "Julian Alvarez",
+      "memberId": 2
+    },
+    {
+      "id": 3,
+      "concept": "CUOTA_SOCIAL",
+      "amount": 12500,
+      "date": "2026-06-10T14:30:00.000Z",
+      "status": "COMPLETED",
+      "memberName": "Sofia Martinez",
+      "memberId": 3
+    }
+  ],
+  "member": [
+    {
+      "id": 1,
+      "socioNumber": 1001,
+      "firstName": "Martin",
+      "lastName": "Perez",
+      "dni": "47542096",
+      "birthDate": "2000-05-15T00:00:00.000Z",
+      "address": "Av. Lincoln 4500, Villa Devoto",
+      "phone": "11-3456-7890",
+      "email": "martin.perez.47542096@example.com",
+      "category": "ACTIVO",
+      "estado": "ACTIVO",
+      "userId": 1,
+      "clubId": 1
+    },
+    {
+      "id": 2,
+      "socioNumber": 1002,
+      "firstName": "Julian",
+      "lastName": "Alvarez",
+      "dni": "45123456",
+      "birthDate": "2000-05-15T00:00:00.000Z",
+      "address": "Av. Lincoln 4500, Villa Devoto",
+      "phone": "11-3456-7890",
+      "email": "julian.alvarez@example.com",
+      "category": "ACTIVO",
+      "estado": "ACTIVO",
+      "userId": 2,
+      "clubId": 1
+    },
+    {
+      "id": 3,
+      "socioNumber": 1003,
+      "firstName": "Sofia",
+      "lastName": "Martinez",
+      "dni": "48901234",
+      "birthDate": "2000-05-15T00:00:00.000Z",
+      "address": "Av. Lincoln 4500, Villa Devoto",
+      "phone": "11-3456-7890",
+      "email": "sofia.martinez@example.com",
+      "category": "CADETE",
+      "estado": "ACTIVO",
+      "userId": 3,
+      "clubId": 1
+    },
+    {
+      "id": 4,
+      "socioNumber": 1004,
+      "firstName": "Lucas",
+      "lastName": "Beltran",
+      "dni": "46789012",
+      "birthDate": "2000-05-15T00:00:00.000Z",
+      "address": "Av. Lincoln 4500, Villa Devoto",
+      "phone": "11-3456-7890",
+      "email": "lucas.beltran@example.com",
+      "category": "ACTIVO",
+      "estado": "SUSPENDIDO",
+      "userId": 4,
+      "clubId": 1
+    },
+    {
+      "id": 5,
+      "socioNumber": 1005,
+      "firstName": "Valentina",
+      "lastName": "Ortiz",
+      "dni": "44567890",
+      "birthDate": "2000-05-15T00:00:00.000Z",
+      "address": "Av. Lincoln 4500, Villa Devoto",
+      "phone": "11-3456-7890",
+      "email": "valentina.ortiz@example.com",
+      "category": "ACTIVO",
+      "estado": "INACTIVO",
+      "userId": 5,
+      "clubId": 1
+    }
+  ],
+  "tutor": [
+    {
+      "id": 1,
+      "nombre": "Carlos",
+      "apellido": "Perez",
+      "DNI": "14779838",
+      "telefono": "15-4444-5555",
+      "email": "carlos.perez.14779838@test.com",
+      "parentesco": "PADRE",
+      "contactoEmergencia": "Mama 15-2222-3333"
+    }
+  ],
+  "digitalCard": [
+    {
+      "id": 1,
+      "socioId": 3,
+      "qrCode": "jn-socio-3-1001-456172",
+      "issuedAt": "2026-07-17T20:26:59.786Z",
+      "expiresAt": "2031-07-17T20:26:59.786Z",
+      "status": "ACTIVE"
+    }
+  ],
+  "membershipPlan": [
+    {
+      "id": 1,
+      "nombre": "Socio Activo Pleno",
+      "tipo": "SOCIO",
+      "importe": 12500,
+      "periodicidad": "MENSUAL",
+      "moneda": "ARS",
+      "activo": true,
+      "clubId": 1
+    },
+    {
+      "id": 2,
+      "nombre": "Arancel Futsal AFA",
+      "tipo": "DEPORTIVO",
+      "importe": 9500,
+      "periodicidad": "MENSUAL",
+      "moneda": "ARS",
+      "activo": true,
+      "clubId": 1
+    }
+  ],
+  "subscription": [
+    {
+      "id": 1,
+      "socioId": 1,
+      "planId": 1,
+      "fechaInicio": "2026-01-01T00:00:00.000Z",
+      "estado": "ACTIVO",
+      "proximoCobro": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "socioId": 2,
+      "planId": 1,
+      "fechaInicio": "2026-01-01T00:00:00.000Z",
+      "estado": "ACTIVO",
+      "proximoCobro": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "socioId": 3,
+      "planId": 1,
+      "fechaInicio": "2026-01-01T00:00:00.000Z",
+      "estado": "ACTIVO",
+      "proximoCobro": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "socioId": 4,
+      "planId": 1,
+      "fechaInicio": "2026-01-01T00:00:00.000Z",
+      "estado": "CANCELADO",
+      "proximoCobro": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": 5,
+      "socioId": 5,
+      "planId": 1,
+      "fechaInicio": "2026-01-01T00:00:00.000Z",
+      "estado": "CANCELADO",
+      "proximoCobro": "2026-08-01T00:00:00.000Z"
+    }
+  ],
+  "payment": [
+    {
+      "id": 1,
+      "socioId": 1,
+      "planId": 1,
+      "importe": 12500,
+      "metodoPago": "MERCADOPAGO",
+      "estado": "PAGADO",
+      "fechaPago": "2026-06-10T14:30:00.000Z",
+      "mpPaymentId": "mp-pay-99210",
+      "mpStatus": "approved"
+    },
+    {
+      "id": 2,
+      "socioId": 2,
+      "planId": 1,
+      "importe": 12500,
+      "metodoPago": "MERCADOPAGO",
+      "estado": "PAGADO",
+      "fechaPago": "2026-06-10T14:30:00.000Z",
+      "mpPaymentId": "mp-pay-99210",
+      "mpStatus": "approved"
+    },
+    {
+      "id": 3,
+      "socioId": 3,
+      "planId": 1,
+      "importe": 12500,
+      "metodoPago": "MERCADOPAGO",
+      "estado": "PAGADO",
+      "fechaPago": "2026-06-10T14:30:00.000Z",
+      "mpPaymentId": "mp-pay-99210",
+      "mpStatus": "approved"
+    },
+    {
+      "id": 4,
+      "socioId": 4,
+      "planId": 1,
+      "importe": 12500,
+      "metodoPago": "MERCADOPAGO",
+      "estado": "PENDIENTE",
+      "fechaPago": null,
+      "mpPaymentId": "",
+      "mpStatus": ""
+    },
+    {
+      "id": 5,
+      "socioId": 5,
+      "planId": 1,
+      "importe": 12500,
+      "metodoPago": "MERCADOPAGO",
+      "estado": "PENDIENTE",
+      "fechaPago": null,
+      "mpPaymentId": "",
+      "mpStatus": ""
+    }
+  ],
+  "invoice": [
+    {
+      "id": 1,
+      "paymentId": 1,
+      "numero": "REC-001001",
+      "fechaEmision": "2026-06-10T14:35:00.000Z",
+      "estado": "EMITIDO",
+      "tipoComprobante": "RECIBO"
+    },
+    {
+      "id": 2,
+      "paymentId": 2,
+      "numero": "REC-001002",
+      "fechaEmision": "2026-06-10T14:35:00.000Z",
+      "estado": "EMITIDO",
+      "tipoComprobante": "RECIBO"
+    },
+    {
+      "id": 3,
+      "paymentId": 3,
+      "numero": "REC-001003",
+      "fechaEmision": "2026-06-10T14:35:00.000Z",
+      "estado": "EMITIDO",
+      "tipoComprobante": "RECIBO"
+    }
+  ],
+  "channel": [
+    {
+      "id": 1,
+      "name": "Newbery TV Pro",
+      "logoUrl": "/images/new_logo.png",
+      "bannerUrl": "/images/new_banner.png",
+      "description": "Canal premium del Club Jorge Newbery",
+      "email": "prensa@newbery.com",
+      "subscribers": 2450,
+      "views": 18900,
+      "watchHours": 320.5,
+      "status": "ACTIVE"
+    }
+  ],
+  "liveStream": [
+    {
+      "id": 1,
+      "title": "Gran Clásico: Newbery vs Franja de Oro",
+      "description": "Transmisión oficial del encuentro.",
+      "youtubeId": "yt-stream-496565",
+      "rtmpUrl": "rtmp://a.rtmp.youtube.com/live2",
+      "streamKey": "jn-key-12624",
+      "status": "UPCOMING",
+      "bitrate": "6000 Kbps",
+      "resolution": "1080p",
+      "fps": 60
+    },
+    {
+      "id": 2,
+      "description": "Transmisión oficial del encuentro.",
+      "youtubeId": "yt-stream-52295",
+      "status": "LIVE"
+    },
+    {
+      "id": 3,
+      "title": "Gran Clásico: Newbery vs Franja de Oro",
+      "description": "Transmisión oficial del encuentro.",
+      "youtubeId": "yt-stream-924828",
+      "rtmpUrl": "rtmp://a.rtmp.youtube.com/live2",
+      "streamKey": "jn-key-11671",
+      "status": "LIVE",
+      "bitrate": "6000 Kbps",
+      "resolution": "1080p",
+      "fps": 60
+    }
+  ],
+  "matchBroadcast": [
+    {
+      "id": 1,
+      "matchId": 0,
+      "title": "Gran Clásico: Newbery vs Franja de Oro",
+      "status": "PROGRAMADO",
+      "streamUrl": "https://youtube.com/live/yt-stream-496565",
+      "platform": "YOUTUBE",
+      "competition": "Liga de Honor Futsal",
+      "season": "2026",
+      "date": "2026-07-15T00:00:00.000Z",
+      "timeSlot": "21:00",
+      "homeTeam": "Jorge Newbery",
+      "awayTeam": "Franja de Oro",
+      "court": "Microestadio Devoto",
+      "referee": "Horacio Elizondo",
+      "addedTime": 0,
+      "foulsHome": 0,
+      "foulsAway": 0,
+      "cardsYellowHome": 0,
+      "cardsYellowAway": 0,
+      "cardsRedHome": 0,
+      "cardsRedAway": 0,
+      "scorers": "[]",
+      "audioStatus": "OK",
+      "liveStreamId": 1
+    },
+    {
+      "id": 2,
+      "matchId": 0,
+      "status": "EN_VIVO",
+      "foulsHome": 2,
+      "foulsAway": 1,
+      "audioStatus": "OK",
+      "liveStreamId": 2,
+      "scorers": "[{\"minute\":12,\"playerName\":\"Ariel Ortega\",\"team\":\"LOCAL\"}]"
+    },
+    {
+      "id": 3,
+      "matchId": 0,
+      "title": "Gran Clásico: Newbery vs Franja de Oro",
+      "status": "EN_VIVO",
+      "streamUrl": "https://youtube.com/live/yt-stream-924828",
+      "platform": "YOUTUBE",
+      "competition": "Liga de Honor Futsal",
+      "season": "2026",
+      "date": "2026-07-15T00:00:00.000Z",
+      "timeSlot": "21:00",
+      "homeTeam": "Jorge Newbery",
+      "awayTeam": "Franja de Oro",
+      "court": "Microestadio Devoto",
+      "referee": "Horacio Elizondo",
+      "addedTime": 0,
+      "foulsHome": 2,
+      "foulsAway": 1,
+      "cardsYellowHome": 0,
+      "cardsYellowAway": 0,
+      "cardsRedHome": 0,
+      "cardsRedAway": 0,
+      "scorers": "[{\"minute\":12,\"playerName\":\"Ariel Ortega\",\"team\":\"LOCAL\"}]",
+      "audioStatus": "OK",
+      "liveStreamId": 3
+    }
+  ],
+  "cameraStatus": [
+    {
+      "id": 1,
+      "matchBroadcastId": 2,
+      "name": "Cámara Principal",
+      "status": "ACTIVE"
+    },
+    {
+      "id": 2,
+      "matchBroadcastId": 2,
+      "name": "Cámara Lateral",
+      "status": "ACTIVE"
+    },
+    {
+      "id": 3,
+      "matchBroadcastId": 2,
+      "name": "Cámara Arco Norte",
+      "status": "OFFLINE"
+    },
+    {
+      "id": 4,
+      "matchBroadcastId": 2,
+      "name": "Cámara Arco Sur",
+      "status": "OFFLINE"
+    },
+    {
+      "id": 5,
+      "matchBroadcastId": 2,
+      "name": "Cámara Móvil",
+      "status": "OFFLINE"
+    },
+    {
+      "id": 6,
+      "matchBroadcastId": 3,
+      "name": "Cámara Principal",
+      "status": "ACTIVE"
+    },
+    {
+      "id": 7,
+      "matchBroadcastId": 3,
+      "name": "Cámara Lateral",
+      "status": "ACTIVE"
+    },
+    {
+      "id": 8,
+      "matchBroadcastId": 3,
+      "name": "Cámara Arco Norte",
+      "status": "OFFLINE"
+    },
+    {
+      "id": 9,
+      "matchBroadcastId": 3,
+      "name": "Cámara Arco Sur",
+      "status": "OFFLINE"
+    },
+    {
+      "id": 10,
+      "matchBroadcastId": 3,
+      "name": "Cámara Móvil",
+      "status": "OFFLINE"
+    }
+  ],
+  "broadcastSponsor": [
+    {
+      "id": 1,
+      "matchBroadcastId": 2,
+      "sponsorId": 1,
+      "sponsorName": "Sponsor Oficial Newbery",
+      "logoUrl": "https://example.com/logo.png",
+      "linkUrl": "#",
+      "position": "PREVIA"
+    },
+    {
+      "id": 2,
+      "matchBroadcastId": 3,
+      "sponsorId": 1,
+      "sponsorName": "Sponsor Oficial Newbery",
+      "logoUrl": "https://example.com/logo.png",
+      "linkUrl": "#",
+      "position": "PREVIA"
+    }
+  ],
+  "streamEvent": [
+    {
+      "id": 1,
+      "matchBroadcastId": 2,
+      "minute": 12,
+      "type": "GOL",
+      "description": "¡Golazo espectacular al ángulo!",
+      "team": "LOCAL",
+      "playerName": "Ariel Ortega"
+    },
+    {
+      "id": 2,
+      "matchBroadcastId": 3,
+      "minute": 12,
+      "type": "GOL",
+      "description": "¡Golazo espectacular al ángulo!",
+      "team": "LOCAL",
+      "playerName": "Ariel Ortega"
+    }
+  ],
+  "replayMarker": [
+    {
+      "id": 1,
+      "matchBroadcastId": 2,
+      "minute": 15,
+      "title": "Remate al poste de Ortega",
+      "description": "Jugada muy veloz que pega en la base del palo derecho",
+      "processed": false
+    },
+    {
+      "id": 2,
+      "matchBroadcastId": 3,
+      "minute": 15,
+      "title": "Remate al poste de Ortega",
+      "description": "Jugada muy veloz que pega en la base del palo derecho",
+      "processed": false
+    }
+  ],
+  "video": [
+    {
+      "id": 1,
+      "title": "Resumen: Jorge Newbery vs Atlanta 2026",
+      "description": "Los goles y mejores jugadas del triunfo 3-1 en Devoto.",
+      "url": "https://youtube.com/watch?v=mock-vid-123",
+      "youtubeId": "mock-vid-123",
+      "thumbnailUrl": "/uploads/thumbnails/mock-thumbnail.png",
+      "duration": "08:45",
+      "durationSeconds": 0,
+      "size": 0,
+      "category": "Resumenes",
+      "folder": "",
+      "team": "",
+      "season": "2026",
+      "tournament": "Torneo de AFA Futsal",
+      "views": 0,
+      "likes": 0
+    },
+    {
+      "id": 2,
+      "title": "Resumen: Jorge Newbery vs Atlanta 2026",
+      "description": "Los goles y mejores jugadas del triunfo 3-1 en Devoto.",
+      "url": "https://youtube.com/watch?v=mock-vid-123",
+      "youtubeId": "mock-vid-123",
+      "thumbnailUrl": "/uploads/thumbnails/mock-thumbnail.png",
+      "duration": "08:45",
+      "durationSeconds": 0,
+      "size": 0,
+      "category": "Resumenes",
+      "folder": "",
+      "team": "",
+      "season": "2026",
+      "tournament": "Torneo de AFA Futsal",
+      "views": 0,
+      "likes": 0
+    }
+  ],
+  "matchEvent": [],
+  "highlightClip": [],
+  "contractHistory": [
+    {
+      "id": 1,
+      "sponsorId": 2,
+      "startDate": "2026-07-12T00:00:00.000Z",
+      "endDate": "2027-07-12T00:00:00.000Z",
+      "notes": "Contrato inicial registrado al crear el Sponsor."
+    },
+    {
+      "id": 2,
+      "sponsorId": 3,
+      "startDate": "2026-07-12T00:00:00.000Z",
+      "endDate": "2027-07-12T00:00:00.000Z",
+      "notes": "Contrato inicial registrado al crear el Sponsor."
+    },
+    {
+      "id": 3,
+      "sponsorId": 3,
+      "startDate": "2026-07-12T00:00:00.000Z",
+      "endDate": "2027-07-12T00:00:00.000Z",
+      "notes": "Contrato inicial registrado al crear el Sponsor."
+    },
+    {
+      "id": 4,
+      "sponsorId": 3,
+      "startDate": "2026-07-12T00:00:00.000Z",
+      "endDate": "2027-07-12T00:00:00.000Z",
+      "notes": "Contrato inicial registrado al crear el Sponsor."
+    }
+  ],
+  "mediaFile": [],
+  "banner": [],
+  "campaign": [],
+  "booking": [
+    {
+      "id": 1,
+      "nombreCliente": "Carlos Tevez",
+      "telefono": "11-1234-5678",
+      "email": "carlitos@example.com",
+      "facilityId": 1,
+      "fecha": "2026-07-18T09:52:34.328Z",
+      "horaInicio": "19:00",
+      "horaFin": "20:00",
+      "tipoReserva": "GENERAL",
+      "estado": "CONFIRMADA",
+      "importe": 15000,
+      "clubId": 1
+    },
+    {
+      "id": 2,
+      "nombreCliente": "Julian Alvarez",
+      "telefono": "11-8765-4321",
+      "email": "julian.alvarez@example.com",
+      "facilityId": 2,
+      "fecha": "2026-07-19T09:52:34.332Z",
+      "horaInicio": "21:00",
+      "horaFin": "22:00",
+      "tipoReserva": "SOCIO",
+      "estado": "CONFIRMADA",
+      "importe": 12000,
+      "socioId": 2,
+      "clubId": 1
+    }
+  ],
+  "liveMatchEvent": [
+    {
+      "id": 1,
+      "matchId": 1,
+      "minute": 4,
+      "type": "GOL",
+      "playerName": "Sebastián López",
+      "team": "HOME",
+      "detail": "Gol de penal"
+    },
+    {
+      "id": 2,
+      "matchId": 1,
+      "minute": 8,
+      "type": "TARJETA",
+      "playerName": "Matías Rodríguez",
+      "team": "HOME",
+      "detail": "Tarjeta Amarilla"
+    },
+    {
+      "id": 3,
+      "matchId": 1,
+      "minute": 12,
+      "type": "GOL",
+      "playerName": "Pinocho Nº10",
+      "team": "AWAY",
+      "detail": "Gol de jugada colectiva"
+    },
+    {
+      "id": 4,
+      "matchId": 1,
+      "minute": 14,
+      "type": "GOL",
+      "playerName": "Sebastián López",
+      "team": "HOME",
+      "detail": "Golazo de volea"
+    }
+  ],
+  "auditLog": [
+    {
+      "id": 1,
+      "action": "POST",
+      "entity": "MEDIA",
+      "entityId": null,
+      "entityName": "POST /api/media",
+      "userId": 2,
+      "userName": "User #2",
+      "details": "{\"path\":\"/api/media\",\"body\":{\"type\":\"VIDEO\",\"title\":\"TEST_VIDEO - Gol de taco contra Ferro\",\"url\":\"https://www.youtube.com/watch?v=mock_ferro_gol\",\"category\":\"Goles\",\"description\":\"Gran gol anotado en el segundo tiempo.\",\"season\":\"2026\",\"competition\":\"AFA Primera\",\"opponent\":\"Ferro\",\"published\":true,\"visibility\":\"PUBLIC\",\"featured\":true},\"result\":\"FAILED (403)\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 2,
+      "action": "POST",
+      "entity": "MEDIA",
+      "entityId": null,
+      "entityName": "POST /api/media",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/media\",\"body\":{\"type\":\"VIDEO\",\"title\":\"TEST_VIDEO - Gol de taco contra Ferro\",\"url\":\"invalid-url-format\",\"category\":\"Goles\",\"description\":\"Gran gol anotado en el segundo tiempo.\",\"season\":\"2026\",\"competition\":\"AFA Primera\",\"opponent\":\"Ferro\",\"published\":true,\"visibility\":\"PUBLIC\",\"featured\":true},\"result\":\"FAILED (400)\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 3,
+      "action": "POST",
+      "entity": "MEDIA",
+      "entityId": 3,
+      "entityName": "POST /api/media",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/media\",\"body\":{\"type\":\"VIDEO\",\"title\":\"TEST_VIDEO - Gol de taco contra Ferro\",\"url\":\"https://www.youtube.com/watch?v=mock_ferro_gol\",\"category\":\"Goles\",\"description\":\"Gran gol anotado en el segundo tiempo.\",\"season\":\"2026\",\"competition\":\"AFA Primera\",\"opponent\":\"Ferro\",\"published\":true,\"visibility\":\"PUBLIC\",\"featured\":true},\"result\":\"SUCCESS\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 4,
+      "action": "PUT",
+      "entity": "MEDIA",
+      "entityId": 3,
+      "entityName": "PUT /api/media/3",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/media/3\",\"body\":{\"type\":\"VIDEO\",\"title\":\"TEST_VIDEO - Gol de taco contra Ferro\",\"url\":\"https://www.youtube.com/watch?v=mock_ferro_gol\",\"category\":\"Goles\",\"description\":\"Gran gol anotado en el segundo tiempo.\",\"season\":\"2026\",\"competition\":\"AFA Primera\",\"opponent\":\"Ferro\",\"published\":false,\"visibility\":\"PUBLIC\",\"featured\":true},\"result\":\"SUCCESS\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 5,
+      "action": "DELETE",
+      "entity": "MEDIA",
+      "entityId": 3,
+      "entityName": "DELETE /api/media/3",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/media/3\",\"body\":null,\"result\":\"SUCCESS\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 6,
+      "action": "POST",
+      "entity": "MEDIA",
+      "entityId": null,
+      "entityName": "POST /api/media",
+      "userId": 2,
+      "userName": "User #2",
+      "details": "{\"path\":\"/api/media\",\"body\":{\"type\":\"VIDEO\",\"title\":\"TEST_VIDEO - Gol de taco contra Ferro\",\"url\":\"https://www.youtube.com/watch?v=mock_ferro_gol\",\"category\":\"Goles\",\"description\":\"Gran gol anotado en el segundo tiempo.\",\"season\":\"2026\",\"competition\":\"AFA Primera\",\"opponent\":\"Ferro\",\"published\":true,\"visibility\":\"PUBLIC\",\"featured\":true},\"result\":\"FAILED (403)\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 7,
+      "action": "POST",
+      "entity": "MEDIA",
+      "entityId": null,
+      "entityName": "POST /api/media",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/media\",\"body\":{\"type\":\"VIDEO\",\"title\":\"TEST_VIDEO - Gol de taco contra Ferro\",\"url\":\"invalid-url-format\",\"category\":\"Goles\",\"description\":\"Gran gol anotado en el segundo tiempo.\",\"season\":\"2026\",\"competition\":\"AFA Primera\",\"opponent\":\"Ferro\",\"published\":true,\"visibility\":\"PUBLIC\",\"featured\":true},\"result\":\"FAILED (400)\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 8,
+      "action": "POST",
+      "entity": "MEDIA",
+      "entityId": 3,
+      "entityName": "POST /api/media",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/media\",\"body\":{\"type\":\"VIDEO\",\"title\":\"TEST_VIDEO - Gol de taco contra Ferro\",\"url\":\"https://www.youtube.com/watch?v=mock_ferro_gol\",\"category\":\"Goles\",\"description\":\"Gran gol anotado en el segundo tiempo.\",\"season\":\"2026\",\"competition\":\"AFA Primera\",\"opponent\":\"Ferro\",\"published\":true,\"visibility\":\"PUBLIC\",\"featured\":true},\"result\":\"SUCCESS\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 9,
+      "action": "PUT",
+      "entity": "MEDIA",
+      "entityId": 3,
+      "entityName": "PUT /api/media/3",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/media/3\",\"body\":{\"type\":\"VIDEO\",\"title\":\"TEST_VIDEO - Gol de taco contra Ferro\",\"url\":\"https://www.youtube.com/watch?v=mock_ferro_gol\",\"category\":\"Goles\",\"description\":\"Gran gol anotado en el segundo tiempo.\",\"season\":\"2026\",\"competition\":\"AFA Primera\",\"opponent\":\"Ferro\",\"published\":false,\"visibility\":\"PUBLIC\",\"featured\":true},\"result\":\"SUCCESS\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 10,
+      "action": "DELETE",
+      "entity": "MEDIA",
+      "entityId": 3,
+      "entityName": "DELETE /api/media/3",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/media/3\",\"body\":null,\"result\":\"SUCCESS\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 11,
+      "action": "POST",
+      "entity": "NEWBERYTV",
+      "entityId": 1,
+      "entityName": "POST /api/newberytv/channel",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/newberytv/channel\",\"body\":{\"name\":\"Newbery TV Pro\",\"logoUrl\":\"/images/new_logo.png\",\"bannerUrl\":\"/images/new_banner.png\",\"description\":\"Canal premium del Club Jorge Newbery\",\"email\":\"prensa@newbery.com\"},\"result\":\"SUCCESS\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 12,
+      "action": "POST",
+      "entity": "NEWBERYTV",
+      "entityId": 3,
+      "entityName": "POST /api/newberytv/livestreams",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/newberytv/livestreams\",\"body\":{\"title\":\"Gran Clásico: Newbery vs Franja de Oro\",\"homeTeam\":\"Jorge Newbery\",\"awayTeam\":\"Franja de Oro\",\"competition\":\"Liga de Honor Futsal\",\"season\":\"2026\",\"court\":\"Microestadio Devoto\",\"referee\":\"Horacio Elizondo\",\"date\":\"2026-07-15\",\"timeSlot\":\"21:00\",\"resolution\":\"1080p\",\"fps\":60,\"bitrate\":\"6000 Kbps\"},\"result\":\"SUCCESS\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 13,
+      "action": "PUT",
+      "entity": "NEWBERYTV",
+      "entityId": 3,
+      "entityName": "PUT /api/newberytv/livestreams/3",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/newberytv/livestreams/3\",\"body\":{\"status\":\"EN_VIVO\",\"foulsHome\":2,\"foulsAway\":1,\"audioStatus\":\"OK\"},\"result\":\"SUCCESS\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 14,
+      "action": "POST",
+      "entity": "NEWBERYTV",
+      "entityId": 3,
+      "entityName": "POST /api/newberytv/livestreams/3/events",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/newberytv/livestreams/3/events\",\"body\":{\"minute\":12,\"type\":\"GOL\",\"team\":\"LOCAL\",\"playerName\":\"Ariel Ortega\",\"description\":\"¡Golazo espectacular al ángulo!\"},\"result\":\"SUCCESS\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 15,
+      "action": "POST",
+      "entity": "NEWBERYTV",
+      "entityId": 3,
+      "entityName": "POST /api/newberytv/livestreams/3/cameras",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/newberytv/livestreams/3/cameras\",\"body\":{\"name\":\"Cámara Lateral\",\"status\":\"ACTIVE\"},\"result\":\"SUCCESS\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 16,
+      "action": "POST",
+      "entity": "NEWBERYTV",
+      "entityId": 3,
+      "entityName": "POST /api/newberytv/livestreams/3/replays",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/newberytv/livestreams/3/replays\",\"body\":{\"minute\":15,\"title\":\"Remate al poste de Ortega\",\"description\":\"Jugada muy veloz que pega en la base del palo derecho\"},\"result\":\"SUCCESS\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    },
+    {
+      "id": 17,
+      "action": "POST",
+      "entity": "NEWBERYTV",
+      "entityId": 2,
+      "entityName": "POST /api/newberytv/videos",
+      "userId": 1,
+      "userName": "User #1",
+      "details": "{\"path\":\"/api/newberytv/videos\",\"body\":{\"title\":\"Resumen: Jorge Newbery vs Atlanta 2026\",\"description\":\"Los goles y mejores jugadas del triunfo 3-1 en Devoto.\",\"url\":\"https://youtube.com/watch?v=mock-vid-123\",\"youtubeId\":\"mock-vid-123\",\"category\":\"Resumenes\",\"season\":\"2026\",\"tournament\":\"Torneo de AFA Futsal\",\"duration\":\"08:45\",\"thumbnailUrl\":\"/uploads/thumbnails/mock-thumbnail.png\"},\"result\":\"SUCCESS\"}",
+      "ipAddress": "::1",
+      "clubId": 1
+    }
+  ]
+}

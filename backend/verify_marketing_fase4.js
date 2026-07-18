@@ -1,4 +1,8 @@
 const http = require('http');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_jn_2026';
+const adminToken = jwt.sign({ userId: 1, role: 'ADMIN' }, JWT_SECRET);
 
 function request(path, method, headers = {}, body = null) {
   return new Promise((resolve, reject) => {
@@ -9,6 +13,7 @@ function request(path, method, headers = {}, body = null) {
       method: method,
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
         ...headers
       }
     };
@@ -45,7 +50,7 @@ async function run() {
   try {
     // 1. Crear Sponsor
     console.log('⏳ 1. Probando: Crear Sponsor...');
-    const resSponsor = await request('/api/sponsors', 'POST', {}, {
+    const resSponsor = await request('/api/publicidad/sponsors', 'POST', {}, {
       name: 'Coca Cola Test',
       category: 'PRINCIPAL',
       website: 'https://coca-cola.com',
@@ -66,7 +71,7 @@ async function run() {
 
     // 2. Editar Sponsor
     console.log('\n⏳ 2. Probando: Editar Sponsor...');
-    const resEditSponsor = await request(`/api/sponsors/${sponsorId}`, 'PUT', {}, {
+    const resEditSponsor = await request(`/api/publicidad/sponsors/${sponsorId}`, 'PUT', {}, {
       name: 'Coca Cola Company Test',
       category: 'PRINCIPAL',
       address: 'Av. Del Libertador 5555, CABA'
@@ -83,7 +88,6 @@ async function run() {
     console.log('\n⏳ 3. Probando: Subir Archivo (Simulado)...');
     const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
     
-    // Crear un body multipart buffer
     const boundaryHeader = `--${boundary}\r\nContent-Disposition: form-data; name="category"\r\n\r\nsponsors\r\n`;
     const boundaryFile = `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="test-logo.png"\r\nContent-Type: image/png\r\n\r\n`;
     const fileBytes = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
@@ -96,7 +100,7 @@ async function run() {
       Buffer.from(boundaryEnd)
     ]);
 
-    const resUpload = await request('/api/media-files/upload', 'POST', {
+    const resUpload = await request('/api/media/upload', 'POST', {
       'Content-Type': `multipart/form-data; boundary=${boundary}`,
       'Content-Length': multipartBody.length
     }, multipartBody);
@@ -111,7 +115,7 @@ async function run() {
 
     // 4. Crear Banner
     console.log('\n⏳ 4. Probando: Crear Banner...');
-    const resBanner = await request('/api/banners', 'POST', {}, {
+    const resBanner = await request('/api/publicidad/banners', 'POST', {}, {
       title: 'Coca Cola Banner Principal',
       imageUrl: resUpload.data.url,
       linkUrl: 'https://coca-cola.com/promo',
@@ -129,7 +133,7 @@ async function run() {
 
     // 5. Crear Campaña
     console.log('\n⏳ 5. Probando: Crear Campaña...');
-    const resCampaign = await request('/api/campaigns', 'POST', {}, {
+    const resCampaign = await request('/api/publicidad/campaigns', 'POST', {}, {
       title: 'Campaña Primavera Coca Cola',
       imageUrl: resUpload.data.url,
       linkUrl: 'https://coca-cola.com/primavera',
@@ -148,7 +152,7 @@ async function run() {
 
     // 6. Registrar Impresión/Vista (VIEW)
     console.log('\n⏳ 6. Probando: Registrar Visualización (Impresión)...');
-    const resView = await request('/api/statistics/event', 'POST', {}, {
+    const resView = await request('/api/publicidad/statistics/event', 'POST', {}, {
       type: 'VIEW',
       bannerId: bannerId,
       campaignId: campaignId,
@@ -166,7 +170,7 @@ async function run() {
 
     // 7. Registrar Click (CLICK)
     console.log('\n⏳ 7. Probando: Registrar Click...');
-    const resClick = await request('/api/statistics/event', 'POST', {}, {
+    const resClick = await request('/api/publicidad/statistics/event', 'POST', {}, {
       type: 'CLICK',
       bannerId: bannerId,
       campaignId: campaignId,
@@ -184,7 +188,7 @@ async function run() {
 
     // 8. Generar Estadísticas
     console.log('\n⏳ 8. Probando: Generar Estadísticas de Negocios...');
-    const resStats = await request('/api/statistics', 'GET');
+    const resStats = await request('/api/publicidad/statistics', 'GET');
 
     if (resStats.status === 200 && resStats.data.totalClicks !== undefined) {
       console.log('  ✔ Éxito! Estadísticas generadas exitosamente.');
@@ -199,11 +203,11 @@ async function run() {
     }
 
     // Limpieza de datos creados en el test
-    console.log('\n🧹 Limpiando base de datos de pruebas...');
-    await request(`/api/media-files/${fileId}`, 'DELETE');
-    await request(`/api/campaigns/${campaignId}`, 'DELETE');
-    await request(`/api/banners/${bannerId}`, 'DELETE');
-    await request(`/api/sponsors/${sponsorId}`, 'DELETE');
+    console.log('\n... Limpiando base de datos de pruebas...');
+    await request(`/api/media/${fileId}?type=file`, 'DELETE');
+    await request(`/api/publicidad/campaigns/${campaignId}`, 'DELETE');
+    await request(`/api/publicidad/banners/${bannerId}`, 'DELETE');
+    await request(`/api/publicidad/sponsors/${sponsorId}`, 'DELETE');
     console.log('  ✔ Limpieza completada.');
 
     console.log('\n🎉 ¡TODAS LAS PRUEBAS FUE APROBADAS SATISFACTORIAMENTE! Fase 4 en orden.');

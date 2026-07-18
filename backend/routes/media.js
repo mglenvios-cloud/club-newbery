@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const fs = require('fs');
@@ -26,35 +26,14 @@ const CATEGORY_FOLDERS = {
 };
 
 // Configuración de Multer
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const category = req.body.category || req.query.category || 'documentos';
-    const folderName = CATEGORY_FOLDERS[category] || category.toLowerCase().replace(/[^a-z0-9_-]/g, '');
-    const destDir = path.join(__dirname, '../uploads', folderName);
-    
-    if (!fs.existsSync(destDir)) {
-      fs.mkdirSync(destDir, { recursive: true });
-    }
-    cb(null, destDir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    const baseName = path.basename(file.originalname, ext)
-      .replace(/[^a-zA-Z0-9]/g, '-')
-      .replace(/-+/g, '-')
-      .toLowerCase();
-    
-    const category = req.body.category || req.query.category || 'media';
-    const timestamp = Math.floor(Date.now() / 1000);
-    const newName = `${category}-${baseName}-${timestamp}${ext}`;
-    cb(null, newName);
-  }
-});
-
 const upload = multer({
-  storage: storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 100 * 1024 * 1024 } // 100MB
 });
+
+const admin = require('../config/firebase-admin');
+const bucket = admin.storage().bucket();
+const firebaseStorage = require('../config/storage');
 
 // Middleware to authenticate JWT token
 const authenticateToken = (req, res, next) => {
@@ -70,9 +49,9 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Middleware to enforce admin or operator role
+// Middleware to enforce admin, operator or super admin role
 const requireAdmin = (req, res, next) => {
-  if (!req.user || (req.user.role !== 'ADMIN' && req.user.role !== 'OPERADOR')) {
+  if (!req.user || (req.user.role !== 'ADMIN' && req.user.role !== 'OPERADOR' && req.user.role !== 'SUPER_ADMIN')) {
     return res.status(403).json({ error: 'Acceso denegado. Permisos de administrador o productor operador requeridos.' });
   }
   next();
@@ -96,20 +75,41 @@ router.post('/upload', authenticateToken, upload.single('file'), async (req, res
     }
 
     const category = req.body.category || req.query.category || 'documentos';
-    const folderName = CATEGORY_FOLDERS[category] || category.toLowerCase().replace(/[^a-z0-9_-]/g, '');
-    const fileUrl = `/uploads/${folderName}/${req.file.filename}`;
+    const storagePath = firebaseStorage.buildStoragePath(category, req.file.originalname);
+
+    const useLocalJson = !process.env.GOOGLE_APPLICATION_CREDENTIALS && !process.env.FIREBASE_STORAGE_BUCKET && !process.env.STORAGE_EMULATOR_HOST;
+    let fileUrl = '';
+
+    if (useLocalJson) {
+      const localFilePath = path.join(__dirname, '../uploads', storagePath);
+      fs.mkdirSync(path.dirname(localFilePath), { recursive: true });
+      fs.writeFileSync(localFilePath, req.file.buffer);
+      fileUrl = `/uploads/${storagePath}`;
+    } else {
+      const file = bucket.file(storagePath);
+      await file.save(req.file.buffer, {
+        metadata: { contentType: req.file.mimetype }
+      });
+      try {
+        await file.makePublic();
+      } catch (e) {
+        // Ignorar si el emulador no soporta
+      }
+      fileUrl = firebaseStorage.getPublicUrl(storagePath);
+    }
 
     const width = req.body.width ? parseInt(req.body.width) : null;
     const height = req.body.height ? parseInt(req.body.height) : null;
     const duration = req.body.duration ? parseFloat(req.body.duration) : null;
     
     const ext = path.extname(req.file.originalname).toLowerCase().replace('.', '');
+    const filename = path.basename(storagePath);
 
     const media = await prisma.mediaFile.create({
       data: {
-        name: req.body.name || req.file.filename,
+        name: req.body.name || filename,
         originalName: req.file.originalname,
-        path: req.file.path,
+        path: storagePath,
         url: fileUrl,
         mimeType: req.file.mimetype,
         extension: ext,
@@ -121,8 +121,8 @@ router.post('/upload', authenticateToken, upload.single('file'), async (req, res
         userId: req.user ? req.user.userId : null,
 
         // Compatibilidad legacy
-        filename: req.file.filename,
-        filepath: req.file.path,
+        filename: filename,
+        filepath: storagePath,
         filetype: ext
       }
     });
@@ -144,12 +144,6 @@ router.post('/upload-url', authenticateToken, async (req, res) => {
   try {
     const parsedUrl = new URL(url);
     const resolvedCategory = category || 'documentos';
-    const folderName = CATEGORY_FOLDERS[resolvedCategory] || resolvedCategory.toLowerCase().replace(/[^a-z0-9_-]/g, '');
-    const destDir = path.join(__dirname, '../uploads', folderName);
-
-    if (!fs.existsSync(destDir)) {
-      fs.mkdirSync(destDir, { recursive: true });
-    }
 
     const response = await fetch(url);
     if (!response.ok) {
@@ -175,25 +169,37 @@ router.post('/upload-url', authenticateToken, async (req, res) => {
     };
     
     ext = mimeToExt[contentType] || path.extname(parsedUrl.pathname).toLowerCase() || '.bin';
-    
     const originalName = path.basename(parsedUrl.pathname) || `remoto-${Math.floor(Date.now() / 1000)}`;
-    const baseName = originalName.replace(ext, '')
-      .replace(/[^a-zA-Z0-9]/g, '-')
-      .replace(/-+/g, '-')
-      .toLowerCase();
+    
+    const storagePath = firebaseStorage.buildStoragePath(resolvedCategory, originalName);
+    
+    const useLocalJson = !process.env.GOOGLE_APPLICATION_CREDENTIALS && !process.env.FIREBASE_STORAGE_BUCKET && !process.env.STORAGE_EMULATOR_HOST;
+    let fileUrl = '';
 
-    const timestamp = Math.floor(Date.now() / 1000);
-    const filename = `${resolvedCategory}-${baseName}-${timestamp}${ext}`;
-    const filepath = path.join(destDir, filename);
-    const fileUrl = `/uploads/${folderName}/${filename}`;
-
-    fs.writeFileSync(filepath, buffer);
+    if (useLocalJson) {
+      const localFilePath = path.join(__dirname, '../uploads', storagePath);
+      fs.mkdirSync(path.dirname(localFilePath), { recursive: true });
+      fs.writeFileSync(localFilePath, buffer);
+      fileUrl = `/uploads/${storagePath}`;
+    } else {
+      const file = bucket.file(storagePath);
+      await file.save(buffer, {
+        metadata: { contentType }
+      });
+      try {
+        await file.makePublic();
+      } catch (e) {
+        // Ignorar si el emulador no soporta
+      }
+      fileUrl = firebaseStorage.getPublicUrl(storagePath);
+    }
+    const filename = path.basename(storagePath);
 
     const media = await prisma.mediaFile.create({
       data: {
         name: filename,
         originalName: originalName,
-        path: filepath,
+        path: storagePath,
         url: fileUrl,
         mimeType: contentType,
         extension: ext.replace('.', ''),
@@ -203,7 +209,7 @@ router.post('/upload-url', authenticateToken, async (req, res) => {
 
         // Compatibilidad legacy
         filename: filename,
-        filepath: filepath,
+        filepath: storagePath,
         filetype: ext.replace('.', '')
       }
     });

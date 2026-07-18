@@ -35,14 +35,7 @@ export default function MundoInferiores() {
     fetchPlayers();
   }, []);
 
-  const defaultMockPlayers = [
-    { id: 1, name: "Thiago Medina", age: 11, category: "2015", position: "Ala", team: "Futsal A", achievements: "Goleador, Compañero ⭐", matchesPlayed: 14, goals: 12, assists: 8, photoUrl: null },
-    { id: 2, name: "Mateo Rossi", age: 10, category: "2016", position: "Cierre", team: "Futsal A", achievements: "Fair Play ⭐", matchesPlayed: 12, goals: 3, assists: 9, photoUrl: null },
-    { id: 3, name: "Bautista Castro", age: 11, category: "2015", position: "Ala", team: "Futsal A", achievements: "Mejor Compañero 🤝", matchesPlayed: 10, goals: 8, assists: 4, photoUrl: null },
-    { id: 4, name: "Benjamín Rossi", age: 8, category: "2018", position: "Ala", team: "Futsal B", achievements: "Goleador Semillero", matchesPlayed: 8, goals: 10, assists: 2, photoUrl: null },
-    { id: 5, name: "Juana Rossi", age: 10, category: "2016", position: "Patinadora", team: "Patín Show", achievements: "Medalla de Oro 🥇", matchesPlayed: 6, goals: 0, assists: 0, photoUrl: null },
-    { id: 6, name: "Delfina Solari", age: 11, category: "2015", position: "Patinadora", team: "Patín Show", achievements: "Esfuerzo Escolar 📚", matchesPlayed: 8, goals: 0, assists: 0, photoUrl: null }
-  ];
+
 
   const categories = ["ALL", "2015", "2016", "2018"];
 

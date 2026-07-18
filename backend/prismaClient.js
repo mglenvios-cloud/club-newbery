@@ -1,24 +1,12 @@
-const { PrismaClient } = require('@prisma/client');
-require('dotenv').config();
+'use strict';
 
 /**
- * ─── Prisma Client — PostgreSQL ───────────────────────────────────────────────
+ * ─── Prisma Client — Firebase Firestore Adapter ────────────────────────────────
  *
- * La conexión se obtiene exclusivamente desde DATABASE_URL.
- * config/env.js garantiza que esta variable esté definida antes de que
- * cualquier ruta sea cargada.
+ * Mapea todas las llamadas de base de datos a colecciones Firestore emulando Prisma.
  */
+const prisma = require('./firestorePrismaAdapter');
 
-const nodeEnv = process.env.NODE_ENV || 'development';
-
-const prisma = new PrismaClient({
-  log: nodeEnv === 'development'
-    ? ['error', 'warn']
-    : ['error'],
-});
-
-if (nodeEnv !== 'production') {
-  console.log(`[Prisma] Conectando a base de datos (${nodeEnv})`);
-}
+console.log('[Prisma-Firestore] Inicializando adaptador para base de datos Firestore');
 
 module.exports = prisma;

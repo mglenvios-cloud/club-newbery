@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const prisma = require('../prismaClient');
 const router = express.Router();
 
@@ -21,7 +21,7 @@ const authenticateToken = (req, res, next) => {
 
 // Listar todas las transacciones
 router.get('/', authenticateToken, async (req, res) => {
-  if (!['ADMIN', 'FUTSAL', 'OPERADOR'].includes(req.user.role)) return res.status(403).json({ error: 'Acceso denegado. Se requieren permisos de administrador o personal de staff.' });
+  if (!['ADMIN', 'FUTSAL', 'OPERADOR', 'SUPER_ADMIN'].includes(req.user.role)) return res.status(403).json({ error: 'Acceso denegado. Se requieren permisos de administrador o personal de staff.' });
   const { concept, status } = req.query;
   try {
     const filters = {};
@@ -41,7 +41,7 @@ router.get('/', authenticateToken, async (req, res) => {
 
 // Registrar un movimiento de pago manual
 router.post('/', authenticateToken, async (req, res) => {
-  if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Acceso denegado' });
+  if (req.user.role !== 'ADMIN' && req.user.role !== 'SUPER_ADMIN') return res.status(403).json({ error: 'Acceso denegado' });
   const { concept, amount, memberName, memberId, details, status } = req.body;
   try {
     if (!concept || amount === undefined || !memberName) {

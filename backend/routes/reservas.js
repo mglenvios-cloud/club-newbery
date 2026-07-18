@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const jwt = require('jsonwebtoken');
 const prisma = require('../prismaClient');
 const { logError } = require('../modules/gestionDeportiva/utils/errorLogger');
@@ -82,7 +82,7 @@ router.get('/availability', async (req, res) => {
 // Admin lists all, Socio lists their own bookings
 router.get('/bookings', authenticateToken, async (req, res) => {
   try {
-    const isStaff = ['ADMIN', 'FUTSAL', 'OPERADOR'].includes(req.user.role);
+    const isStaff = ['ADMIN', 'FUTSAL', 'OPERADOR', 'SUPER_ADMIN'].includes(req.user.role);
     if (isStaff) {
       const allBookings = await bookingsService.getAllBookings();
       return res.json(allBookings);
@@ -134,8 +134,8 @@ router.post('/bookings', optionalAuthenticate, validateBooking, async (req, res)
 router.put('/bookings/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   try {
-    // Si no es admin, verificar que la reserva le pertenezca a este socio
-    if (req.user.role !== 'ADMIN') {
+    // Si no es admin o superadmin, verificar que la reserva le pertenezca a este socio
+    if (req.user.role !== 'ADMIN' && req.user.role !== 'SUPER_ADMIN') {
       const socio = await prisma.member.findUnique({ where: { userId: req.user.userId } });
       const booking = await prisma.booking.findUnique({ where: { id: parseInt(id, 10) } });
       if (!socio || !booking || booking.socioId !== socio.id) {
@@ -156,8 +156,8 @@ router.put('/bookings/:id', authenticateToken, async (req, res) => {
 router.delete('/bookings/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   try {
-    // Si no es admin, verificar que la reserva le pertenezca a este socio
-    if (req.user.role !== 'ADMIN') {
+    // Si no es admin o superadmin, verificar que la reserva le pertenezca a este socio
+    if (req.user.role !== 'ADMIN' && req.user.role !== 'SUPER_ADMIN') {
       const socio = await prisma.member.findUnique({ where: { userId: req.user.userId } });
       const booking = await prisma.booking.findUnique({ where: { id: parseInt(id, 10) } });
       if (!socio || !booking || booking.socioId !== socio.id) {

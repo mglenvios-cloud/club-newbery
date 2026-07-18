@@ -6,8 +6,7 @@ const nextConfig = {
   // Reescrituras para evitar problemas CORS en producción
   // El frontend hace llamadas a /api/* que Next.js reenvía al backend real
   async rewrites() {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || '';
-    if (!backendUrl) return [];
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
     return [
       {
         source: '/api/:path*',

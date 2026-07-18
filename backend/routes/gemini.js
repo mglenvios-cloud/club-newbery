@@ -11,14 +11,7 @@ const SYSTEM_PROMPTS = {
   trivia: "Sos el conductor del show de trivias del Club Jorge Newbery. Generá una pregunta interactiva de opción múltiple sobre deportes, reglamentos o la historia del club e invitá al usuario a responder A, B o C. Mantenelo dinámico y divertido."
 };
 
-// Respuestas locales de contingencia (Fallback si no hay API Key)
-const fallbackResponses = {
-  club: "🕒 El club abre de 17 a 22hs. La sede está en Alpatacal 3026 (Villa Devoto). Podés asociarte en la secretaría o en la web.",
-  school: "📚 ¡Hola! Preguntame alguna duda de matemáticas o geografía y te ayudo a pensar la respuesta paso a paso.",
-  sports: "⚽ Futsal AFA se juega 5 contra 5 en dos tiempos de 20 minutos netos. ¿Querés que te recomiende un ejercicio de calentamiento?",
-  trivia: "🏆 Trivia: ¿De qué colores es la camiseta del club? A) Azul/Amarillo B) Blanco/Rojo/Negro C) Verde. ¡Escribí la opción correcta!"
-};
-
+// POST /api/chat
 router.post('/chat', async (req, res) => {
   const { message, mode } = req.body;
   const activeMode = mode || 'club';
@@ -28,11 +21,9 @@ router.post('/chat', async (req, res) => {
     return res.status(400).json({ error: 'Mensaje faltante' });
   }
 
-  // Si no hay API Key configurada, usar respuestas locales de contingencia
   if (!GEMINI_API_KEY) {
-    console.warn("[Gemini API] GEMINI_API_KEY no configurada. Usando fallback local.");
-    let fallbackText = fallbackResponses[activeMode] || fallbackResponses.club;
-    return res.json({ text: fallbackText });
+    console.error("[Gemini API] Error: GEMINI_API_KEY no configurada.");
+    return res.status(503).json({ error: 'El servicio de IA no está disponible en este momento.' });
   }
 
   try {
@@ -66,11 +57,11 @@ router.post('/chat', async (req, res) => {
     } else {
       const errText = await response.text();
       console.error("[Gemini API Error]", errText);
-      throw new Error("Error en el servicio de Gemini");
+      throw new Error(`Error en servicio externo de Gemini: ${response.status}`);
     }
   } catch (error) {
-    console.error('Error al conectar con Gemini:', error);
-    res.json({ text: fallbackResponses[activeMode] || "Tengo problemas de conexión, pero recordá que en secretaría podemos ayudarte." });
+    console.error('[Gemini API] Error de conexión:', error.message);
+    res.status(503).json({ error: 'El servicio de IA no está disponible en este momento. Intente más tarde.' });
   }
 });
 
