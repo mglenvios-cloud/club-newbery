@@ -45,23 +45,34 @@ const app = express();
 // ─── CORS — Lista blanca de orígenes permitidos ────────────────────────────────
 const allowedOrigins = [
   FRONTEND_URL,
+  'https://frontend-indol-rho-38.vercel.app', // Respaldo explícito para producción en Vercel
   // En desarrollo local, permitir localhost
   ...(NODE_ENV !== 'production' ? [
     'http://localhost:3000',
     'http://localhost:3001',
     'http://127.0.0.1:3000',
   ] : []),
-].filter(Boolean).map(url => url.replace(/\/$/, ''));
+].filter(Boolean).map(url => url.trim().replace(/[\r\n]/g, '').replace(/\/$/, ''));
 
 app.use(cors({
   origin: (origin, callback) => {
     // Permitir peticiones sin origin (curl, Postman, mobile apps)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
+
+    // Normalizar origen entrante
+    const normalizedOrigin = origin.trim().replace(/\/$/, '');
+
+    // Validar si el origen está permitido por lista o coincide con wildcard de Vercel
+    const isAllowed = allowedOrigins.includes(normalizedOrigin) || 
+                      normalizedOrigin.endsWith('.vercel.app');
+
+    if (isAllowed) {
       return callback(null, true);
     }
+
     console.error(`[CORS] Origen bloqueado: ${origin}`);
-    return callback(new Error(`CORS: Origen no autorizado: ${origin}`));
+    // No lanzar error Express (evita respuesta 500 en preflight OPTIONS), solo retornar false
+    return callback(null, false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

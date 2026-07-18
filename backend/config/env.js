@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ─── Validación de Variables de Entorno ───────────────────────────────────────
  *
  * Este módulo se importa UNA VEZ en index.js ANTES de cargar cualquier ruta.
@@ -20,11 +20,14 @@ const OPTIONAL_VARS = [
   { key: 'PORT',            description: 'Puerto de escucha del servidor' },
 ];
 
+const cleanEnvVar = (val) => typeof val === 'string' ? val.trim().replace(/[\r\n]/g, '') : val;
+
 function validateEnv() {
   const missing = [];
 
   for (const { key, description } of REQUIRED_VARS) {
-    if (!process.env[key]) {
+    const value = cleanEnvVar(process.env[key]);
+    if (!value) {
       missing.push(`  - ${key}: ${description}`);
     }
   }
@@ -39,7 +42,8 @@ function validateEnv() {
   }
 
   for (const { key, description } of OPTIONAL_VARS) {
-    if (!process.env[key]) {
+    const value = cleanEnvVar(process.env[key]);
+    if (!value) {
       console.warn(`[ENV] ADVERTENCIA: ${key} no definida: ${description}`);
     }
   }
@@ -50,10 +54,10 @@ function validateEnv() {
 validateEnv();
 
 module.exports = {
-  JWT_SECRET:      process.env.JWT_SECRET,
-  DATABASE_URL:    process.env.DATABASE_URL,
-  FRONTEND_URL:    process.env.FRONTEND_URL,
-  MP_ACCESS_TOKEN: process.env.MP_ACCESS_TOKEN || null,
-  NODE_ENV:        process.env.NODE_ENV || 'development',
+  JWT_SECRET:      cleanEnvVar(process.env.JWT_SECRET),
+  DATABASE_URL:    cleanEnvVar(process.env.DATABASE_URL),
+  FRONTEND_URL:    cleanEnvVar(process.env.FRONTEND_URL),
+  MP_ACCESS_TOKEN: cleanEnvVar(process.env.MP_ACCESS_TOKEN) || null,
+  NODE_ENV:        cleanEnvVar(process.env.NODE_ENV) || 'development',
   PORT:            parseInt(process.env.PORT, 10) || 5000,
 };

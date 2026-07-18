@@ -1,15 +1,15 @@
 const express = require('express');
 const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 const prisma = require('../prismaClient');
+const { FRONTEND_URL, MP_ACCESS_TOKEN } = require('../config/env');
 
 const router = express.Router();
-const FRONTEND_URL = process.env.FRONTEND_URL;
+
 if (!FRONTEND_URL) {
   console.error('[MercadoPago] CRITICAL: FRONTEND_URL no está definida. Configurar en variables de entorno.');
 }
 
 // Inicializar MercadoPago Client
-const MP_ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN;
 if (!MP_ACCESS_TOKEN) {
   console.error('[MercadoPago] CRITICAL: MP_ACCESS_TOKEN no está definida. Los pagos no funcionarán.');
 }
