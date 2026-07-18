@@ -191,23 +191,6 @@ app.get('/api/carnets', async (req, res) => {
   }
 });
 
-// TEMPORARY: Debug users endpoint to verify production DB state
-app.get('/api/debug-users', async (req, res) => {
-  try {
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        password: true
-      }
-    });
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // Health check — usado por Render para verificar que el servicio está vivo
 app.get(['/health', '/api/health'], async (req, res) => {
   try {
