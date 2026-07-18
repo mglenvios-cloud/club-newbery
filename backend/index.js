@@ -192,7 +192,7 @@ app.get('/api/carnets', async (req, res) => {
 });
 
 // Health check — usado por Render para verificar que el servicio está vivo
-app.get('/health', async (req, res) => {
+app.get(['/health', '/api/health'], async (req, res) => {
   try {
     const prisma = require('./prismaClient');
     await prisma.$queryRaw`SELECT 1`;
