@@ -1,9 +1,13 @@
+databases:
+  - name: club-newbery-db
+    plan: free                  # Base de datos PostgreSQL creada en Render
+
 services:
   - type: web
-    name: club-newbery-backend
+    name: club-newbery          # Web Service Render
     env: node
     plan: free
-    region: oregon              # Región más cercana a Argentina con plan free
+    region: oregon              # Región gratuita de Render
     rootDir: backend            # Directorio raíz del backend en el monorepo
     buildCommand: npm install && npm run build
     startCommand: npm start
@@ -12,7 +16,9 @@ services:
       - key: PORT
         value: 5000
       - key: DATABASE_URL
-        sync: false       # REQUERIDO: URL de PostgreSQL (Render Dashboard)
+        fromDatabase:
+          name: club-newbery-db
+          property: connectionString
       - key: JWT_SECRET
         sync: false       # REQUERIDO: Clave fuerte >= 64 caracteres (Render Dashboard)
       - key: MP_ACCESS_TOKEN
@@ -21,3 +27,5 @@ services:
         value: https://frontend-indol-rho-38.vercel.app
       - key: NODE_ENV
         value: production
+      - key: GCLOUD_PROJECT
+        value: club-newbery-digital
