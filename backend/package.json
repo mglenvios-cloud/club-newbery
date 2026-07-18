@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "prisma generate && prisma migrate deploy && node seed_users.js",
+    "build": "prisma generate && node seed_users.js",
     "start": "node index.js",
     "seed:test": "node -e \"process.env.APP_ENV='TEST'; require('./seed_demo.js')\"",
     "verify:test": "node verify_emulators.js",
