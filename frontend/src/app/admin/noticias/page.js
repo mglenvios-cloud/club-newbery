@@ -66,14 +66,9 @@ export default function AdminNoticias() {
     const url = isEditing ? `/api/news/${editId}` : '/api/news';
 
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
       const res = await fetch(url, {
         method,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
+        body: payload
       });
 
       if (res.ok) {
@@ -133,12 +128,8 @@ export default function AdminNoticias() {
     if (!confirm("¿Estás seguro de eliminar esta noticia?")) return;
 
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
       const res = await fetch(`/api/news/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        method: 'DELETE'
       });
 
       if (res.ok) {
