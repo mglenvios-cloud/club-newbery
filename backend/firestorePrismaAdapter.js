@@ -159,7 +159,12 @@ class FirestoreCollection {
       }
     }
 
-    const record = { id: nextId, ...data };
+    const record = { 
+      id: nextId, 
+      createdAt: data.createdAt !== undefined ? data.createdAt : new Date().toISOString(),
+      updatedAt: data.updatedAt !== undefined ? data.updatedAt : new Date().toISOString(),
+      ...data 
+    };
     
     // Re-leer dbData tras getNextId
     const currentDbData = readJsonDb();
@@ -212,6 +217,7 @@ class FirestoreCollection {
         record[k] = v;
       }
     }
+    record.updatedAt = new Date().toISOString();
 
     writeJsonDb(dbData);
 
@@ -328,7 +334,12 @@ class FirestoreCollection {
       }
     }
 
-    const record = { id: nextId, ...data };
+    const record = { 
+      id: nextId, 
+      createdAt: data.createdAt !== undefined ? data.createdAt : new Date().toISOString(),
+      updatedAt: data.updatedAt !== undefined ? data.updatedAt : new Date().toISOString(),
+      ...data 
+    };
     await docRef.set(record);
 
     for (const [relName, relData] of Object.entries(nestedCreates)) {
@@ -369,6 +380,7 @@ class FirestoreCollection {
         updateData[k] = current + v.increment;
       }
     }
+    updateData.updatedAt = new Date().toISOString();
 
     await docRef.update(updateData);
     const doc = await docRef.get();
