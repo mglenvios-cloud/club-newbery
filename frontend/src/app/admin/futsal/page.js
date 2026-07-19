@@ -51,7 +51,7 @@ export default function AdminFutsal() {
     position: "Ala", team: "Futsal AFA", achievements: "", matchesPlayed: "0",
     goals: "0", assists: "0", yellowCards: "0", redCards: "0", cleanSheets: "0",
     season: "2026", description: "", birthDate: "", playerStatus: "ACTIVE",
-    videoUrl: "", photoUrl: ""
+    videoUrl: "", photoUrl: "", dni: ""
   });
 
   // 3. Match Form
@@ -240,7 +240,8 @@ export default function AdminFutsal() {
     setEditTarget(p);
     setPlayerForm({
       ...p,
-      birthDate: p.birthDate ? new Date(p.birthDate).toISOString().split('T')[0] : ""
+      birthDate: p.birthDate ? new Date(p.birthDate).toISOString().split('T')[0] : "",
+      dni: p.dni || ""
     });
     setShowPlayerModal(true);
   };
@@ -252,7 +253,7 @@ export default function AdminFutsal() {
       position: "Ala", team: "Futsal AFA", achievements: "", matchesPlayed: "0",
       goals: "0", assists: "0", yellowCards: "0", redCards: "0", cleanSheets: "0",
       season: "2026", description: "", birthDate: "", playerStatus: "ACTIVE",
-      videoUrl: "", photoUrl: ""
+      videoUrl: "", photoUrl: "", dni: ""
     });
     setShowPlayerModal(true);
   };
@@ -757,7 +758,7 @@ export default function AdminFutsal() {
                           <span className="w-6 h-6 bg-jn-red/10 text-jn-red font-black font-mono flex items-center justify-center rounded-md text-[10px]">{p.dorsal}</span>
                           <div>
                             <span className="font-bold text-jn-black">{p.name} {p.lastName}</span>
-                            <span className="block text-[9px] text-gray-400 font-medium mt-0.5">Edad: {p.age} años</span>
+                            <span className="block text-[9px] text-gray-400 font-medium mt-0.5">Edad: {p.age} años {p.dni && `| DNI: ${p.dni}`}</span>
                           </div>
                         </div>
                       </td>
@@ -1188,6 +1189,10 @@ export default function AdminFutsal() {
                     <option value="INJURED">Lesionado</option>
                     <option value="INACTIVE">Inactivo</option>
                   </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">DNI del Jugador</label>
+                  <input type="text" value={playerForm.dni} onChange={e => setPlayerForm({...playerForm, dni: e.target.value})} className="w-full p-2.5 border border-gray-250 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-jn-red" placeholder="e.g. 40123456" />
                 </div>
 
                 <div className="col-span-2 border-t border-gray-100 pt-3">

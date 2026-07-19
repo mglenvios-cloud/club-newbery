@@ -82,7 +82,7 @@ export default function HeroLive({ liveMatch, videoDestacado, onPlayVideo }) {
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-zinc-400 font-mono border-y border-white/5 py-4 w-fit select-none">
             <span className="flex items-center gap-2">
               <Clock size={14} className="text-red-500 animate-pulse" />
-              <span>MINUTO <strong className="text-white">{liveMatch.liveMinute || 0}'</strong></span>
+              <span>MINUTO <strong className="text-white">{liveMatch.liveMinute || 0}&apos;</strong></span>
             </span>
             <span className="flex items-center gap-2">
               <Users size={14} className="text-red-500" />

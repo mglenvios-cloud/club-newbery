@@ -150,6 +150,15 @@ app.use('/api/integrations', integrationsRoutes);
 app.use('/api/publicidad', publicidadRoutes);
 app.use('/api/gestion-deportiva', gestionDeportivaRoutes);
 app.use('/api/demo-contact', demoContactRoutes);
+
+// ─── Rutas de Futsal AFA (Alias de compatibilidad) ───────────────────────────
+app.use('/api/futsal/teams', teamRoutes);
+app.use('/api/futsal/players', playerRoutes);
+app.use('/api/futsal/matches', matchRoutes);
+
+// ─── Rutas Comerciales directas (para /api/sponsors y /api/banners) ─────────
+app.use('/api', publicidadRoutes);
+
 // ─── Nuevas rutas Fase 2 ───────────────────────────────────────────────────────
 app.use('/api/technical-staff', technicalStaffRoutes);
 app.use('/api/club-events', clubEventsRoutes);
@@ -166,9 +175,6 @@ app.use('/api/newberytv', newberytvRoutes);
 
 // Servir archivos estáticos subidos de publicidad/sponsors
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Módulo Comercial — ruta específica
-app.use('/api/publicidad', publicidadRoutes);
 
 
 

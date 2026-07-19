@@ -37,7 +37,7 @@ export default function Timeline({ events = [], onEventClick }) {
                 
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] font-mono text-red-500 font-black">{evt.minute}'</span>
+                    <span className="text-[11px] font-mono text-red-500 font-black">{evt.minute}&apos;</span>
                     <span className="text-[9px] font-bold text-zinc-300">{icon}</span>
                     <span className="text-[9px] font-black text-zinc-400 bg-zinc-800/80 px-2 py-0.5 rounded uppercase tracking-wider">
                       {evt.type}

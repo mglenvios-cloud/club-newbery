@@ -6,27 +6,7 @@ const { logError } = require('../modules/gestionDeportiva/utils/errorLogger');
 const router = express.Router();
 const { JWT_SECRET } = require('../config/env');
 
-// Middleware to authenticate JWT
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  
-  if (!token) return res.sendStatus(401);
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
-
-// Middleware to require admin
-const requireAdmin = (req, res, next) => {
-  if (!req.user || (req.user.role !== 'ADMIN' && req.user.role !== 'SUPER_ADMIN')) {
-    return res.status(403).json({ error: 'Acceso denegado. Permisos de administrador requeridos.' });
-  }
-  next();
-};
+const { dualAuth, requireAdmin } = require('../middleware/firebaseAuth');
 
 // Robust URL or local path validation
 function isValidUrlOrPath(string) {
@@ -42,8 +22,14 @@ function isValidUrlOrPath(string) {
 
 // ─── GET /api/news ─────────────────────────────────────────────────────────
 router.get('/', async (req, res) => {
+  const { status } = req.query;
   try {
+    const where = {};
+    if (status) {
+      where.status = status;
+    }
     const news = await prisma.news.findMany({
+      where,
       orderBy: { createdAt: 'desc' }
     });
     res.json(news);
@@ -53,9 +39,26 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ─── GET /api/news/:id ─────────────────────────────────────────────────────
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const newsItem = await prisma.news.findUnique({
+      where: { id: parseInt(id, 10) }
+    });
+    if (!newsItem) {
+      return res.status(404).json({ error: 'Novedad no encontrada.' });
+    }
+    res.json(newsItem);
+  } catch (error) {
+    logError({ module: 'NewberyTV', action: 'getNewsById', error, req });
+    res.status(500).json({ error: 'Error al obtener la novedad.' });
+  }
+});
+
 // ─── POST /api/news (Admin only) ───────────────────────────────────────────
-router.post('/', authenticateToken, requireAdmin, async (req, res) => {
-  const { title, content, category, tag, imageUrl } = req.body;
+router.post('/', dualAuth, requireAdmin, async (req, res) => {
+  const { title, description, content, category, tag, imageUrl, author, status } = req.body;
   try {
     if (!title || !content || !category) {
       return res.status(400).json({ error: 'Faltan campos obligatorios (título, contenido o categoría).' });
@@ -68,10 +71,13 @@ router.post('/', authenticateToken, requireAdmin, async (req, res) => {
     const newsItem = await prisma.news.create({
       data: {
         title,
+        description: description || '',
         content,
         category,
         tag: tag || null,
-        imageUrl: imageUrl || null
+        imageUrl: imageUrl || null,
+        author: author || 'Admin',
+        status: status || 'DRAFT'
       }
     });
 
@@ -83,9 +89,9 @@ router.post('/', authenticateToken, requireAdmin, async (req, res) => {
 });
 
 // ─── PUT /api/news/:id (Admin only) ──────────────────────────────────────────
-router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
+router.put('/:id', dualAuth, requireAdmin, async (req, res) => {
   const { id } = req.params;
-  const { title, content, category, tag, imageUrl } = req.body;
+  const { title, description, content, category, tag, imageUrl, author, status } = req.body;
   try {
     if (!title || !content || !category) {
       return res.status(400).json({ error: 'Faltan campos obligatorios (título, contenido o categoría).' });
@@ -104,10 +110,13 @@ router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
       where: { id: parseInt(id, 10) },
       data: {
         title,
+        description: description !== undefined ? description : existing.description,
         content,
         category,
         tag: tag || null,
-        imageUrl: imageUrl || null
+        imageUrl: imageUrl || null,
+        author: author || existing.author,
+        status: status || existing.status
       }
     });
 
@@ -119,7 +128,7 @@ router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
 });
 
 // ─── DELETE /api/news/:id (Admin only) ─────────────────────────────────────
-router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
+router.delete('/:id', dualAuth, requireAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const existing = await prisma.news.findUnique({ where: { id: parseInt(id, 10) } });

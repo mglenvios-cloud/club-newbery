@@ -591,6 +591,82 @@ router.delete('/media-files/:id', async (req, res) => {
 
 // ─── ENDPOINTS: TRACKING (ESTADÍSTICAS) ──────────────────────────────────────
 
+// POST /sponsors/:id/click — Registrar click directo en sponsor
+router.post('/sponsors/:id/click', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const sponsorId = parseInt(id, 10);
+    await prisma.sponsor.update({
+      where: { id: sponsorId },
+      data: { clicks: { increment: 1 } }
+    });
+    
+    // Registrar también como un evento en AdvertisementView
+    await prisma.advertisementView.create({
+      data: {
+        type: 'CLICK',
+        sponsorId,
+        device: 'desktop'
+      }
+    }).catch(() => {});
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[Publicidad] Error al registrar click en sponsor:', error.message);
+    res.status(500).json({ error: 'Error al registrar click en sponsor' });
+  }
+});
+
+// POST /banners/:id/click — Registrar click directo en banner
+router.post('/banners/:id/click', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const bannerId = parseInt(id, 10);
+    const banner = await prisma.banner.update({
+      where: { id: bannerId },
+      data: { clicks: { increment: 1 } }
+    });
+
+    // Registrar también como un evento en AdvertisementView
+    await prisma.advertisementView.create({
+      data: {
+        type: 'CLICK',
+        bannerId,
+        sponsorId: banner.sponsorId || null,
+        device: 'desktop'
+      }
+    }).catch(() => {});
+
+    // Consolidar en el modelo Advertisement
+    if (banner.sponsorId) {
+      const existingAd = await prisma.advertisement.findFirst({
+        where: { sponsorId: banner.sponsorId, bannerId: bannerId }
+      });
+      if (existingAd) {
+        await prisma.advertisement.update({
+          where: { id: existingAd.id },
+          data: { clicks: { increment: 1 } }
+        });
+      } else {
+        await prisma.advertisement.create({
+          data: {
+            sponsorId: banner.sponsorId,
+            bannerId: bannerId,
+            clicks: 1,
+            impressions: 0,
+            statistics: '{}'
+          }
+        });
+      }
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[Publicidad] Error al registrar click en banner:', error.message);
+    res.status(500).json({ error: 'Error al registrar click en banner' });
+  }
+});
+
 // POST /api/statistics/event — Registro de impresión/vista o clics
 router.post('/statistics/event', async (req, res) => {
   const { type, bannerId, campaignId, sponsorId, device, ip } = req.body;
@@ -599,38 +675,72 @@ router.post('/statistics/event', async (req, res) => {
       return res.status(400).json({ error: 'El tipo de evento debe ser VIEW o CLICK' });
     }
 
+    const sId = sponsorId ? parseInt(sponsorId, 10) : null;
+    const bId = bannerId ? parseInt(bannerId, 10) : null;
+    const cId = campaignId ? parseInt(campaignId, 10) : null;
+
     // Registrar en base de datos detallada
     const adView = await prisma.advertisementView.create({
       data: {
         type,
-        bannerId: bannerId ? parseInt(bannerId) : null,
-        campaignId: campaignId ? parseInt(campaignId) : null,
-        sponsorId: sponsorId ? parseInt(sponsorId) : null,
+        bannerId: bId,
+        campaignId: cId,
+        sponsorId: sId,
         device: device || 'desktop',
         ipAddress: ip || null
       }
     });
 
     // Incrementar en modelos principales para mantener compatibilidad e histórico rápido
-    if (bannerId) {
+    if (bId) {
       await prisma.banner.update({
-        where: { id: parseInt(bannerId) },
+        where: { id: bId },
         data: type === 'CLICK' ? { clicks: { increment: 1 } } : { views: { increment: 1 } }
       }).catch(() => {});
     }
 
-    if (campaignId) {
+    if (cId) {
       await prisma.campaign.update({
-        where: { id: parseInt(campaignId) },
+        where: { id: cId },
         data: type === 'CLICK' ? { clicks: { increment: 1 } } : { views: { increment: 1 } }
       }).catch(() => {});
     }
 
-    if (sponsorId) {
+    if (sId) {
       await prisma.sponsor.update({
-        where: { id: parseInt(sponsorId) },
+        where: { id: sId },
         data: type === 'CLICK' ? { clicks: { increment: 1 } } : { views: { increment: 1 } }
       }).catch(() => {});
+    }
+
+    // Consolidar en el modelo Advertisement
+    if (sId && bId) {
+      try {
+        const existingAd = await prisma.advertisement.findFirst({
+          where: { sponsorId: sId, bannerId: bId }
+        });
+        if (existingAd) {
+          await prisma.advertisement.update({
+            where: { id: existingAd.id },
+            data: {
+              impressions: type === 'VIEW' ? { increment: 1 } : undefined,
+              clicks: type === 'CLICK' ? { increment: 1 } : undefined
+            }
+          });
+        } else {
+          await prisma.advertisement.create({
+            data: {
+              sponsorId: sId,
+              bannerId: bId,
+              impressions: type === 'VIEW' ? 1 : 0,
+              clicks: type === 'CLICK' ? 1 : 0,
+              statistics: '{}'
+            }
+          });
+        }
+      } catch (adError) {
+        console.error('[Publicidad] Error al actualizar consolidated Advertisement:', adError.message);
+      }
     }
 
     res.status(201).json(adView);

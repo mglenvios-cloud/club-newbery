@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { PlayCircle, Users, Clock, Video, Calendar, Shield, X, Maximize2, Tv, ChevronRight, Award, User } from 'lucide-react';
@@ -17,8 +17,37 @@ import { apiFetch } from '@/lib/apiClient';
 
 export default function NewberyTv() {
   const [media, setMedia] = useState([]);
+  const [news, setNews] = useState([]);
+  const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    async function loadNews() {
+      try {
+        const res = await fetch(`/api/news`);
+        if (res.ok) {
+          const data = await res.json();
+          setNews(data.slice(0, 3));
+        }
+      } catch (err) {
+        console.error("Error al cargar noticias en TV:", err);
+      }
+    }
+    async function loadChannel() {
+      try {
+        const res = await fetch(`/api/newberytv/channel`);
+        if (res.ok) {
+          const data = await res.json();
+          setChannel(data);
+        }
+      } catch (err) {
+        console.error("Error al cargar canal en TV:", err);
+      }
+    }
+    loadNews();
+    loadChannel();
+  }, []);
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [activePlayer, setActivePlayer] = useState('');
   const [activeSeason, setActiveSeason] = useState('ALL');
@@ -789,6 +818,41 @@ export default function NewberyTv() {
           onPlayVideo={handlePlayVideo}
         />
       </div>
+
+      {/* 9. Novedades de la Cartelera en Newbery TV */}
+      {news.length > 0 && (
+        <div className="mt-16 border-t border-zinc-800 pt-16 max-w-6xl mx-auto px-6 text-left">
+          <h3 className="text-xl font-bold uppercase tracking-wider mb-6 text-red-500 flex items-center gap-2">
+            <span className="w-1.5 h-5 bg-jn-red rounded"></span>
+            Cartelera de Novedades del Club
+          </h3>
+          <div className="grid md:grid-cols-3 gap-6">
+            {news.map(item => (
+              <div key={item.id} className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 flex flex-col justify-between space-y-4 hover:border-zinc-700 transition-all duration-300">
+                <div className="space-y-3">
+                  {item.imageUrl && (
+                    <div className="h-36 rounded-lg overflow-hidden border border-zinc-800 bg-black">
+                      <img 
+                        src={item.imageUrl.startsWith('http') || item.imageUrl.startsWith('/') ? (item.imageUrl.startsWith('/') && !item.imageUrl.startsWith('/uploads') ? item.imageUrl : `${API_URL}${item.imageUrl}`) : item.imageUrl} 
+                        alt={item.title} 
+                        className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity" 
+                      />
+                    </div>
+                  )}
+                  <span className="text-[9px] font-black uppercase text-red-500 bg-red-955 px-2 py-0.5 rounded-full inline-block tracking-wider">
+                    {item.category}
+                  </span>
+                  <h4 className="font-bold text-sm text-zinc-100 leading-snug">{item.title}</h4>
+                  <p className="text-xs text-zinc-400 font-medium leading-relaxed line-clamp-3">{item.content}</p>
+                </div>
+                <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
+                  {new Date(item.createdAt).toLocaleDateString('es-AR')}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 11. Sponsors carrusel */}
       {config.modules.sponsors && (

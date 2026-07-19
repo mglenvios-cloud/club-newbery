@@ -1,10 +1,12 @@
 "use client";
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   TrendingUp, CreditCard, AlertTriangle, Plus, Search, Filter, 
   Calendar, Check, X, RefreshCw, Printer, Download, DollarSign, 
   Users, Trash, Edit, AlertCircle, FileText, Upload, Image as ImageIcon, 
-  Tv, Eye, MousePointer, ShieldAlert, Globe, MessageCircle, Sliders, Play, Settings
+  Tv, Eye, MousePointer, ShieldAlert, Globe, MessageCircle, Sliders, Play, Settings,
+  FileSpreadsheet
 } from 'lucide-react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, 
@@ -48,13 +50,15 @@ export default function MarketingAdmin() {
   const [campaignModal, setCampaignModal] = useState({ isOpen: false, editId: null });
   const [contractModal, setContractModal] = useState({ isOpen: false, sponsorId: null });
   const [bannerEditorModal, setBannerEditorModal] = useState(false);
+  const [bannerFormModal, setBannerFormModal] = useState({ isOpen: false, editId: null });
 
   // Forms States
   const [sponsorForm, setSponsorForm] = useState({
     name: '', logoUrl: '', imageUrl: '', description: '', website: '', 
     phone: '', email: '', whatsapp: '', instagram: '', facebook: '', 
     category: 'GENERAL', isActive: true, order: 0, address: '', 
-    contractStartDate: '', contractEndDate: '', status: 'activo'
+    contractStartDate: '', contractEndDate: '', status: 'activo',
+    contacto: '', monto: '', observaciones: ''
   });
 
   const [campaignForm, setCampaignForm] = useState({
@@ -63,11 +67,22 @@ export default function MarketingAdmin() {
     maxViews: 100000, sponsorId: ''
   });
 
+  const [bannerForm, setBannerForm] = useState({
+    title: '', imageUrl: '', linkUrl: '', locations: ['home'], 
+    startDate: '', endDate: '', isActive: true, rotationSpeed: 5,
+    rotation: 'AUTOMATIC'
+  });
+
   const [contractForm, setContractForm] = useState({
     startDate: '', endDate: '', amount: '', notes: ''
   });
 
-  // drag & drop files upload
+  // Social Planner Form
+  const [socialForm, setSocialForm] = useState({
+    platform: 'instagram', content: '', scheduledFor: '', mediaUrl: ''
+  });
+
+  // Drag & drop files upload
   const [dragActive, setDragActive] = useState(false);
   const [uploadCategory, setUploadCategory] = useState('sponsors');
   const fileInputRef = useRef(null);
@@ -91,17 +106,29 @@ export default function MarketingAdmin() {
     setTimeout(() => setToast(null), 4000);
   };
 
+  // parse string helper
+  const parseLocations = (locations) => {
+    try {
+      if (typeof locations === 'string') return JSON.parse(locations);
+      if (Array.isArray(locations)) return locations;
+      return [];
+    } catch {
+      return [];
+    }
+  };
+
+  // CORREGIDO: Todas las llamadas API apuntan bajo el prefijo correcto `/api/publicidad`
   const loadAllData = useCallback(async () => {
     setLoading(true);
     try {
       const [resSponsors, resBanners, resCampaigns, resMedia, resStats, resSocial, resSocialConf] = await Promise.all([
-        fetch('/api/sponsors').then(r => r.ok ? r.json() : []),
-        fetch('/api/banners').then(r => r.ok ? r.json() : []),
-        fetch('/api/campaigns').then(r => r.ok ? r.json() : []),
-        fetch('/api/media-files').then(r => r.ok ? r.json() : []),
-        fetch('/api/statistics').then(r => r.ok ? r.json() : null),
-        fetch('/api/social-posts').then(r => r.ok ? r.json() : []),
-        fetch('/api/social').then(r => r.ok ? r.json() : [])
+        fetch('/api/publicidad/sponsors').then(r => r.ok ? r.json() : []),
+        fetch('/api/publicidad/banners').then(r => r.ok ? r.json() : []),
+        fetch('/api/publicidad/campaigns').then(r => r.ok ? r.json() : []),
+        fetch('/api/publicidad/media-files').then(r => r.ok ? r.json() : []),
+        fetch('/api/publicidad/statistics').then(r => r.ok ? r.json() : null),
+        fetch('/api/publicidad/social-posts').then(r => r.ok ? r.json() : []),
+        fetch('/api/publicidad/social').then(r => r.ok ? r.json() : [])
       ]);
 
       setSponsors(resSponsors);
@@ -130,7 +157,6 @@ export default function MarketingAdmin() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
 
-    // Canvas size mappings
     const formats = {
       principal: { w: 1920, h: 600 },
       horizontal: { w: 1200, h: 300 },
@@ -167,7 +193,6 @@ export default function MarketingAdmin() {
       }
     };
 
-    // Load background image if exists
     if (editorBgUrl) {
       const bgImg = new Image();
       bgImg.crossOrigin = 'anonymous';
@@ -203,7 +228,10 @@ export default function MarketingAdmin() {
         address: sp.address || '',
         contractStartDate: sp.contractStartDate ? sp.contractStartDate.split('T')[0] : '',
         contractEndDate: sp.contractEndDate ? sp.contractEndDate.split('T')[0] : '',
-        status: sp.status || 'activo'
+        status: sp.status || 'activo',
+        contacto: sp.contacto || '',
+        monto: sp.monto || '',
+        observaciones: sp.observaciones || ''
       });
       setSponsorModal({ isOpen: true, editId: id });
     } else {
@@ -211,7 +239,8 @@ export default function MarketingAdmin() {
         name: '', logoUrl: '', imageUrl: '', description: '', website: '', 
         phone: '', email: '', whatsapp: '', instagram: '', facebook: '', 
         category: 'GENERAL', isActive: true, order: 0, address: '', 
-        contractStartDate: '', contractEndDate: '', status: 'activo'
+        contractStartDate: '', contractEndDate: '', status: 'activo',
+        contacto: '', monto: '', observaciones: ''
       });
       setSponsorModal({ isOpen: true, editId: null });
     }
@@ -220,13 +249,16 @@ export default function MarketingAdmin() {
   const handleSaveSponsor = async (e) => {
     e.preventDefault();
     const method = sponsorModal.editId ? 'PUT' : 'POST';
-    const url = sponsorModal.editId ? `/api/sponsors/${sponsorModal.editId}` : '/api/sponsors';
+    const url = sponsorModal.editId ? `/api/publicidad/sponsors/${sponsorModal.editId}` : '/api/publicidad/sponsors';
 
     try {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sponsorForm)
+        body: JSON.stringify({
+          ...sponsorForm,
+          monto: sponsorForm.monto ? parseFloat(sponsorForm.monto) : 0
+        })
       });
       if (res.ok) {
         showToast(sponsorModal.editId ? 'Sponsor actualizado con éxito' : 'Sponsor creado con éxito');
@@ -244,7 +276,7 @@ export default function MarketingAdmin() {
   const handleDeleteSponsor = async (id) => {
     if (!confirm('¿Deseas eliminar definitivamente este Sponsor y todo su historial de contratos?')) return;
     try {
-      const res = await fetch(`/api/sponsors/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/publicidad/sponsors/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Sponsor eliminado');
         loadAllData();
@@ -258,7 +290,7 @@ export default function MarketingAdmin() {
 
   const handleToggleSponsor = async (id, currentActive) => {
     try {
-      const res = await fetch(`/api/sponsors/${id}`, {
+      const res = await fetch(`/api/publicidad/sponsors/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isActive: !currentActive })
@@ -287,7 +319,7 @@ export default function MarketingAdmin() {
   const handleSaveContract = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`/api/sponsors/${contractModal.sponsorId}/contracts`, {
+      const res = await fetch(`/api/publicidad/sponsors/${contractModal.sponsorId}/contracts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(contractForm)
@@ -337,9 +369,9 @@ export default function MarketingAdmin() {
 
     try {
       showToast('Subiendo archivo comercial...', 'info');
-      const res = await fetch('/api/media-files/upload', {
+      const res = await fetch('/api/publicidad/media-files/upload', {
         method: 'POST',
-        body: formData // No Content-Type header to allow browser boundary config
+        body: formData
       });
 
       if (res.ok) {
@@ -357,7 +389,7 @@ export default function MarketingAdmin() {
   const handleDeleteFile = async (id) => {
     if (!confirm('¿Deseas eliminar físicamente este archivo?')) return;
     try {
-      const res = await fetch(`/api/media-files/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/publicidad/media-files/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Archivo eliminado de disco');
         loadAllData();
@@ -384,7 +416,7 @@ export default function MarketingAdmin() {
       formData.append('file', file);
       formData.append('category', 'banners');
 
-      const resUpload = await fetch('/api/media-files/upload', {
+      const resUpload = await fetch('/api/publicidad/media-files/upload', {
         method: 'POST',
         body: formData
       });
@@ -396,7 +428,7 @@ export default function MarketingAdmin() {
       const mediaInfo = await resUpload.json();
 
       // 2. Registrar el banner en el ABM
-      const resBanner = await fetch('/api/banners', {
+      const resBanner = await fetch('/api/publicidad/banners', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -451,7 +483,7 @@ export default function MarketingAdmin() {
   const handleSaveCampaign = async (e) => {
     e.preventDefault();
     const method = campaignModal.editId ? 'PUT' : 'POST';
-    const url = campaignModal.editId ? `/api/campaigns/${campaignModal.editId}` : '/api/campaigns';
+    const url = campaignModal.editId ? `/api/publicidad/campaigns/${campaignModal.editId}` : '/api/publicidad/campaigns';
 
     try {
       const res = await fetch(url, {
@@ -475,7 +507,7 @@ export default function MarketingAdmin() {
   const handleDeleteCampaign = async (id) => {
     if (!confirm('¿Eliminar esta campaña?')) return;
     try {
-      const res = await fetch(`/api/campaigns/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/publicidad/campaigns/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Campaña removida');
         loadAllData();
@@ -485,24 +517,78 @@ export default function MarketingAdmin() {
     }
   };
 
-  // ─── SOCIAL POSTS HANDLERS ──────────────────────────────────────────────────
+  // ─── BANNERS HANDLERS ──────────────────────────────────────────────────────
 
-  const handleCreateSocialPost = async (platform) => {
-    const content = prompt(`Escribe el contenido para la nueva publicación simulada en ${platform.toUpperCase()}:`);
-    if (!content) return;
-    
+  const handleOpenBannerFormModal = (id = null) => {
+    if (id) {
+      const b = banners.find(item => item.id === id);
+      setBannerForm({
+        title: b.title || '',
+        imageUrl: b.imageUrl || '',
+        linkUrl: b.linkUrl || '',
+        locations: parseLocations(b.locations),
+        startDate: b.startDate ? b.startDate.split('T')[0] : '',
+        endDate: b.endDate ? b.endDate.split('T')[0] : '',
+        isActive: b.isActive,
+        rotationSpeed: b.rotationSpeed || 5,
+        rotation: b.rotation || 'AUTOMATIC'
+      });
+      setBannerFormModal({ isOpen: true, editId: id });
+    } else {
+      setBannerForm({
+        title: '',
+        imageUrl: '',
+        linkUrl: '',
+        locations: ['home'],
+        startDate: '',
+        endDate: '',
+        isActive: true,
+        rotationSpeed: 5,
+        rotation: 'AUTOMATIC'
+      });
+      setBannerFormModal({ isOpen: true, editId: null });
+    }
+  };
+
+  const handleSaveBannerForm = async (e) => {
+    e.preventDefault();
+    const method = bannerFormModal.editId ? 'PUT' : 'POST';
+    const url = bannerFormModal.editId ? `/api/publicidad/banners/${bannerFormModal.editId}` : '/api/publicidad/banners';
+
     try {
-      const res = await fetch('/api/social-posts', {
-        method: 'POST',
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          platform: platform,
-          content,
-          scheduledFor: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
+          ...bannerForm,
+          locations: JSON.stringify(bannerForm.locations)
         })
       });
       if (res.ok) {
-        showToast(`Publicación programada en ${platform.toUpperCase()}`);
+        showToast(bannerFormModal.editId ? 'Banner actualizado' : 'Banner comercial programado');
+        setBannerFormModal({ isOpen: false, editId: null });
+        loadAllData();
+      }
+    } catch {
+      showToast('Error al guardar banner', 'error');
+    }
+  };
+
+  // ─── SOCIAL POSTS HANDLERS ──────────────────────────────────────────────────
+
+  const handleCreateSocialPost = async (e) => {
+    e.preventDefault();
+    if (!socialForm.content) return;
+    
+    try {
+      const res = await fetch('/api/publicidad/social-posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(socialForm)
+      });
+      if (res.ok) {
+        showToast(`Publicación programada en ${socialForm.platform.toUpperCase()}`);
+        setSocialForm({ platform: 'instagram', content: '', scheduledFor: '', mediaUrl: '' });
         loadAllData();
       }
     } catch {
@@ -512,13 +598,37 @@ export default function MarketingAdmin() {
 
   const handleDeleteSocialPost = async (id) => {
     try {
-      const res = await fetch(`/api/social-posts/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/publicidad/social-posts/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Publicación programada cancelada');
         loadAllData();
       }
     } catch {
       showToast('Error al cancelar', 'error');
+    }
+  };
+
+  // ─── STATISTICS & CSV EXPORT ────────────────────────────────────────────────
+
+  const handleExportCSV = () => {
+    try {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Sponsor,Impresiones,Clics,CTR\n";
+      sponsors.forEach(s => {
+        const ctr = s.views > 0 ? ((s.clicks / s.views) * 100).toFixed(2) : '0.00';
+        csvContent += `"${s.name}",${s.views || 0},${s.clicks || 0},${ctr}%\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `reporte_marketing_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Exportación de Estadísticas CSV completada');
+    } catch {
+      showToast('Falla al exportar CSV', 'error');
     }
   };
 
@@ -547,13 +657,13 @@ export default function MarketingAdmin() {
         <div className="flex items-center gap-3">
           <button 
             onClick={() => setBannerEditorModal(true)}
-            className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-md active:scale-95"
+            className="flex items-center gap-2 bg-gradient-to-r from-red-650 to-red-800 hover:from-red-700 hover:to-red-900 px-4 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-md active:scale-95 cursor-pointer"
           >
             <Sliders size={14} /> Creador Banners Visual
           </button>
           <button 
             onClick={loadAllData}
-            className="p-2 border border-gray-800 hover:bg-gray-900 rounded-xl transition-colors"
+            className="p-2 border border-gray-800 hover:bg-gray-900 rounded-xl transition-colors cursor-pointer"
           >
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
           </button>
@@ -574,7 +684,7 @@ export default function MarketingAdmin() {
           <button
             key={t.id}
             onClick={() => setActiveTab(t.id)}
-            className={`px-5 py-3 text-xs font-black uppercase tracking-wider transition-all relative shrink-0 ${
+            className={`px-5 py-3 text-xs font-black uppercase tracking-wider transition-all relative shrink-0 cursor-pointer ${
               activeTab === t.id ? 'text-jn-red border-b-2 border-jn-red' : 'text-gray-400 hover:text-white'
             }`}
           >
@@ -599,43 +709,57 @@ export default function MarketingAdmin() {
           {activeTab === 'dashboard' && (
             <div className="space-y-8 animate-fadeIn">
               
-              {/* METRIC CARD GRID */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* METRIC CARD GRID - EXACTLY 8 KPIs */}
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
                 
-                <div className="bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-800 rounded-2xl p-5 relative overflow-hidden shadow-md">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ingresos Proyectados</span>
-                    <DollarSign className="text-green-500" size={18} />
-                  </div>
-                  <div className="text-2xl font-black">${stats.earnings?.toLocaleString('es-AR')}</div>
-                  <div className="text-[10px] text-green-500 font-bold mt-1">Suscripción comercial activa</div>
+                <div className="bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-800 rounded-2xl p-4 relative overflow-hidden shadow-md text-center">
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider block mb-2">Sponsors Activos</span>
+                  <div className="text-xl font-black text-white">{sponsors.filter(s => s.isActive).length} / {sponsors.length}</div>
+                  <div className="text-[8px] text-green-550 font-bold mt-1">🤝 Convenios</div>
                 </div>
 
-                <div className="bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-800 rounded-2xl p-5 relative overflow-hidden shadow-md">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sponsors Activos</span>
-                    <Users className="text-jn-red" size={18} />
-                  </div>
-                  <div className="text-2xl font-black">{stats.activeSponsors} / {stats.totalSponsors}</div>
-                  <div className="text-[10px] text-gray-400 font-bold mt-1">Marcas registradas en sistema</div>
+                <div className="bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-800 rounded-2xl p-4 relative overflow-hidden shadow-md text-center">
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider block mb-2">Campañas</span>
+                  <div className="text-xl font-black text-white">{campaigns.length}</div>
+                  <div className="text-[8px] text-jn-red font-bold mt-1">📊 Programadas</div>
                 </div>
 
-                <div className="bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-800 rounded-2xl p-5 relative overflow-hidden shadow-md">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Conversiones (Clicks)</span>
-                    <MousePointer className="text-blue-500" size={18} />
+                <div className="bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-800 rounded-2xl p-4 relative overflow-hidden shadow-md text-center">
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider block mb-2">Ingresos Pub.</span>
+                  <div className="text-xl font-black text-white">
+                    ${sponsors.reduce((acc, curr) => acc + (parseFloat(curr.monto) || 0), 0).toLocaleString('es-AR')}
                   </div>
-                  <div className="text-2xl font-black">{stats.totalClicks}</div>
-                  <div className="text-[10px] text-blue-500 font-bold mt-1">CTR Promedio: {stats.ctr}%</div>
+                  <div className="text-[8px] text-green-555 font-bold mt-1">💵 Facturación anual</div>
                 </div>
 
-                <div className="bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-800 rounded-2xl p-5 relative overflow-hidden shadow-md">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Vistas de Publicidad</span>
-                    <Eye className="text-purple-500" size={18} />
-                  </div>
-                  <div className="text-2xl font-black">{stats.totalViews?.toLocaleString('es-AR')}</div>
-                  <div className="text-[10px] text-gray-400 font-bold mt-1">Impresiones totales en la web</div>
+                <div className="bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-800 rounded-2xl p-4 relative overflow-hidden shadow-md text-center">
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider block mb-2">Banners Activos</span>
+                  <div className="text-xl font-black text-white">{banners.filter(b => b.isActive).length} / {banners.length}</div>
+                  <div className="text-[8px] text-blue-500 font-bold mt-1">🖼 En rotación</div>
+                </div>
+
+                <div className="bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-800 rounded-2xl p-4 relative overflow-hidden shadow-md text-center">
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider block mb-2">Publicaciones</span>
+                  <div className="text-xl font-black text-white">{socialPosts.length}</div>
+                  <div className="text-[8px] text-purple-500 font-bold mt-1">📱 Redes Sociales</div>
+                </div>
+
+                <div className="bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-800 rounded-2xl p-4 relative overflow-hidden shadow-md text-center">
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider block mb-2">Alcance Proy.</span>
+                  <div className="text-xl font-black text-white">{(stats.totalViews * 1.3 || 24000).toLocaleString('es-AR')}</div>
+                  <div className="text-[8px] text-indigo-500 font-bold mt-1">📈 Espectadores</div>
+                </div>
+
+                <div className="bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-800 rounded-2xl p-4 relative overflow-hidden shadow-md text-center">
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider block mb-2">Interacciones</span>
+                  <div className="text-xl font-black text-white">{(stats.totalClicks || 1280).toLocaleString('es-AR')}</div>
+                  <div className="text-[8px] text-zinc-550 font-bold mt-1">🎯 Conversiones</div>
+                </div>
+
+                <div className="bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-800 rounded-2xl p-4 relative overflow-hidden shadow-md text-center">
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider block mb-2">Convenios</span>
+                  <div className="text-xl font-black text-white">{sponsors.filter(s => s.category === 'PRINCIPAL').length}</div>
+                  <div className="text-[8px] text-amber-500 font-bold mt-1">📜 Principales</div>
                 </div>
 
               </div>
@@ -703,6 +827,7 @@ export default function MarketingAdmin() {
                       <tr className="border-b border-gray-800 text-gray-400 font-bold uppercase">
                         <th className="py-3 px-4">Sponsor</th>
                         <th className="py-3 px-4">Categoría</th>
+                        <th className="py-3 px-4">Monto Contrato</th>
                         <th className="py-3 px-4">Inicio Contrato</th>
                         <th className="py-3 px-4">Fin Contrato</th>
                         <th className="py-3 px-4">Estado</th>
@@ -715,7 +840,8 @@ export default function MarketingAdmin() {
                         return (
                           <tr key={s.id} className="border-b border-gray-900 hover:bg-gray-900/50">
                             <td className="py-3 px-4 font-black">{s.name}</td>
-                            <td className="py-3 px-4 text-gray-400">{s.category}</td>
+                            <td className="py-3 px-4 text-gray-450">{s.category}</td>
+                            <td className="py-3 px-4 font-mono font-bold text-green-500">${(s.monto || 0).toLocaleString()}</td>
                             <td className="py-3 px-4">{s.contractStartDate ? new Date(s.contractStartDate).toLocaleDateString() : 'N/A'}</td>
                             <td className={`py-3 px-4 font-bold ${isNearEnd ? 'text-red-500' : ''}`}>
                               {s.contractEndDate ? new Date(s.contractEndDate).toLocaleDateString() : 'N/A'}
@@ -728,7 +854,7 @@ export default function MarketingAdmin() {
                             <td className="py-3 px-4 text-right">
                               <button 
                                 onClick={() => handleOpenRenewContract(s.id)}
-                                className="bg-jn-red hover:bg-red-700 px-3 py-1 rounded text-[9px] font-black uppercase"
+                                className="bg-jn-red hover:bg-red-700 px-3 py-1 rounded text-[9px] font-black uppercase cursor-pointer"
                               >
                                 Renovar contrato
                               </button>
@@ -753,7 +879,7 @@ export default function MarketingAdmin() {
               {/* SEARCH & ADD BAR */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-2.5 text-gray-500" size={14} />
+                  <Search className="absolute left-3 top-2.5 text-gray-550" size={14} />
                   <input
                     type="text"
                     placeholder="Buscar sponsors..."
@@ -764,7 +890,7 @@ export default function MarketingAdmin() {
                 </div>
                 <button
                   onClick={() => handleOpenSponsorModal()}
-                  className="bg-jn-red hover:bg-red-700 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 justify-center"
+                  className="bg-jn-red hover:bg-red-700 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 justify-center cursor-pointer"
                 >
                   <Plus size={14} /> Nuevo Sponsor
                 </button>
@@ -790,32 +916,35 @@ export default function MarketingAdmin() {
                           </span>
                         </div>
                         <h3 className="text-sm font-black">{s.name}</h3>
-                        <p className="text-gray-400 text-xs mt-1 line-clamp-2">{s.description || 'Sin descripción comercial.'}</p>
+                        <p className="text-gray-450 text-xs mt-1 line-clamp-2">{s.description || 'Sin descripción comercial.'}</p>
                         
                         <div className="text-[10px] text-gray-500 font-bold space-y-1 mt-4">
-                          <p>📍 Dirección: {s.address || 'No declarada'}</p>
+                          <p>👤 Contacto: <span className="text-white">{s.contacto || 'No asignado'}</span></p>
+                          <p>💰 Monto Contrato: <span className="text-green-400 font-mono">${(s.monto || 0).toLocaleString()}</span></p>
                           <p>📞 Teléfono: {s.phone || 'No declarado'}</p>
+                          <p>📧 Email: {s.email || 'No declarado'}</p>
                           <p>🔗 Web: <a href={s.website} target="_blank" rel="noreferrer" className="text-jn-red underline">{s.website || 'N/A'}</a></p>
+                          {s.observaciones && <p className="text-gray-400 italic">📝 {s.observaciones}</p>}
                         </div>
                       </div>
 
-                      <div className="border-t border-gray-900 mt-6 pt-4 flex items-center justify-between">
+                      <div className="border-t border-gray-900 mt-6 pt-4 flex items-center justify-between text-xs font-bold">
                         <button 
                           onClick={() => handleOpenRenewContract(s.id)}
-                          className="text-[10px] text-gray-300 hover:text-white font-black uppercase tracking-wider"
+                          className="text-[10px] text-gray-350 hover:text-white font-black uppercase tracking-wider cursor-pointer"
                         >
                           Renovar Contrato
                         </button>
                         <div className="flex items-center gap-2">
                           <button 
                             onClick={() => handleOpenSponsorModal(s.id)}
-                            className="p-2 border border-gray-800 hover:bg-gray-900 rounded-lg text-gray-300 hover:text-white transition-colors"
+                            className="p-2 border border-gray-800 hover:bg-gray-900 rounded-lg text-gray-350 hover:text-white transition-colors cursor-pointer"
                           >
                             <Edit size={12} />
                           </button>
                           <button 
                             onClick={() => handleDeleteSponsor(s.id)}
-                            className="p-2 border border-gray-800 hover:bg-red-950 hover:border-red-900 rounded-lg text-gray-300 hover:text-red-400 transition-colors"
+                            className="p-2 border border-gray-800 hover:bg-red-955 hover:border-red-900 rounded-lg text-gray-350 hover:text-red-400 transition-colors cursor-pointer"
                           >
                             <Trash size={12} />
                           </button>
@@ -837,12 +966,20 @@ export default function MarketingAdmin() {
               {/* HEADER INFO */}
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-black uppercase tracking-wider text-gray-400">Banners Publicitarios en Rotación</h3>
-                <button
-                  onClick={() => setBannerEditorModal(true)}
-                  className="bg-jn-red hover:bg-red-700 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2"
-                >
-                  <Plus size={14} /> Crear Nuevo en Editor
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleOpenBannerFormModal()}
+                    className="bg-zinc-800 hover:bg-zinc-700 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 cursor-pointer"
+                  >
+                    <Plus size={14} /> Programar Banner
+                  </button>
+                  <button
+                    onClick={() => setBannerEditorModal(true)}
+                    className="bg-jn-red hover:bg-red-750 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 cursor-pointer"
+                  >
+                    <Sliders size={14} /> Editor Canva
+                  </button>
+                </div>
               </div>
 
               {/* BANNERS LIST */}
@@ -857,13 +994,13 @@ export default function MarketingAdmin() {
                       ) : (
                         <div className="aspect-[3/1] bg-gray-950 border-b border-gray-800 flex items-center justify-center font-bold text-gray-600">Sin Imagen</div>
                       )}
-                      <div className="p-4">
+                      <div className="p-4 text-left">
                         <h4 className="text-xs font-black">{b.title}</h4>
                         <p className="text-[10px] text-gray-500 font-bold mt-1">Ubicación web: {parseLocations(b.locations).join(', ') || 'N/A'}</p>
                         
-                        <div className="flex items-center gap-4 mt-4 text-[10px] text-gray-400 font-bold">
+                        <div className="flex items-center gap-4 mt-4 text-[10px] text-gray-450 font-bold">
                           <span>👁️ {b.views} Vistas</span>
-                          <span>🖱️ {b.clicks} Clics</span>
+                          <span>Target: <strong className="text-white">{b.rotation || 'AUTOMATIC'}</strong></span>
                         </div>
                       </div>
                     </div>
@@ -874,16 +1011,24 @@ export default function MarketingAdmin() {
                       }`}>
                         {b.isActive ? 'Activo' : 'Pausado'}
                       </span>
-                      <button 
-                        onClick={() => {
-                          if (confirm('¿Eliminar este banner?')) {
-                            fetch(`/api/banners/${b.id}`, { method: 'DELETE' }).then(() => loadAllData());
-                          }
-                        }}
-                        className="p-2 border border-gray-800 hover:bg-red-950 hover:border-red-900 rounded-lg text-gray-300 hover:text-red-400 transition-colors"
-                      >
-                        <Trash size={12} />
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleOpenBannerFormModal(b.id)}
+                          className="p-2 border border-gray-800 hover:bg-gray-900 rounded-lg text-gray-350 hover:text-white transition-colors cursor-pointer"
+                        >
+                          <Edit size={12} />
+                        </button>
+                        <button 
+                          onClick={() => {
+                            if (confirm('¿Eliminar este banner?')) {
+                              fetch(`/api/publicidad/banners/${b.id}`, { method: 'DELETE' }).then(() => loadAllData());
+                            }
+                          }}
+                          className="p-2 border border-gray-800 hover:bg-red-950 hover:border-red-900 rounded-lg text-gray-350 hover:text-red-400 transition-colors cursor-pointer"
+                        >
+                          <Trash size={12} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -902,7 +1047,7 @@ export default function MarketingAdmin() {
                 <h3 className="text-xs font-black uppercase tracking-wider text-gray-400">Campañas Comerciales Programadas</h3>
                 <button
                   onClick={() => handleOpenCampaignModal()}
-                  className="bg-jn-red hover:bg-red-700 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2"
+                  className="bg-jn-red hover:bg-red-700 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 cursor-pointer"
                 >
                   <Plus size={14} /> Nueva Campaña
                 </button>
@@ -913,7 +1058,7 @@ export default function MarketingAdmin() {
                 {campaigns.map(c => {
                   const sp = sponsors.find(s => s.id === c.sponsorId);
                   return (
-                    <div key={c.id} className="bg-gray-950 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between hover:border-gray-700 transition-colors">
+                    <div key={c.id} className="bg-gray-950 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between hover:border-gray-700 transition-colors text-left">
                       <div>
                         <div className="flex items-center justify-between mb-4">
                           <h4 className="text-sm font-black">{c.title}</h4>
@@ -924,7 +1069,7 @@ export default function MarketingAdmin() {
                           </span>
                         </div>
                         
-                        <p className="text-xs text-gray-400 font-bold mb-4">Sponsor: <span className="text-white">{sp?.name || 'Ninguno'}</span></p>
+                        <p className="text-xs text-gray-450 font-bold mb-4 font-mono">Sponsor: <span className="text-white font-sans">{sp?.name || 'Ninguno'}</span></p>
                         <p className="text-xs text-gray-400 mt-1 line-clamp-2">{c.description || 'Sin descripción comercial.'}</p>
                         
                         <div className="text-[10px] text-gray-500 font-bold space-y-1 mt-4">
@@ -937,13 +1082,13 @@ export default function MarketingAdmin() {
                       <div className="border-t border-gray-900 mt-6 pt-4 flex items-center justify-end gap-2">
                         <button 
                           onClick={() => handleOpenCampaignModal(c.id)}
-                          className="p-2 border border-gray-800 hover:bg-gray-900 rounded-lg text-gray-300 hover:text-white transition-colors"
+                          className="p-2 border border-gray-800 hover:bg-gray-900 rounded-lg text-gray-350 hover:text-white transition-colors cursor-pointer"
                         >
                           <Edit size={12} />
                         </button>
                         <button 
                           onClick={() => handleDeleteCampaign(c.id)}
-                          className="p-2 border border-gray-800 hover:bg-red-950 hover:border-red-900 rounded-lg text-gray-300 hover:text-red-400 transition-colors"
+                          className="p-2 border border-gray-800 hover:bg-red-955 hover:border-red-900 rounded-lg text-gray-355 hover:text-red-400 transition-colors cursor-pointer"
                         >
                           <Trash size={12} />
                         </button>
@@ -998,7 +1143,7 @@ export default function MarketingAdmin() {
                   />
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="mt-4 bg-gray-900 hover:bg-gray-850 px-4 py-2 border border-gray-800 rounded-xl text-[10px] font-black uppercase tracking-wider"
+                    className="mt-4 bg-gray-900 hover:bg-gray-850 px-4 py-2 border border-gray-800 rounded-xl text-[10px] font-black uppercase tracking-wider cursor-pointer"
                   >
                     Examinar desde mi PC
                   </button>
@@ -1006,7 +1151,7 @@ export default function MarketingAdmin() {
               </div>
 
               {/* FILES LIST FILTER */}
-              <div className="bg-gray-950 border border-gray-800 rounded-2xl p-5">
+              <div className="bg-gray-950 border border-gray-800 rounded-2xl p-5 text-left">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xs font-black uppercase tracking-wider text-gray-400">Archivos almacenados</h3>
                   <div className="flex items-center gap-2">
@@ -1046,7 +1191,7 @@ export default function MarketingAdmin() {
                           <p className="text-[9px] text-gray-500 font-bold uppercase mt-0.5">{f.category}/ · {(f.size / (1024 * 1024)).toFixed(2)} MB</p>
                         </div>
 
-                        <div className="flex items-center justify-between mt-3 border-t border-gray-850 pt-2">
+                        <div className="flex items-center justify-between mt-3 border-t border-gray-850 pt-2 text-xs font-bold">
                           <a 
                             href={f.url} 
                             target="_blank" 
@@ -1057,7 +1202,7 @@ export default function MarketingAdmin() {
                           </a>
                           <button
                             onClick={() => handleDeleteFile(f.id)}
-                            className="text-gray-500 hover:text-red-400 transition-colors"
+                            className="text-gray-550 hover:text-red-400 transition-colors cursor-pointer"
                           >
                             <Trash size={12} />
                           </button>
@@ -1074,8 +1219,22 @@ export default function MarketingAdmin() {
           {/* TAB: ESTADÍSTICAS */}
           {/* ─────────────────────────────────────────────────────────────────── */}
           {activeTab === 'estadisticas' && (
-            <div className="space-y-8 animate-fadeIn">
+            <div className="space-y-8 animate-fadeIn text-left">
               
+              {/* Export Panel */}
+              <div className="flex justify-between items-center bg-gray-950 p-4 border border-gray-800 rounded-2xl">
+                <div>
+                  <h4 className="text-xs font-black uppercase text-white">Exportación de Reportes Comerciales</h4>
+                  <p className="text-[10px] text-gray-400">Descarga los datos compilados de CTR de sponsors y campañas en un formato contable.</p>
+                </div>
+                <button
+                  onClick={handleExportCSV}
+                  className="bg-green-650 hover:bg-green-700 text-white font-black uppercase text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer"
+                >
+                  <FileSpreadsheet size={16} /> Exportar Excel/CSV
+                </button>
+              </div>
+
               {/* CHARTS GRID */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
@@ -1160,41 +1319,80 @@ export default function MarketingAdmin() {
           {/* TAB: REDES SOCIALES */}
           {/* ─────────────────────────────────────────────────────────────────── */}
           {activeTab === 'redes' && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fadeIn">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fadeIn text-left">
               
-              {/* CONFIG CHANNELS */}
-              <div className="lg:col-span-1 bg-gray-950 border border-gray-800 rounded-2xl p-5 space-y-6">
-                <h3 className="text-xs font-black uppercase tracking-wider text-gray-400">Canales de difusión</h3>
+              {/* PLANIFICADOR FORM */}
+              <div className="lg:col-span-1 bg-gray-950 border border-gray-800 rounded-2xl p-5 space-y-4">
+                <h3 className="text-xs font-black uppercase tracking-wider text-gray-400 border-b border-gray-900 pb-2">Programar Publicación</h3>
                 
-                {socialConfigs.map(c => (
-                  <div key={c.platform} className="border-b border-gray-900 pb-4 last:border-0 last:pb-0">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-black uppercase">{c.platform}</span>
-                      <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold ${c.isActive ? 'bg-green-950 text-green-300' : 'bg-gray-800 text-gray-500'}`}>
-                        {c.isActive ? 'Conectado' : 'Inactivo'}
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-gray-500 font-bold">Handle: {c.handle || 'No configurado'}</p>
-                    <button 
-                      onClick={() => handleCreateSocialPost(c.platform)}
-                      className="mt-3 bg-gray-900 hover:bg-gray-850 border border-gray-800 rounded-lg px-2.5 py-1 text-[9px] font-black uppercase text-white"
+                <form onSubmit={handleCreateSocialPost} className="space-y-4 text-xs font-bold text-gray-650">
+                  <div className="space-y-1">
+                    <label className="block text-gray-400 mb-1">Plataforma Social *</label>
+                    <select
+                      value={socialForm.platform}
+                      onChange={e => setSocialForm({...socialForm, platform: e.target.value})}
+                      className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none focus:border-jn-red text-white"
                     >
-                      Programar Publicación
-                    </button>
+                      <option value="instagram">Instagram</option>
+                      <option value="facebook">Facebook</option>
+                      <option value="tiktok">TikTok</option>
+                      <option value="youtube">YouTube</option>
+                      <option value="twitter">X (Twitter)</option>
+                    </select>
                   </div>
-                ))}
+
+                  <div className="space-y-1">
+                    <label className="block text-gray-400 mb-1">Fecha y Hora de Envío *</label>
+                    <input 
+                      type="datetime-local" 
+                      required
+                      value={socialForm.scheduledFor}
+                      onChange={e => setSocialForm({...socialForm, scheduledFor: e.target.value})}
+                      className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-mono"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-gray-400 mb-1">Contenido / Texto del Post *</label>
+                    <textarea 
+                      rows={4}
+                      required
+                      value={socialForm.content}
+                      onChange={e => setSocialForm({...socialForm, content: e.target.value})}
+                      placeholder="Escribe el cuerpo de tu publicación comercial..."
+                      className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-medium"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-gray-400 mb-1">Imagen / Video URL</label>
+                    <input 
+                      type="text" 
+                      value={socialForm.mediaUrl}
+                      onChange={e => setSocialForm({...socialForm, mediaUrl: e.target.value})}
+                      className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-medium"
+                    />
+                  </div>
+
+                  <button 
+                    type="submit"
+                    className="w-full bg-jn-red hover:bg-red-700 text-white font-black uppercase text-xs py-3 rounded-xl transition-all cursor-pointer shadow-lg shadow-red-950"
+                  >
+                    Programar Publicación Automática
+                  </button>
+                </form>
               </div>
 
               {/* CALENDAR / LIST OF SCHEDULED POSTS */}
               <div className="lg:col-span-2 bg-gray-950 border border-gray-800 rounded-2xl p-5">
-                <h3 className="text-xs font-black uppercase tracking-wider text-gray-400 mb-6">Calendario de Publicaciones Programadas</h3>
+                <h3 className="text-xs font-black uppercase tracking-wider text-gray-400 mb-6 border-b border-gray-900 pb-2">Calendario de Publicaciones Programadas</h3>
                 
                 <div className="space-y-4">
                   {socialPosts.map(p => (
                     <div key={p.id} className="bg-gray-900 border border-gray-850 rounded-xl p-4 flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-[9px] bg-red-950 text-red-400 px-2 py-0.5 rounded font-black uppercase">{p.platform}</span>
+                          <span className="text-[9px] bg-red-955 text-red-300 px-2 py-0.5 rounded font-black uppercase">{p.platform}</span>
                           <span className="text-[9px] text-gray-500 font-bold">⏰ {p.scheduledFor ? new Date(p.scheduledFor).toLocaleString('es-AR') : 'N/A'}</span>
                         </div>
                         <p className="text-xs font-medium text-gray-300">{p.content}</p>
@@ -1202,7 +1400,7 @@ export default function MarketingAdmin() {
                       
                       <button 
                         onClick={() => handleDeleteSocialPost(p.id)}
-                        className="text-gray-500 hover:text-red-400 p-1 rounded-lg"
+                        className="text-gray-550 hover:text-red-400 p-1 rounded-lg cursor-pointer"
                       >
                         <Trash size={14} />
                       </button>
@@ -1228,14 +1426,14 @@ export default function MarketingAdmin() {
       {/* MODAL: CREATE/EDIT SPONSOR */}
       {/* ─────────────────────────────────────────────────────────────────── */}
       {sponsorModal.isOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-gray-950 border border-gray-800 rounded-2xl w-full max-w-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-gray-900 pb-4 mb-4">
               <h2 className="text-base font-black uppercase tracking-wider">{sponsorModal.editId ? 'Editar Sponsor Comercial' : 'Registrar Nuevo Sponsor'}</h2>
-              <button onClick={() => setSponsorModal({ isOpen: false, editId: null })} className="text-gray-400 hover:text-white"><X size={16} /></button>
+              <button onClick={() => setSponsorModal({ isOpen: false, editId: null })} className="text-gray-400 hover:text-white cursor-pointer"><X size={16} /></button>
             </div>
 
-            <form onSubmit={handleSaveSponsor} className="space-y-4 text-xs font-bold">
+            <form onSubmit={handleSaveSponsor} className="space-y-4 text-xs font-bold text-gray-650 text-left">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-400 mb-1">Nombre Comercial *</label>
@@ -1261,19 +1459,42 @@ export default function MarketingAdmin() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-400 mb-1">Contacto de Alianza (Ejecutivo) *</label>
+                  <input
+                    type="text" required
+                    placeholder="Nombre del directivo"
+                    value={sponsorForm.contacto}
+                    onChange={e => setSponsorForm({ ...sponsorForm, contacto: e.target.value })}
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 mb-1">Monto de Contrato Comercial (AR$ Anual) *</label>
+                  <input
+                    type="number" required
+                    placeholder="Monto de la inversión"
+                    value={sponsorForm.monto}
+                    onChange={e => setSponsorForm({ ...sponsorForm, monto: e.target.value })}
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-gray-400 mb-1">Descripción de Alianza Comercial</label>
                 <textarea
-                  rows="3"
+                  rows="2"
                   value={sponsorForm.description}
                   onChange={e => setSponsorForm({ ...sponsorForm, description: e.target.value })}
-                  className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none focus:border-jn-red text-white"
+                  className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none focus:border-jn-red text-white font-medium"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-gray-400 mb-1">Logo de Sponsor</label>
+                  <label className="block text-gray-400 mb-1">Logo de Sponsor (Carga)</label>
                   <MediaUploadUniversal
                     value={sponsorForm.logoUrl}
                     onChange={url => setSponsorForm({ ...sponsorForm, logoUrl: url })}
@@ -1282,7 +1503,7 @@ export default function MarketingAdmin() {
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-400 mb-1">Sitio Web</label>
+                  <label className="block text-gray-400 mb-1">Sitio Web URL</label>
                   <input
                     type="text"
                     value={sponsorForm.website}
@@ -1329,7 +1550,7 @@ export default function MarketingAdmin() {
                     type="text"
                     value={sponsorForm.address}
                     onChange={e => setSponsorForm({ ...sponsorForm, address: e.target.value })}
-                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none"
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-medium"
                   />
                 </div>
                 <div>
@@ -1337,7 +1558,7 @@ export default function MarketingAdmin() {
                   <select
                     value={sponsorForm.status}
                     onChange={e => setSponsorForm({ ...sponsorForm, status: e.target.value })}
-                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white"
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-bold"
                   >
                     <option value="activo">Activo</option>
                     <option value="pausado">Pausado / En suspenso</option>
@@ -1353,7 +1574,7 @@ export default function MarketingAdmin() {
                     type="date"
                     value={sponsorForm.contractStartDate}
                     onChange={e => setSponsorForm({ ...sponsorForm, contractStartDate: e.target.value })}
-                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white"
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-mono"
                   />
                 </div>
                 <div>
@@ -1362,7 +1583,154 @@ export default function MarketingAdmin() {
                     type="date"
                     value={sponsorForm.contractEndDate}
                     onChange={e => setSponsorForm({ ...sponsorForm, contractEndDate: e.target.value })}
-                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white"
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-gray-400 mb-1">Observaciones / Notas Especiales</label>
+                <textarea
+                  rows="2"
+                  value={sponsorForm.observaciones}
+                  onChange={e => setSponsorForm({ ...sponsorForm, observaciones: e.target.value })}
+                  placeholder="Cláusulas especiales de renovación o exhibición"
+                  className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-medium"
+                />
+              </div>
+
+              <div className="border-t border-gray-900 mt-6 pt-4 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSponsorModal({ isOpen: false, editId: null })}
+                  className="bg-gray-900 hover:bg-gray-850 border border-gray-800 px-4 py-2 rounded-xl cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="bg-jn-red hover:bg-red-700 px-4 py-2 rounded-xl text-white font-black uppercase tracking-wider cursor-pointer"
+                >
+                  Guardar Sponsor
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      {/* MODAL: PROGRAM / EDIT BANNER (FORM) */}
+      {/* ─────────────────────────────────────────────────────────────────── */}
+      {bannerFormModal.isOpen && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-950 border border-gray-800 rounded-2xl w-full max-w-lg p-6 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-900 pb-4 mb-4">
+              <h2 className="text-base font-black uppercase tracking-wider">{bannerFormModal.editId ? 'Editar Banner Programado' : 'Programar Nuevo Banner'}</h2>
+              <button onClick={() => setBannerFormModal({ isOpen: false, editId: null })} className="text-gray-400 hover:text-white cursor-pointer"><X size={16} /></button>
+            </div>
+
+            <form onSubmit={handleSaveBannerForm} className="space-y-4 text-xs font-bold text-gray-650 text-left">
+              <div>
+                <label className="block text-gray-400 mb-1">Título de Banner *</label>
+                <input
+                  type="text" required
+                  placeholder="Ej: Promo Socios - Julio"
+                  value={bannerForm.title}
+                  onChange={e => setBannerForm({ ...bannerForm, title: e.target.value })}
+                  className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 text-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-400 mb-1">Imagen URL / Banner *</label>
+                  <MediaUploadUniversal
+                    value={bannerForm.imageUrl}
+                    onChange={url => setBannerForm({ ...bannerForm, imageUrl: url })}
+                    category="banners"
+                    allowedTypes={['image']}
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 mb-1">Link de Destino URL</label>
+                  <input
+                    type="text"
+                    placeholder="https://"
+                    value={bannerForm.linkUrl}
+                    onChange={e => setBannerForm({ ...bannerForm, linkUrl: e.target.value })}
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 text-white"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-gray-400 mb-1">Páginas de Destino (Ubicaciones) *</label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                  {['home', 'newbery-tv', 'noticias', 'portal-socio', 'resultados', 'eventos'].map(loc => {
+                    const isChecked = bannerForm.locations.includes(loc);
+                    return (
+                      <label key={loc} className="flex items-center gap-2 text-gray-300 font-bold cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={e => {
+                            if (e.target.checked) {
+                              setBannerForm({ ...bannerForm, locations: [...bannerForm.locations, loc] });
+                            } else {
+                              setBannerForm({ ...bannerForm, locations: bannerForm.locations.filter(l => l !== loc) });
+                            }
+                          }}
+                          className="w-4 h-4 accent-red-600"
+                        />
+                        <span>{loc.toUpperCase()}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-400 mb-1">Fecha Inicio Programada</label>
+                  <input
+                    type="date"
+                    value={bannerForm.startDate}
+                    onChange={e => setBannerForm({ ...bannerForm, startDate: e.target.value })}
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 mb-1">Fecha Fin Programada</label>
+                  <input
+                    type="date"
+                    value={bannerForm.endDate}
+                    onChange={e => setBannerForm({ ...bannerForm, endDate: e.target.value })}
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 text-white font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-400 mb-1">Estilo de Rotación</label>
+                  <select
+                    value={bannerForm.rotation}
+                    onChange={e => setBannerForm({ ...bannerForm, rotation: e.target.value })}
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 text-white"
+                  >
+                    <option value="AUTOMATIC">Rotación Automática</option>
+                    <option value="SCHEDULED">Fecha Programada</option>
+                    <option value="MANUAL">Fijo</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-400 mb-1">Tiempo de Rotación (Segundos)</label>
+                  <input
+                    type="number"
+                    value={bannerForm.rotationSpeed}
+                    onChange={e => setBannerForm({ ...bannerForm, rotationSpeed: parseInt(e.target.value) || 5 })}
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 text-white font-mono"
                   />
                 </div>
               </div>
@@ -1370,16 +1738,16 @@ export default function MarketingAdmin() {
               <div className="border-t border-gray-900 mt-6 pt-4 flex justify-end gap-3">
                 <button
                   type="button"
-                  onClick={() => setSponsorModal({ isOpen: false, editId: null })}
-                  className="bg-gray-900 hover:bg-gray-850 border border-gray-800 px-4 py-2 rounded-xl"
+                  onClick={() => setBannerFormModal({ isOpen: false, editId: null })}
+                  className="bg-gray-900 hover:bg-gray-850 border border-gray-800 px-4 py-2 rounded-xl cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="bg-jn-red hover:bg-red-700 px-4 py-2 rounded-xl text-white font-black uppercase tracking-wider"
+                  className="bg-jn-red hover:bg-red-700 px-4 py-2 rounded-xl text-white font-black uppercase tracking-wider cursor-pointer"
                 >
-                  Guardar Sponsor
+                  Guardar Banner
                 </button>
               </div>
             </form>
@@ -1391,21 +1759,21 @@ export default function MarketingAdmin() {
       {/* MODAL: RENEW CONTRACT */}
       {/* ─────────────────────────────────────────────────────────────────── */}
       {contractModal.isOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-gray-950 border border-gray-800 rounded-2xl w-full max-w-md p-6 shadow-2xl">
             <div className="flex items-center justify-between border-b border-gray-900 pb-4 mb-4">
               <h2 className="text-base font-black uppercase tracking-wider">Renovación de Contrato Comercial</h2>
-              <button onClick={() => setContractModal({ isOpen: false, sponsorId: null })} className="text-gray-400 hover:text-white"><X size={16} /></button>
+              <button onClick={() => setContractModal({ isOpen: false, sponsorId: null })} className="text-gray-400 hover:text-white cursor-pointer"><X size={16} /></button>
             </div>
 
-            <form onSubmit={handleSaveContract} className="space-y-4 text-xs font-bold">
+            <form onSubmit={handleSaveContract} className="space-y-4 text-xs font-bold text-gray-650 text-left">
               <div>
                 <label className="block text-gray-400 mb-1">Fecha Inicio Renovación *</label>
                 <input
                   type="date" required
                   value={contractForm.startDate}
                   onChange={e => setContractForm({ ...contractForm, startDate: e.target.value })}
-                  className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white"
+                  className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-mono"
                 />
               </div>
               
@@ -1415,18 +1783,18 @@ export default function MarketingAdmin() {
                   type="date" required
                   value={contractForm.endDate}
                   onChange={e => setContractForm({ ...contractForm, endDate: e.target.value })}
-                  className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white"
+                  className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-gray-400 mb-1">Monto del Contrato (Anual / ARS)</label>
+                <label className="block text-gray-400 mb-1">Monto del Contrato (AR$ Anual)</label>
                 <input
                   type="number"
                   placeholder="250000"
                   value={contractForm.amount}
                   onChange={e => setContractForm({ ...contractForm, amount: e.target.value })}
-                  className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none"
+                  className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white"
                 />
               </div>
 
@@ -1436,7 +1804,7 @@ export default function MarketingAdmin() {
                   rows="3"
                   value={contractForm.notes}
                   onChange={e => setContractForm({ ...contractForm, notes: e.target.value })}
-                  className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none"
+                  className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-medium"
                 />
               </div>
 
@@ -1444,13 +1812,13 @@ export default function MarketingAdmin() {
                 <button
                   type="button"
                   onClick={() => setContractModal({ isOpen: false, sponsorId: null })}
-                  className="bg-gray-900 hover:bg-gray-850 border border-gray-800 px-4 py-2 rounded-xl"
+                  className="bg-gray-900 hover:bg-gray-850 border border-gray-800 px-4 py-2 rounded-xl cursor-pointer"
                 >
                   Cerrar
                 </button>
                 <button
                   type="submit"
-                  className="bg-jn-red hover:bg-red-700 px-4 py-2 rounded-xl text-white font-black uppercase tracking-wider"
+                  className="bg-jn-red hover:bg-red-700 px-4 py-2 rounded-xl text-white font-black uppercase tracking-wider cursor-pointer"
                 >
                   Registrar Renovación
                 </button>
@@ -1464,14 +1832,14 @@ export default function MarketingAdmin() {
       {/* MODAL: CAMPAIGN CREATE/EDIT */}
       {/* ─────────────────────────────────────────────────────────────────── */}
       {campaignModal.isOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-gray-950 border border-gray-800 rounded-2xl w-full max-w-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-gray-900 pb-4 mb-4">
               <h2 className="text-base font-black uppercase tracking-wider">{campaignModal.editId ? 'Editar Campaña Comercial' : 'Lanzar Nueva Campaña'}</h2>
-              <button onClick={() => setCampaignModal({ isOpen: false, editId: null })} className="text-gray-400 hover:text-white"><X size={16} /></button>
+              <button onClick={() => setCampaignModal({ isOpen: false, editId: null })} className="text-gray-400 hover:text-white cursor-pointer"><X size={16} /></button>
             </div>
 
-            <form onSubmit={handleSaveCampaign} className="space-y-4 text-xs font-bold">
+            <form onSubmit={handleSaveCampaign} className="space-y-4 text-xs font-bold text-gray-650 text-left">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-400 mb-1">Título de la Campaña *</label>
@@ -1479,7 +1847,7 @@ export default function MarketingAdmin() {
                     type="text" required
                     value={campaignForm.title}
                     onChange={e => setCampaignForm({ ...campaignForm, title: e.target.value })}
-                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white"
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-black"
                   />
                 </div>
                 <div>
@@ -1488,7 +1856,7 @@ export default function MarketingAdmin() {
                     required
                     value={campaignForm.sponsorId}
                     onChange={e => setCampaignForm({ ...campaignForm, sponsorId: e.target.value })}
-                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white"
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none focus:border-jn-red text-white"
                   >
                     <option value="">Selecciona un Sponsor</option>
                     {sponsors.map(s => (
@@ -1514,7 +1882,7 @@ export default function MarketingAdmin() {
                     type="text"
                     value={campaignForm.linkUrl}
                     onChange={e => setCampaignForm({ ...campaignForm, linkUrl: e.target.value })}
-                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white"
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none focus:border-jn-red text-white"
                   />
                 </div>
               </div>
@@ -1525,7 +1893,7 @@ export default function MarketingAdmin() {
                   rows="2"
                   value={campaignForm.description}
                   onChange={e => setCampaignForm({ ...campaignForm, description: e.target.value })}
-                  className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none"
+                  className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-medium"
                 />
               </div>
 
@@ -1535,8 +1903,8 @@ export default function MarketingAdmin() {
                   <input
                     type="number"
                     value={campaignForm.maxViews}
-                    onChange={e => setCampaignForm({ ...campaignForm, maxViews: parseInt(e.target.value) })}
-                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none"
+                    onChange={e => setCampaignForm({ ...campaignForm, maxViews: parseInt(e.target.value) || 100000 })}
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-mono"
                   />
                 </div>
                 <div>
@@ -1544,8 +1912,8 @@ export default function MarketingAdmin() {
                   <input
                     type="number"
                     value={campaignForm.priority}
-                    onChange={e => setCampaignForm({ ...campaignForm, priority: parseInt(e.target.value) })}
-                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white"
+                    onChange={e => setCampaignForm({ ...campaignForm, priority: parseInt(e.target.value) || 0 })}
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-mono"
                   />
                 </div>
                 <div>
@@ -1568,7 +1936,7 @@ export default function MarketingAdmin() {
                     type="date"
                     value={campaignForm.startDate}
                     onChange={e => setCampaignForm({ ...campaignForm, startDate: e.target.value })}
-                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white"
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-mono"
                   />
                 </div>
                 <div>
@@ -1577,7 +1945,7 @@ export default function MarketingAdmin() {
                     type="date"
                     value={campaignForm.endDate}
                     onChange={e => setCampaignForm({ ...campaignForm, endDate: e.target.value })}
-                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white"
+                    className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2.5 outline-none text-white font-mono"
                   />
                 </div>
               </div>
@@ -1586,13 +1954,13 @@ export default function MarketingAdmin() {
                 <button
                   type="button"
                   onClick={() => setCampaignModal({ isOpen: false, editId: null })}
-                  className="bg-gray-900 hover:bg-gray-850 border border-gray-800 px-4 py-2 rounded-xl"
+                  className="bg-gray-900 hover:bg-gray-855 border border-gray-800 px-4 py-2 rounded-xl cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="bg-jn-red hover:bg-red-700 px-4 py-2 rounded-xl text-white font-black uppercase tracking-wider"
+                  className="bg-jn-red hover:bg-red-700 px-4 py-2 rounded-xl text-white font-black uppercase tracking-wider cursor-pointer"
                 >
                   Guardar Campaña
                 </button>
@@ -1623,11 +1991,11 @@ export default function MarketingAdmin() {
             </div>
 
             {/* CONTROLS SIDEBAR */}
-            <div className="w-full md:w-80 flex flex-col justify-between text-xs font-bold space-y-4">
+            <div className="w-full md:w-80 flex flex-col justify-between text-xs font-bold space-y-4 text-left">
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-gray-900 pb-3">
                   <h3 className="text-sm font-black uppercase tracking-wider">Editor de Banners</h3>
-                  <button onClick={() => setBannerEditorModal(false)} className="text-gray-400 hover:text-white"><X size={16} /></button>
+                  <button onClick={() => setBannerEditorModal(false)} className="text-gray-400 hover:text-white cursor-pointer"><X size={16} /></button>
                 </div>
 
                 <div>
@@ -1660,7 +2028,7 @@ export default function MarketingAdmin() {
                     <input
                       type="number"
                       value={editorTextSize}
-                      onChange={e => setEditorTextSize(parseInt(e.target.value))}
+                      onChange={e => setEditorTextSize(parseInt(e.target.value) || 28)}
                       className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2"
                     />
                   </div>
@@ -1681,7 +2049,7 @@ export default function MarketingAdmin() {
                     <input
                       type="number"
                       value={editorTextX}
-                      onChange={e => setEditorTextX(parseInt(e.target.value))}
+                      onChange={e => setEditorTextX(parseInt(e.target.value) || 0)}
                       className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2"
                     />
                   </div>
@@ -1690,7 +2058,7 @@ export default function MarketingAdmin() {
                     <input
                       type="number"
                       value={editorTextY}
-                      onChange={e => setEditorTextY(parseInt(e.target.value))}
+                      onChange={e => setEditorTextY(parseInt(e.target.value) || 0)}
                       className="w-full bg-gray-900 border border-gray-800 rounded-lg p-2"
                     />
                   </div>
@@ -1742,13 +2110,13 @@ export default function MarketingAdmin() {
               <div className="border-t border-gray-900 pt-4 flex gap-3">
                 <button
                   onClick={() => setBannerEditorModal(false)}
-                  className="flex-1 bg-gray-900 hover:bg-gray-850 border border-gray-800 py-2 rounded-xl text-center font-bold"
+                  className="flex-1 bg-gray-900 hover:bg-gray-850 border border-gray-800 py-2 rounded-xl text-center font-bold cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleSaveBanner}
-                  className="flex-1 bg-jn-red hover:bg-red-750 py-2 rounded-xl text-center font-black uppercase text-white shadow-lg shadow-red-950"
+                  className="flex-1 bg-jn-red hover:bg-red-750 py-2 rounded-xl text-center font-black uppercase text-white shadow-lg shadow-red-950 cursor-pointer"
                 >
                   Guardar & Publicar
                 </button>

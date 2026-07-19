@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Upload, Link as LinkIcon, Camera, Image as ImageIcon, 
@@ -22,7 +22,8 @@ export default function MediaUploadUniversal({
   value, 
   onChange, 
   category = 'documentos', 
-  allowedTypes = ['image', 'video', 'audio', 'document'] 
+  allowedTypes = ['image', 'video', 'audio', 'document'],
+  compact = false
 }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('upload'); // upload, url, camera, library
@@ -504,54 +505,101 @@ export default function MediaUploadUniversal({
     <div className="w-full">
       {/* PREVIEW CONTAINER EN FORMULARIO */}
       {value ? (
-        <div className="border border-gray-250 rounded-2xl p-4 bg-gray-50 flex flex-col md:flex-row items-center gap-4 relative animate-fade-in text-jn-black">
-          {/* Miniatura inteligente */}
-          <div className="w-20 h-20 rounded-xl overflow-hidden bg-white border border-gray-150 flex items-center justify-center flex-shrink-0 shadow-sm">
-            {value.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) || value.includes('socios') || value.includes('sponsors') || value.includes('noticias') ? (
-              <img src={value.startsWith('http') ? value : `${API_URL}${value}`} alt="Vista Previa" className="w-full h-full object-contain" />
-            ) : value.match(/\.(mp4|webm|mov)/i) || value.includes('videos') ? (
-              <Video className="text-red-600" size={32} />
-            ) : value.match(/\.(mp3|wav)/i) ? (
-              <Volume2 className="text-blue-600" size={32} />
-            ) : (
-              <FileText className="text-jn-black" size={32} />
-            )}
+        compact ? (
+          <div className="border border-gray-200 rounded-xl p-1.5 bg-gray-50 flex items-center justify-between gap-3 animate-fade-in text-jn-black">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-9 h-9 rounded-lg overflow-hidden bg-white border border-gray-150 flex items-center justify-center flex-shrink-0">
+                {value.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) || value.includes('socios') || value.includes('sponsors') || value.includes('noticias') ? (
+                  <img src={value.startsWith('http') ? value : `${API_URL}${value}`} alt="Vista Previa" className="w-full h-full object-contain" />
+                ) : value.match(/\.(mp4|webm|mov)/i) || value.includes('videos') ? (
+                  <Video className="text-red-650" size={16} />
+                ) : (
+                  <FileText className="text-jn-black" size={16} />
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="text-[9px] font-black uppercase tracking-wider text-gray-500">Asociado</p>
+                <p className="text-[10px] font-semibold truncate font-mono text-jn-black max-w-[120px]">{value.split('/').pop()}</p>
+              </div>
+            </div>
+            <div className="flex gap-1.5">
+              <button 
+                type="button" 
+                onClick={() => setModalOpen(true)}
+                className="bg-jn-black hover:bg-gray-800 text-white font-black uppercase text-[8px] px-2 py-1.5 rounded transition-colors"
+              >
+                Cambiar
+              </button>
+              <button 
+                type="button" 
+                onClick={() => onChange('')}
+                className="bg-white border hover:bg-gray-100 text-red-600 font-black uppercase text-[8px] px-2 py-1.5 rounded transition-colors"
+              >
+                Quitar
+              </button>
+            </div>
           </div>
+        ) : (
+          <div className="border border-gray-250 rounded-2xl p-4 bg-gray-50 flex flex-col md:flex-row items-center gap-4 relative animate-fade-in text-jn-black">
+            {/* Miniatura inteligente */}
+            <div className="w-20 h-20 rounded-xl overflow-hidden bg-white border border-gray-150 flex items-center justify-center flex-shrink-0 shadow-sm">
+              {value.match(/\.(jpeg|jpg|gif|png|webp|svg)/i) || value.includes('socios') || value.includes('sponsors') || value.includes('noticias') ? (
+                <img src={value.startsWith('http') ? value : `${API_URL}${value}`} alt="Vista Previa" className="w-full h-full object-contain" />
+              ) : value.match(/\.(mp4|webm|mov)/i) || value.includes('videos') ? (
+                <Video className="text-red-600" size={32} />
+              ) : value.match(/\.(mp3|wav)/i) ? (
+                <Volume2 className="text-blue-600" size={32} />
+              ) : (
+                <FileText className="text-jn-black" size={32} />
+              )}
+            </div>
 
-          <div className="flex-1 min-w-0 text-center md:text-left space-y-1">
-            <p className="text-xs font-black text-jn-black truncate uppercase tracking-wide">Archivo Asociado</p>
-            <p className="text-[10px] text-gray-500 font-mono break-all font-semibold select-all">{value}</p>
-          </div>
+            <div className="flex-1 min-w-0 text-center md:text-left space-y-1">
+              <p className="text-xs font-black text-jn-black truncate uppercase tracking-wide">Archivo Asociado</p>
+              <p className="text-[10px] text-gray-500 font-mono break-all font-semibold select-all">{value}</p>
+            </div>
 
-          <div className="flex gap-2 w-full md:w-auto justify-center">
-            <button 
-              type="button" 
-              onClick={() => setModalOpen(true)}
-              className="bg-jn-black hover:bg-gray-800 text-white font-black uppercase text-[10px] px-3.5 py-2 rounded-lg transition-colors"
-            >
-              Cambiar
-            </button>
-            <button 
-              type="button" 
-              onClick={() => onChange('')}
-              className="bg-white border hover:bg-gray-100 text-red-600 font-black uppercase text-[10px] px-3.5 py-2 rounded-lg transition-colors"
-            >
-              Quitar
-            </button>
+            <div className="flex gap-2 w-full md:w-auto justify-center">
+              <button 
+                type="button" 
+                onClick={() => setModalOpen(true)}
+                className="bg-jn-black hover:bg-gray-800 text-white font-black uppercase text-[10px] px-3.5 py-2 rounded-lg transition-colors"
+              >
+                Cambiar
+              </button>
+              <button 
+                type="button" 
+                onClick={() => onChange('')}
+                className="bg-white border hover:bg-gray-100 text-red-650 font-black uppercase text-[10px] px-3.5 py-2 rounded-lg transition-colors"
+              >
+                Quitar
+              </button>
+            </div>
           </div>
-        </div>
+        )
       ) : (
         /* CAJA RECEPTORA DESCONECTADA */
-        <div 
-          onClick={() => setModalOpen(true)}
-          className="border-2 border-dashed border-gray-300 hover:border-jn-red rounded-2xl p-6 text-center cursor-pointer bg-white hover:bg-red-50/20 transition-all select-none group"
-        >
-          <div className="w-12 h-12 bg-gray-100 group-hover:bg-red-100/50 text-gray-500 group-hover:text-jn-red rounded-full flex items-center justify-center mx-auto mb-3 transition-colors">
-            <Upload size={20} />
+        compact ? (
+          <button 
+            type="button"
+            onClick={() => setModalOpen(true)}
+            className="w-full border border-dashed border-gray-300 hover:border-jn-red rounded-lg p-2.5 text-center cursor-pointer bg-white hover:bg-red-50/10 transition-all text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 text-gray-600"
+          >
+            <Upload size={12} className="text-gray-400" />
+            <span>Subir o Buscar Foto</span>
+          </button>
+        ) : (
+          <div 
+            onClick={() => setModalOpen(true)}
+            className="border-2 border-dashed border-gray-300 hover:border-jn-red rounded-2xl p-6 text-center cursor-pointer bg-white hover:bg-red-50/20 transition-all select-none group"
+          >
+            <div className="w-12 h-12 bg-gray-100 group-hover:bg-red-100/50 text-gray-500 group-hover:text-jn-red rounded-full flex items-center justify-center mx-auto mb-3 transition-colors">
+              <Upload size={20} />
+            </div>
+            <p className="text-xs font-black uppercase text-jn-black tracking-wide">Cargar Archivo / Multimedia</p>
+            <p className="text-[10px] text-gray-400 font-bold uppercase mt-1.5 mb-6">Haz clic para subir de PC, pegar URL o usar Biblioteca</p>
           </div>
-          <p className="text-xs font-black uppercase text-jn-black tracking-wide">Cargar Archivo / Multimedia</p>
-          <p className="text-[10px] text-gray-400 font-bold uppercase mt-1.5 mb-6">Haz clic para subir de PC, pegar URL o usar Biblioteca</p>
-        </div>
+        )
       )}
 
       {/* MODAL DIALOG UNIVERSAL */}

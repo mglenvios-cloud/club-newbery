@@ -1,17 +1,17 @@
 {
   "counters": {
     "club": 1,
-    "user": 6,
+    "user": 7,
     "clubConfig": 1,
     "futsalMatch": 5,
     "futsalNews": 2,
     "futsalMedia": 3,
     "advertisementView": 10,
-    "news": 3,
+    "news": 4,
     "sede": 1,
     "facility": 3,
     "sponsor": 3,
-    "playerProfile": 8,
+    "playerProfile": 9,
     "socialConfig": 1,
     "transaction": 3,
     "member": 6,
@@ -19,8 +19,8 @@
     "digitalCard": 2,
     "membershipPlan": 3,
     "subscription": 6,
-    "payment": 6,
-    "invoice": 4,
+    "payment": 15,
+    "invoice": 13,
     "channel": 1,
     "liveStream": 3,
     "matchBroadcast": 3,
@@ -37,7 +37,9 @@
     "campaign": 1,
     "booking": 3,
     "liveMatchEvent": 4,
-    "auditLog": 17
+    "auditLog": 17,
+    "advertisement": 1,
+    "playerStatistic": 1
   },
   "club": [
     {
@@ -92,6 +94,20 @@
       "role": "SOCIO",
       "isActive": false,
       "name": "Valentina Ortiz",
+      "clubId": 1
+    },
+    {
+      "id": 6,
+      "email": "admin",
+      "password": "$2b$10$rXqE/RT64cZHQHibJrGe2OPbuQoEDP5IhvE64R7ASjw4B4omrVoii",
+      "role": "ADMIN",
+      "clubId": 1
+    },
+    {
+      "id": 7,
+      "email": "futsal",
+      "password": "$2b$10$HDc2edP0paRJTO6JnA90q.K3JEkgq6BMSUwPTDYztARcMpZ4ACVbe",
+      "role": "FUTSAL",
       "clubId": 1
     }
   ],
@@ -625,105 +641,9 @@
       "memberId": 3
     }
   ],
-  "member": [
-    {
-      "id": 1,
-      "socioNumber": 1001,
-      "firstName": "Martin",
-      "lastName": "Perez",
-      "dni": "47542096",
-      "birthDate": "2000-05-15T00:00:00.000Z",
-      "address": "Av. Lincoln 4500, Villa Devoto",
-      "phone": "11-3456-7890",
-      "email": "martin.perez.47542096@example.com",
-      "category": "ACTIVO",
-      "estado": "ACTIVO",
-      "userId": 1,
-      "clubId": 1
-    },
-    {
-      "id": 2,
-      "socioNumber": 1002,
-      "firstName": "Julian",
-      "lastName": "Alvarez",
-      "dni": "45123456",
-      "birthDate": "2000-05-15T00:00:00.000Z",
-      "address": "Av. Lincoln 4500, Villa Devoto",
-      "phone": "11-3456-7890",
-      "email": "julian.alvarez@example.com",
-      "category": "ACTIVO",
-      "estado": "ACTIVO",
-      "userId": 2,
-      "clubId": 1
-    },
-    {
-      "id": 3,
-      "socioNumber": 1003,
-      "firstName": "Sofia",
-      "lastName": "Martinez",
-      "dni": "48901234",
-      "birthDate": "2000-05-15T00:00:00.000Z",
-      "address": "Av. Lincoln 4500, Villa Devoto",
-      "phone": "11-3456-7890",
-      "email": "sofia.martinez@example.com",
-      "category": "CADETE",
-      "estado": "ACTIVO",
-      "userId": 3,
-      "clubId": 1
-    },
-    {
-      "id": 4,
-      "socioNumber": 1004,
-      "firstName": "Lucas",
-      "lastName": "Beltran",
-      "dni": "46789012",
-      "birthDate": "2000-05-15T00:00:00.000Z",
-      "address": "Av. Lincoln 4500, Villa Devoto",
-      "phone": "11-3456-7890",
-      "email": "lucas.beltran@example.com",
-      "category": "ACTIVO",
-      "estado": "SUSPENDIDO",
-      "userId": 4,
-      "clubId": 1
-    },
-    {
-      "id": 5,
-      "socioNumber": 1005,
-      "firstName": "Valentina",
-      "lastName": "Ortiz",
-      "dni": "44567890",
-      "birthDate": "2000-05-15T00:00:00.000Z",
-      "address": "Av. Lincoln 4500, Villa Devoto",
-      "phone": "11-3456-7890",
-      "email": "valentina.ortiz@example.com",
-      "category": "ACTIVO",
-      "estado": "INACTIVO",
-      "userId": 5,
-      "clubId": 1
-    }
-  ],
-  "tutor": [
-    {
-      "id": 1,
-      "nombre": "Carlos",
-      "apellido": "Perez",
-      "DNI": "14779838",
-      "telefono": "15-4444-5555",
-      "email": "carlos.perez.14779838@test.com",
-      "parentesco": "PADRE",
-      "contactoEmergencia": "Mama 15-2222-3333"
-    }
-  ],
-  "digitalCard": [
-    {
-      "id": 1,
-      "socioId": 3,
-      "qrCode": "jn-socio-3-1001-456172",
-      "issuedAt": "2026-07-17T20:26:59.786Z",
-      "expiresAt": "2031-07-17T20:26:59.786Z",
-      "status": "ACTIVE"
-    }
-  ],
+  "member": [],
+  "tutor": [],
+  "digitalCard": [],
   "membershipPlan": [
     {
       "id": 1,
@@ -746,131 +666,9 @@
       "clubId": 1
     }
   ],
-  "subscription": [
-    {
-      "id": 1,
-      "socioId": 1,
-      "planId": 1,
-      "fechaInicio": "2026-01-01T00:00:00.000Z",
-      "estado": "ACTIVO",
-      "proximoCobro": "2026-08-01T00:00:00.000Z"
-    },
-    {
-      "id": 2,
-      "socioId": 2,
-      "planId": 1,
-      "fechaInicio": "2026-01-01T00:00:00.000Z",
-      "estado": "ACTIVO",
-      "proximoCobro": "2026-08-01T00:00:00.000Z"
-    },
-    {
-      "id": 3,
-      "socioId": 3,
-      "planId": 1,
-      "fechaInicio": "2026-01-01T00:00:00.000Z",
-      "estado": "ACTIVO",
-      "proximoCobro": "2026-08-01T00:00:00.000Z"
-    },
-    {
-      "id": 4,
-      "socioId": 4,
-      "planId": 1,
-      "fechaInicio": "2026-01-01T00:00:00.000Z",
-      "estado": "CANCELADO",
-      "proximoCobro": "2026-08-01T00:00:00.000Z"
-    },
-    {
-      "id": 5,
-      "socioId": 5,
-      "planId": 1,
-      "fechaInicio": "2026-01-01T00:00:00.000Z",
-      "estado": "CANCELADO",
-      "proximoCobro": "2026-08-01T00:00:00.000Z"
-    }
-  ],
-  "payment": [
-    {
-      "id": 1,
-      "socioId": 1,
-      "planId": 1,
-      "importe": 12500,
-      "metodoPago": "MERCADOPAGO",
-      "estado": "PAGADO",
-      "fechaPago": "2026-06-10T14:30:00.000Z",
-      "mpPaymentId": "mp-pay-99210",
-      "mpStatus": "approved"
-    },
-    {
-      "id": 2,
-      "socioId": 2,
-      "planId": 1,
-      "importe": 12500,
-      "metodoPago": "MERCADOPAGO",
-      "estado": "PAGADO",
-      "fechaPago": "2026-06-10T14:30:00.000Z",
-      "mpPaymentId": "mp-pay-99210",
-      "mpStatus": "approved"
-    },
-    {
-      "id": 3,
-      "socioId": 3,
-      "planId": 1,
-      "importe": 12500,
-      "metodoPago": "MERCADOPAGO",
-      "estado": "PAGADO",
-      "fechaPago": "2026-06-10T14:30:00.000Z",
-      "mpPaymentId": "mp-pay-99210",
-      "mpStatus": "approved"
-    },
-    {
-      "id": 4,
-      "socioId": 4,
-      "planId": 1,
-      "importe": 12500,
-      "metodoPago": "MERCADOPAGO",
-      "estado": "PENDIENTE",
-      "fechaPago": null,
-      "mpPaymentId": "",
-      "mpStatus": ""
-    },
-    {
-      "id": 5,
-      "socioId": 5,
-      "planId": 1,
-      "importe": 12500,
-      "metodoPago": "MERCADOPAGO",
-      "estado": "PENDIENTE",
-      "fechaPago": null,
-      "mpPaymentId": "",
-      "mpStatus": ""
-    }
-  ],
-  "invoice": [
-    {
-      "id": 1,
-      "paymentId": 1,
-      "numero": "REC-001001",
-      "fechaEmision": "2026-06-10T14:35:00.000Z",
-      "estado": "EMITIDO",
-      "tipoComprobante": "RECIBO"
-    },
-    {
-      "id": 2,
-      "paymentId": 2,
-      "numero": "REC-001002",
-      "fechaEmision": "2026-06-10T14:35:00.000Z",
-      "estado": "EMITIDO",
-      "tipoComprobante": "RECIBO"
-    },
-    {
-      "id": 3,
-      "paymentId": 3,
-      "numero": "REC-001003",
-      "fechaEmision": "2026-06-10T14:35:00.000Z",
-      "estado": "EMITIDO",
-      "tipoComprobante": "RECIBO"
-    }
-  ],
+  "subscription": [],
+  "payment": [],
+  "invoice": [],
   "channel": [
     {
       "id": 1,
@@ -1174,37 +972,7 @@
   "mediaFile": [],
   "banner": [],
   "campaign": [],
-  "booking": [
-    {
-      "id": 1,
-      "nombreCliente": "Carlos Tevez",
-      "telefono": "11-1234-5678",
-      "email": "carlitos@example.com",
-      "facilityId": 1,
-      "fecha": "2026-07-18T09:52:34.328Z",
-      "horaInicio": "19:00",
-      "horaFin": "20:00",
-      "tipoReserva": "GENERAL",
-      "estado": "CONFIRMADA",
-      "importe": 15000,
-      "clubId": 1
-    },
-    {
-      "id": 2,
-      "nombreCliente": "Julian Alvarez",
-      "telefono": "11-8765-4321",
-      "email": "julian.alvarez@example.com",
-      "facilityId": 2,
-      "fecha": "2026-07-19T09:52:34.332Z",
-      "horaInicio": "21:00",
-      "horaFin": "22:00",
-      "tipoReserva": "SOCIO",
-      "estado": "CONFIRMADA",
-      "importe": 12000,
-      "socioId": 2,
-      "clubId": 1
-    }
-  ],
+  "booking": [],
   "liveMatchEvent": [
     {
       "id": 1,
@@ -1448,5 +1216,7 @@
       "ipAddress": "::1",
       "clubId": 1
     }
-  ]
+  ],
+  "advertisement": [],
+  "playerStatistic": []
 }

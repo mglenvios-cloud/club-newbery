@@ -48,7 +48,7 @@ export default function Home() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await apiFetch('/api/news');
+        const res = await apiFetch('/api/news?status=PUBLISHED');
         if (res.ok) {
           const data = await res.json();
           // Filtrar noticias para excluir disciplinas no activas en el club
@@ -475,6 +475,9 @@ export default function Home() {
                     </div>
                     <div>
                       <h4 className="font-bold text-sm text-jn-black leading-snug">{item.title}</h4>
+                      {item.description && (
+                        <p className="text-[10px] text-gray-400 font-bold italic mt-1">{item.description}</p>
+                      )}
                       <p className="text-xs text-gray-500 mt-2 line-clamp-3 leading-relaxed">{item.content}</p>
                     </div>
                   </div>

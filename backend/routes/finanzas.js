@@ -153,12 +153,30 @@ router.put('/payments/:id', authenticateToken, requireAdmin, async (req, res) =>
 
 router.get('/invoices/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
+  const fs = require('fs');
+  const path = require('path');
+  const qr = require('qr-image');
+  const PDFDocument = require('pdfkit');
+
   try {
     const idError = validators.validateId(id);
     if (idError) return res.status(400).json({ error: idError });
 
     const invoice = await invoicesService.get(parseInt(id));
-    if (!invoice) return res.status(404).json({ error: 'Comprobante no encontrado.' });
+    
+    // FASE 8: Validación de objetos requeridos
+    if (!invoice) {
+      return res.status(404).json({ error: 'Comprobante no encontrado.' });
+    }
+    if (!invoice.payment) {
+      return res.status(422).json({ error: 'El comprobante no posee datos de pago asociados.' });
+    }
+    if (!invoice.payment.socio) {
+      return res.status(422).json({ error: 'El pago asociado al comprobante no posee un socio registrado.' });
+    }
+    if (!invoice.payment.plan) {
+      return res.status(422).json({ error: 'El pago asociado al comprobante no posee un plan de membresía registrado.' });
+    }
 
     // Si no es ADMIN ni personal de staff, verificar pertenencia del comprobante
     const isStaff = ['ADMIN', 'FUTSAL', 'OPERADOR', 'SUPER_ADMIN'].includes(req.user.role);
@@ -169,79 +187,238 @@ router.get('/invoices/:id', authenticateToken, async (req, res) => {
       }
     }
 
-    // Generar PDF usando pdfkit
-    const PDFDocument = require('pdfkit');
-    const doc = new PDFDocument({ margin: 50 });
+    // FASE 5: Resolver logo del club de forma segura y automática
+    let logoPath = null;
+    try {
+      const clubConfig = await prisma.clubConfig.findFirst({
+        where: { clubId: invoice.payment.socio.clubId || 1 }
+      });
+      const club = await prisma.club.findUnique({
+        where: { id: invoice.payment.socio.clubId || 1 }
+      });
+
+      const possibleUrls = [];
+      if (clubConfig && clubConfig.shieldUrl) possibleUrls.push(clubConfig.shieldUrl);
+      if (club && club.logoUrl) possibleUrls.push(club.logoUrl);
+
+      for (const urlStr of possibleUrls) {
+        if (!urlStr) continue;
+
+        // Intentar buscar en backend/uploads resolviendo la ruta relativa o nombre de archivo
+        if (urlStr.startsWith('/uploads/')) {
+          const uploadsRelPath = path.join(__dirname, '..', urlStr);
+          if (fs.existsSync(uploadsRelPath)) {
+            logoPath = uploadsRelPath;
+            break;
+          }
+        }
+        const uploadsFileNamePath = path.join(__dirname, '..', 'uploads', path.basename(urlStr));
+        if (fs.existsSync(uploadsFileNamePath)) {
+          logoPath = uploadsFileNamePath;
+          break;
+        }
+
+        // Intentar buscar en frontend/public
+        const frontendPublicPath = path.join(__dirname, '..', '..', 'frontend', 'public', urlStr);
+        if (fs.existsSync(frontendPublicPath)) {
+          logoPath = frontendPublicPath;
+          break;
+        }
+        const frontendPublicImagesPath = path.join(__dirname, '..', '..', 'frontend', 'public', 'images', path.basename(urlStr));
+        if (fs.existsSync(frontendPublicImagesPath)) {
+          logoPath = frontendPublicImagesPath;
+          break;
+        }
+      }
+    } catch (logoError) {
+      console.error('Error resolviendo logo del club:', logoError);
+    }
+
+    // Fallback de respaldo automático
+    if (!logoPath) {
+      const defaultLogo = path.join(__dirname, '..', 'public', 'logo-default.png');
+      if (fs.existsSync(defaultLogo)) {
+        logoPath = defaultLogo;
+      }
+    }
+
+    // FASE 5: Calcular período en español
+    const meses = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    const dateForPeriod = invoice.payment.fechaPago || invoice.payment.createdAt || new Date();
+    const d = new Date(dateForPeriod);
+    const periodo = `${meses[d.getMonth()]} ${d.getFullYear()}`;
+
+    // Inicializar PDFKit (A4 compatible)
+    const doc = new PDFDocument({ size: 'A4', margin: 50 });
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=recibo-${invoice.numero}.pdf`);
 
     doc.pipe(res);
 
-    // Dibujar Banner Superior
+    // FASE 8: Estilo Visual Premium
+    // Dibujar Franja Superior Decorativa Roja
     doc.rect(0, 0, doc.page.width, 15).fill('#CC0000');
 
-    // Dibujar Título y Logo
-    doc.fillColor('#111111');
-    doc.fontSize(20).font('Helvetica-Bold').text('CLUB ATLETICO JORGE NEWBERY', 50, 40);
-    doc.fontSize(10).font('Helvetica').text('Av. Jorge Newbery 1234, CABA | CUIT: 30-12345678-9', 50, 65);
-    doc.text('Asociación Civil sin Fines de Lucro', 50, 78);
+    // Header: Escudo y Datos del Club
+    let textStartX = 50;
+    if (logoPath) {
+      try {
+        doc.image(logoPath, 50, 30, { width: 55, height: 55 });
+        textStartX = 120;
+      } catch (imgErr) {
+        console.error('Error insertando imagen de logo en PDF:', imgErr);
+        textStartX = 50; // Fallback sin imagen si está corrupto
+      }
+    }
 
-    // Detalles del comprobante (Derecha)
-    doc.fontSize(14).font('Helvetica-Bold').text(invoice.tipoComprobante, 400, 40, { align: 'right' });
-    doc.fontSize(10).font('Helvetica-Bold').text(`Número: ${invoice.numero}`, 400, 60, { align: 'right' });
-    doc.font('Helvetica').text(`Fecha: ${new Date(invoice.fechaEmision).toLocaleDateString('es-AR')}`, 400, 75, { align: 'right' });
+    doc.fillColor('#111111');
+    doc.fontSize(16).font('Helvetica-Bold').text('CLUB ATLETICO JORGE NEWBERY', textStartX, 35);
+    doc.fontSize(9).font('Helvetica').fillColor('#555555').text('Av. Jorge Newbery 1234, CABA | CUIT: 30-12345678-9', textStartX, 54);
+    doc.text('Asociación Civil sin Fines de Lucro | Fundado en 1916', textStartX, 66);
+    doc.text('contacto@jorgenewbery.com.ar | www.jorgenewbery.com.ar', textStartX, 78);
+
+    // Encabezado del Recibo (Derecha)
+    doc.fillColor('#CC0000');
+    doc.fontSize(12).font('Helvetica-Bold').text('RECIBO OFICIAL', 400, 35, { align: 'right' });
+    doc.fontSize(10).font('Helvetica-Bold').fillColor('#111111').text(`Número: ${invoice.numero}`, 400, 52, { align: 'right' });
+    doc.fontSize(9).font('Helvetica').fillColor('#555555').text(`Emisión: ${new Date(invoice.fechaEmision).toLocaleDateString('es-AR')}`, 400, 68, { align: 'right' });
+    
+    // Estado del Pago en badge de color
+    const payState = (invoice.payment.estado || 'PENDIENTE').toUpperCase();
+    let badgeBg = '#FFF3CD';
+    let badgeText = '#856404';
+    if (payState === 'PAGADO') {
+      badgeBg = '#D4EDDA';
+      badgeText = '#155724';
+    } else if (payState === 'RECHAZADO' || payState === 'CANCELADO') {
+      badgeBg = '#F8D7DA';
+      badgeText = '#721C24';
+    }
+    
+    doc.rect(doc.page.width - 130, 84, 80, 16).fill(badgeBg);
+    doc.fontSize(8).font('Helvetica-Bold').fillColor(badgeText).text(payState, doc.page.width - 130, 88, { width: 80, align: 'center' });
 
     // Línea separadora
-    doc.moveTo(50, 105).lineTo(doc.page.width - 50, 105).stroke('#CCCCCC');
+    doc.moveTo(50, 110).lineTo(doc.page.width - 50, 110).stroke('#E2E8F0');
 
-    // Información del Socio
-    doc.fontSize(12).font('Helvetica-Bold').text('DATOS DEL SOCIO', 50, 120);
-    doc.fontSize(10).font('Helvetica');
-    doc.text(`Nombre: ${invoice.payment.socio.firstName} ${invoice.payment.socio.lastName}`, 50, 140);
-    doc.text(`Nº Socio: ${invoice.payment.socio.socioNumber}`, 50, 155);
-    doc.text(`DNI: ${invoice.payment.socio.dni}`, 50, 170);
-    doc.text(`Email: ${invoice.payment.socio.email || '-'}`, 50, 185);
+    // DATOS DEL SOCIO
+    doc.fontSize(10).font('Helvetica-Bold').fillColor('#CC0000').text('DATOS DEL SOCIO', 50, 125);
+    
+    // Contenedor de datos del socio (rounded rect)
+    doc.roundedRect(50, 140, doc.page.width - 100, 65, 6).stroke('#E2E8F0');
+    
+    // Textos de Datos de Socio
+    const socio = invoice.payment.socio;
+    const fullName = `${socio.firstName || ''} ${socio.lastName || ''}`.trim();
+    doc.fontSize(9).font('Helvetica-Bold').fillColor('#111111');
+    
+    // Columna 1
+    doc.text('Nombre completo:', 65, 152);
+    doc.font('Helvetica').text(fullName, 160, 152);
+    doc.font('Helvetica-Bold').text('Documento / DNI:', 65, 168);
+    doc.font('Helvetica').text(socio.dni || '-', 160, 168);
+    doc.font('Helvetica-Bold').text('Categoría:', 65, 184);
+    doc.font('Helvetica').text(socio.category || 'ACTIVO', 160, 184);
 
-    // Detalles del Pago
-    doc.fontSize(12).font('Helvetica-Bold').text('DETALLE DEL PAGO', 50, 215);
-    doc.fontSize(10).font('Helvetica');
-    doc.text(`Concepto: ${invoice.payment.plan?.nombre || 'Cuota Social General'}`, 50, 235);
-    doc.text(`Medio de Pago: ${invoice.payment.metodoPago}`, 50, 250);
-    doc.text(`Referencia: ${invoice.payment.referenciaPago || 'N/A'}`, 50, 265);
-    doc.text(`Fecha Pago: ${invoice.payment.fechaPago ? new Date(invoice.payment.fechaPago).toLocaleDateString('es-AR') : 'Pendiente'}`, 50, 280);
+    // Columna 2
+    doc.font('Helvetica-Bold').text('Número de socio:', 310, 152);
+    doc.font('Helvetica').text(String(socio.socioNumber || '-'), 400, 152);
+    doc.font('Helvetica-Bold').text('Plan de membresía:', 310, 168);
+    doc.font('Helvetica').text(invoice.payment.plan.nombre || '-', 400, 168);
 
-    // Contenedor del Total
-    doc.rect(50, 310, doc.page.width - 100, 60).fill('#F5F5F5');
-    doc.fillColor('#111111');
-    doc.fontSize(12).font('Helvetica-Bold').text('TOTAL ABONADO:', 70, 332);
-    doc.fontSize(18).font('Helvetica-Bold').fillColor('#CC0000').text(`$${parseFloat(invoice.payment.importe).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ARS`, 200, 328);
+    // DETALLE DEL PAGO
+    doc.fontSize(10).font('Helvetica-Bold').fillColor('#CC0000').text('DETALLE DEL PAGO', 50, 225);
 
-    // Estado del Pago
-    doc.rect(doc.page.width - 150, 322, 100, 30).fill('#D4EDDA');
-    doc.fillColor('#155724');
-    doc.fontSize(12).font('Helvetica-Bold').text(invoice.payment.estado, doc.page.width - 150, 331, { width: 100, align: 'center' });
+    // Encabezado de la tabla de detalles
+    doc.rect(50, 240, doc.page.width - 100, 18).fill('#F8FAFC');
+    doc.fontSize(8).font('Helvetica-Bold').fillColor('#475569');
+    doc.text('Concepto', 60, 245);
+    doc.text('Período', 210, 245);
+    doc.text('Subtotal', 300, 245, { width: 60, align: 'right' });
+    doc.text('Descuento', 360, 245, { width: 60, align: 'right' });
+    doc.text('Recargo', 420, 245, { width: 60, align: 'right' });
+    doc.text('Total', 480, 245, { width: 60, align: 'right' });
 
-    // Código de Validación y Leyenda
-    doc.fillColor('#111111');
-    doc.fontSize(10).font('Helvetica-Bold').text('VALIDACIÓN DIGITAL', 50, 400);
-    doc.fontSize(8).font('Helvetica');
-    doc.text(`Código de Verificación: ${invoice.numero}-${id}-${new Date(invoice.createdAt).getTime()}`, 50, 420);
-    doc.text('Este es un comprobante oficial emitido de forma digital por el sistema de administración del Club Atlético Jorge Newbery.', 50, 435);
+    // FASE 7: Importes obtenidos desde la base de datos
+    const subtotalVal = parseFloat(invoice.payment.importe) || 0;
+    const discountVal = 0.0;
+    const surchargeVal = 0.0;
+    const totalVal = subtotalVal - discountVal + surchargeVal;
 
-    // Dibujar Código QR simulado (Vectorial)
-    doc.rect(450, 400, 80, 80).stroke('#666666');
-    doc.fontSize(6).text('ESCANEADO\nDIGITAL', 450, 435, { width: 80, align: 'center' });
+    // Fila única de detalle
+    doc.fontSize(9).font('Helvetica').fillColor('#111111');
+    doc.text(invoice.payment.plan.nombre || 'Cuota Social General', 60, 266, { width: 145 });
+    doc.text(periodo, 210, 266);
+    doc.text(`$${subtotalVal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 300, 266, { width: 60, align: 'right' });
+    doc.text(`$${discountVal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 360, 266, { width: 60, align: 'right' });
+    doc.text(`$${surchargeVal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 420, 266, { width: 60, align: 'right' });
+    doc.font('Helvetica-Bold').text(`$${totalVal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 480, 266, { width: 60, align: 'right' });
 
-    // Pie de Página
-    doc.moveTo(50, doc.page.height - 70).lineTo(doc.page.width - 50, doc.page.height - 70).stroke('#CCCCCC');
-    doc.fontSize(8).font('Helvetica').fillColor('#888888').text('Jorge Newbery Online - Sistema de Gestión Deportiva Integral', 50, doc.page.height - 60);
-    doc.text('Página 1 de 1', 450, doc.page.height - 60, { align: 'right' });
+    // Línea divisoria de tabla
+    doc.moveTo(50, 286).lineTo(doc.page.width - 50, 286).stroke('#E2E8F0');
+
+    // Métodos de pago y Total box
+    doc.fontSize(9).font('Helvetica-Bold').fillColor('#111111').text('Medio de pago:', 60, 305);
+    doc.font('Helvetica').text(invoice.payment.metodoPago || 'EFECTIVO', 140, 305);
+    doc.font('Helvetica-Bold').text('Fecha de pago:', 60, 321);
+    doc.font('Helvetica').text(invoice.payment.fechaPago ? new Date(invoice.payment.fechaPago).toLocaleString('es-AR') : 'Pendiente', 140, 321);
+
+    // TOTAL ABONADO BOX
+    doc.rect(340, 298, 205, 38).fill('#F8FAFC');
+    doc.rect(340, 298, 3, 38).fill('#CC0000'); // acento rojo lateral
+    doc.fillColor('#111111').fontSize(9).font('Helvetica-Bold').text('TOTAL ABONADO:', 352, 312);
+    doc.fontSize(12).font('Helvetica-Bold').fillColor('#CC0000').text(`$${totalVal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ARS`, 435, 310, { width: 105, align: 'right' });
+
+    // FASE 6: Código QR Real
+    const validationUrl = process.env.INVOICE_VALIDATION_URL 
+      ? `${process.env.INVOICE_VALIDATION_URL.replace(/\/$/, '')}/verify/invoice/${invoice.id}`
+      : `https://www.jorgenewbery.com.ar/portal/verify/invoice/${invoice.id}`;
+    
+    let qrBuffer = null;
+    try {
+      qrBuffer = qr.imageSync(validationUrl, { type: 'png', margin: 1 });
+    } catch (qrErr) {
+      console.error('Error al generar buffer de QR real:', qrErr);
+    }
+
+    doc.moveTo(50, 355).lineTo(doc.page.width - 50, 355).stroke('#E2E8F0');
+
+    // VALIDACIÓN DIGITAL CONTAINER
+    doc.fontSize(10).font('Helvetica-Bold').fillColor('#CC0000').text('VALIDACIÓN DIGITAL Y CONTROL', 50, 370);
+    
+    if (qrBuffer) {
+      try {
+        doc.image(qrBuffer, 50, 390, { width: 75, height: 75 });
+      } catch (qrDrawErr) {
+        console.error('Error dibujando QR en PDF:', qrDrawErr);
+      }
+    }
+    
+    const qrInfoStartX = qrBuffer ? 140 : 50;
+    doc.fillColor('#111111').fontSize(9).font('Helvetica-Bold').text('INFORMACIÓN DE VERIFICACIÓN:', qrInfoStartX, 390);
+    doc.fontSize(8).font('Helvetica').fillColor('#475569');
+    doc.text(`Código de control único: REC-${invoice.numero}-${invoice.id}-${new Date(invoice.createdAt).getTime()}`, qrInfoStartX, 405);
+    doc.text('Este documento digital sirve como comprobante de pago oficial de las obligaciones sociales y deportivas descritas.', qrInfoStartX, 418, { width: 380 });
+    doc.text('Para verificar su validez en el portal oficial del Club Jorge Newbery, escanee el código QR con su dispositivo celular.', qrInfoStartX, 438, { width: 380 });
+
+    // FASE 7: Pie del documento
+    doc.moveTo(50, doc.page.height - 70).lineTo(doc.page.width - 50, doc.page.height - 70).stroke('#E2E8F0');
+    doc.fontSize(8).font('Helvetica').fillColor('#94A3B8');
+    doc.text('Club Atlético Jorge Newbery - Asociación Civil sin Fines de Lucro', 50, doc.page.height - 60);
+    doc.text('Sistema de Gestión Digital ERP v2.0 - Comprobante de emisión digital automática', 50, doc.page.height - 48);
+    doc.text(`Emisión: ${new Date().toLocaleString('es-AR')}`, 450, doc.page.height - 60, { width: 95, align: 'right' });
 
     doc.end();
   } catch (error) {
     logError({ module: 'FinanzasInvoicesRoute', action: 'get', error, req });
-    res.status(500).json({ error: 'Error al generar o descargar el comprobante.' });
+    // FASE 8: Nunca lanzar excepción ni responder 500 si podemos atraparlo
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Error interno al generar el comprobante PDF.' });
+    }
   }
 });
 

@@ -1,6 +1,6 @@
 # Reporte de Auditoría Funcional - Club Jorge Newbery Digital
 
-**Fecha de Auditoría:** 18/7/2026, 10:05:27
+**Fecha de Auditoría:** 19/7/2026, 11:36:05
 **Estado General del Sistema:** SALUDABLE (100% OPERATIVO)
 **Porcentaje de Funcionamiento Real:** **100%**
 
@@ -22,17 +22,17 @@ A continuación se detallan los resultados de cada script de verificación ejecu
 
 | Módulo / Prueba | Estado | Duración | Detalles |
 | :--- | :---: | :---: | :--- |
-| **Prueba CRUD Firestore** (verify_firestore.js) | 🟢 EXITOSO | 4114ms | Sin incidencias |
-| **Prueba Firebase/JWT Auth** (verify_auth.js) | 🟢 EXITOSO | 442ms | Sin incidencias |
-| **Prueba Firebase Storage** (verify_storage.js) | 🟢 EXITOSO | 6877ms | Sin incidencias |
-| **Auditoría General del Ecosistema** (verify_ecosystem.js) | 🟢 EXITOSO | 3941ms | Sin incidencias |
-| **Verificación de Endpoints del Core** (verify_endpoints.js) | 🟢 EXITOSO | 3961ms | Sin incidencias |
-| **Verificación del Módulo de Socios** (verify_socios.js) | 🟢 EXITOSO | 922ms | Sin incidencias |
-| **Verificación del Módulo de Finanzas** (verify_finanzas.js) | 🟢 EXITOSO | 3924ms | Sin incidencias |
-| **Verificación de Gestión Multimedia** (verify_multimedia.js) | 🟢 EXITOSO | 3936ms | Sin incidencias |
-| **Verificación de Newbery TV** (verify_newberytv.js) | 🟢 EXITOSO | 25096ms | Sin incidencias |
-| **Verificación de Liga Pro Studio** (verify_liga_pro.js) | 🟢 EXITOSO | 4221ms | Sin incidencias |
-| **Verificación de Marketing y Campañas** (verify_marketing_fase4.js) | 🟢 EXITOSO | 12787ms | Sin incidencias |
+| **Prueba CRUD Firestore** (verify_firestore.js) | 🟢 EXITOSO | 4106ms | Sin incidencias |
+| **Prueba Firebase/JWT Auth** (verify_auth.js) | 🟢 EXITOSO | 540ms | Sin incidencias |
+| **Prueba Firebase Storage** (verify_storage.js) | 🟢 EXITOSO | 435ms | Sin incidencias |
+| **Auditoría General del Ecosistema** (verify_ecosystem.js) | 🟢 EXITOSO | 4029ms | Sin incidencias |
+| **Verificación de Endpoints del Core** (verify_endpoints.js) | 🟢 EXITOSO | 3882ms | Sin incidencias |
+| **Verificación del Módulo de Socios** (verify_socios.js) | 🟢 EXITOSO | 865ms | Sin incidencias |
+| **Verificación del Módulo de Finanzas** (verify_finanzas.js) | 🟢 EXITOSO | 3953ms | Sin incidencias |
+| **Verificación de Gestión Multimedia** (verify_multimedia.js) | 🟢 EXITOSO | 4178ms | Sin incidencias |
+| **Verificación de Newbery TV** (verify_newberytv.js) | 🟢 EXITOSO | 13342ms | Sin incidencias |
+| **Verificación de Liga Pro Studio** (verify_liga_pro.js) | 🟢 EXITOSO | 3946ms | Sin incidencias |
+| **Verificación de Marketing y Campañas** (verify_marketing_fase4.js) | 🟢 EXITOSO | 10944ms | Sin incidencias |
 
 ---
 

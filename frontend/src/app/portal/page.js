@@ -1,10 +1,11 @@
-﻿"use client";
+"use client";
 import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { API_URL } from '@/config';
 
 export default function PortalHome() {
   const [socio, setSocio] = useState(null);
+  const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,7 +43,21 @@ export default function PortalHome() {
         setLoading(false);
       }
     }
+
+    async function loadNews() {
+      try {
+        const res = await fetch(`/api/news`);
+        if (res.ok) {
+          const data = await res.json();
+          setNews(data.slice(0, 4));
+        }
+      } catch (err) {
+        console.error("Error al cargar noticias en portal:", err);
+      }
+    }
+
     loadProfile();
+    loadNews();
   }, []);
 
   if (loading) {
@@ -65,7 +80,7 @@ export default function PortalHome() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold mb-6">Mi Perfil</h2>
+      <h2 className="text-2xl font-bold mb-6 text-jn-black">Mi Perfil</h2>
       
       <div className="grid md:grid-cols-2 gap-6">
         {/* Carnet Digital con QR */}
@@ -96,7 +111,7 @@ export default function PortalHome() {
         </div>
 
         {/* Estado de Cuenta */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center text-jn-black">
           <h3 className="text-lg font-bold mb-2">Estado de Cuenta</h3>
           <div className="flex items-center gap-3 mb-4">
             <span className={`w-3 h-3 rounded-full ${socio.estado === "Al día" ? "bg-green-500" : "bg-red-500"}`}></span>
@@ -107,6 +122,43 @@ export default function PortalHome() {
             Ver Medios de Pago
           </a>
         </div>
+      </div>
+
+      {/* Novedades y Cartelera Oficial */}
+      <div className="mt-8 space-y-4 text-jn-black">
+        <h3 className="text-xl font-bold border-b pb-2 flex items-center gap-2">
+          📢 Novedades y Cartelera Oficial
+        </h3>
+        
+        {news.length === 0 ? (
+          <p className="text-sm text-gray-400 italic font-medium">No hay novedades publicadas en este momento.</p>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-4">
+            {news.map(item => (
+              <div key={item.id} className="bg-white p-4.5 rounded-2xl border border-gray-100 shadow-xs flex flex-col justify-between space-y-3 hover:shadow-sm transition-all duration-300">
+                <div className="space-y-2.5">
+                  {item.imageUrl && (
+                    <div className="h-32 rounded-xl overflow-hidden border bg-gray-50">
+                      <img 
+                        src={item.imageUrl.startsWith('http') || item.imageUrl.startsWith('/') ? (item.imageUrl.startsWith('/') && !item.imageUrl.startsWith('/uploads') ? item.imageUrl : `${API_URL}${item.imageUrl}`) : item.imageUrl} 
+                        alt={item.title} 
+                        className="w-full h-full object-cover" 
+                      />
+                    </div>
+                  )}
+                  <span className="text-[9px] font-black uppercase text-jn-red bg-red-50 px-2 py-0.5 rounded-full inline-block tracking-wider">
+                    {item.category}
+                  </span>
+                  <h4 className="font-black text-sm text-slate-800">{item.title}</h4>
+                  <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-3">{item.content}</p>
+                </div>
+                <div className="text-[10px] text-gray-400 font-black">
+                  {new Date(item.createdAt).toLocaleDateString('es-AR')}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

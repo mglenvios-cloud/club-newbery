@@ -40,7 +40,12 @@ router.get('/:id', async (req, res) => {
 
 // Crear un perfil de jugador (ADMIN)
 router.post('/', async (req, res) => {
-  const { name, lastName, dorsal, age, category, position, team, achievements, matchesPlayed, goals, assists, yellowCards, redCards, cleanSheets, season, description, birthDate, playerStatus, videoUrl, photoUrl } = req.body;
+  const { 
+    name, lastName, dorsal, age, category, position, team, achievements, 
+    matchesPlayed, goals, assists, yellowCards, redCards, cleanSheets, 
+    season, description, birthDate, playerStatus, videoUrl, photoUrl,
+    phone, email, address, dni, dominantFoot, height, weight, observations
+  } = req.body;
   try {
     if (!name || age === undefined || !category || !position || !team) {
       return res.status(400).json({ error: 'Faltan campos obligatorios para el jugador' });
@@ -67,7 +72,15 @@ router.post('/', async (req, res) => {
         birthDate: birthDate ? new Date(birthDate) : null,
         playerStatus: playerStatus || 'ACTIVE',
         videoUrl,
-        photoUrl
+        photoUrl,
+        phone: phone || null,
+        email: email || null,
+        address: address || null,
+        dni: dni || null,
+        dominantFoot: dominantFoot || 'DERECHA',
+        height: height ? parseFloat(height) : null,
+        weight: weight ? parseFloat(weight) : null,
+        observations: observations || ''
       }
     });
 
@@ -81,7 +94,12 @@ router.post('/', async (req, res) => {
 // Actualizar estadísticas o logros del jugador (ADMIN)
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { name, lastName, dorsal, age, category, position, team, achievements, matchesPlayed, goals, assists, yellowCards, redCards, cleanSheets, season, description, birthDate, playerStatus, videoUrl, photoUrl } = req.body;
+  const { 
+    name, lastName, dorsal, age, category, position, team, achievements, 
+    matchesPlayed, goals, assists, yellowCards, redCards, cleanSheets, 
+    season, description, birthDate, playerStatus, videoUrl, photoUrl,
+    phone, email, address, dni, dominantFoot, height, weight, observations
+  } = req.body;
   try {
     const updated = await prisma.playerProfile.update({
       where: { id: parseInt(id) },
@@ -105,7 +123,15 @@ router.put('/:id', async (req, res) => {
         birthDate: birthDate ? new Date(birthDate) : (birthDate === null ? null : undefined),
         playerStatus,
         videoUrl,
-        photoUrl
+        photoUrl,
+        phone: phone !== undefined ? phone : undefined,
+        email: email !== undefined ? email : undefined,
+        address: address !== undefined ? address : undefined,
+        dni: dni !== undefined ? dni : undefined,
+        dominantFoot: dominantFoot !== undefined ? dominantFoot : undefined,
+        height: height !== undefined ? (height ? parseFloat(height) : null) : undefined,
+        weight: weight !== undefined ? (weight ? parseFloat(weight) : null) : undefined,
+        observations: observations !== undefined ? observations : undefined
       }
     });
     res.json(updated);

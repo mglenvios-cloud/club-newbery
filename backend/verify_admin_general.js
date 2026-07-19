@@ -1,4 +1,7 @@
 const http = require('http');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_jn_2026';
+const token = jwt.sign({ userId: 1, role: 'SUPER_ADMIN' }, JWT_SECRET);
 
 const endpoints = [
   '/api/admin-general/club-config',
@@ -16,7 +19,10 @@ function testEndpoint(path) {
       hostname: 'localhost',
       port: 5000,
       path: path,
-      method: 'GET'
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     };
 
     const req = http.request(options, (res) => {

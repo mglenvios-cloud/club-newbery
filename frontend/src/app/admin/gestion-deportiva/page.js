@@ -120,7 +120,8 @@ export default function AdminGestionDeportiva() {
   });
 
   const [playerForm, setPlayerForm] = useState({
-    name: '', lastName: '', age: '', dorsal: 0, category: 'Primera Masculina', position: 'Ala', team: 'Futsal AFA', achievements: '', matchesPlayed: 0, goals: 0, assists: 0, yellowCards: 0, redCards: 0, cleanSheets: 0, playerStatus: 'ACTIVE', description: '', birthDate: '', photoUrl: ''
+    name: '', lastName: '', age: '', dorsal: 0, category: 'Primera Masculina', position: 'Ala', team: 'Futsal AFA', achievements: '', matchesPlayed: 0, goals: 0, assists: 0, yellowCards: 0, redCards: 0, cleanSheets: 0, playerStatus: 'ACTIVE', description: '', birthDate: '', photoUrl: '',
+    phone: '', email: '', address: '', dni: '', dominantFoot: 'DERECHA', height: '', weight: '', observations: ''
   });
 
   const [trainingForm, setTrainingForm] = useState({
@@ -1008,7 +1009,7 @@ export default function AdminGestionDeportiva() {
                 </div>
                 <button
                   onClick={() => {
-                    setPlayerForm({ name: '', lastName: '', age: '', dorsal: 0, category: 'Primera Masculina', position: 'Ala', team: 'Futsal AFA', achievements: '', matchesPlayed: 0, goals: 0, assists: 0, yellowCards: 0, redCards: 0, cleanSheets: 0, playerStatus: 'ACTIVE', description: '', birthDate: '', photoUrl: '' });
+                    setPlayerForm({ name: '', lastName: '', age: '', dorsal: 0, category: 'Primera Masculina', position: 'Ala', team: 'Futsal AFA', achievements: '', matchesPlayed: 0, goals: 0, assists: 0, yellowCards: 0, redCards: 0, cleanSheets: 0, playerStatus: 'ACTIVE', description: '', birthDate: '', photoUrl: '', phone: '', email: '', address: '', dni: '', dominantFoot: 'DERECHA', height: '', weight: '', observations: '' });
                     setPlayerModal({ isOpen: true, editId: null });
                   }}
                   className="bg-jn-red hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 self-start"
@@ -1641,53 +1642,169 @@ export default function AdminGestionDeportiva() {
               </button>
             </div>
 
-            <form onSubmit={handleSavePlayer} className="space-y-3 text-xs font-bold text-gray-600 uppercase">
-              <div className="grid grid-cols-2 gap-3">
+            <form onSubmit={handleSavePlayer} className="space-y-2.5 text-[10px] font-black text-gray-500 uppercase">
+              {/* Nombre y Apellido */}
+              <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="mb-1 block">Nombre *</label>
+                  <label className="mb-0.5 block">Nombre *</label>
                   <input
                     type="text" required
                     value={playerForm.name}
                     onChange={e => setPlayerForm(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
+                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block">Apellido *</label>
+                  <label className="mb-0.5 block">Apellido *</label>
                   <input
                     type="text" required
                     value={playerForm.lastName}
                     onChange={e => setPlayerForm(prev => ({ ...prev, lastName: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
+                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              {/* DNI y Fecha Nacimiento */}
+              <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="mb-1 block">Dorsal</label>
+                  <label className="mb-0.5 block">DNI *</label>
+                  <input
+                    type="text" required
+                    value={playerForm.dni || ''}
+                    onChange={e => setPlayerForm(prev => ({ ...prev, dni: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-mono focus:ring-1 focus:ring-red-500 focus:outline-none"
+                    placeholder="Solo Nros"
+                  />
+                </div>
+                <div>
+                  <label className="mb-0.5 block">F. Nacimiento</label>
+                  <input
+                    type="date"
+                    value={playerForm.birthDate}
+                    onChange={e => setPlayerForm(prev => ({ ...prev, birthDate: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-red-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Teléfono y Email */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="mb-0.5 block">Teléfono</label>
+                  <input
+                    type="text"
+                    value={playerForm.phone || ''}
+                    onChange={e => setPlayerForm(prev => ({ ...prev, phone: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-mono focus:ring-1 focus:ring-red-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="mb-0.5 block">Email</label>
+                  <input
+                    type="email"
+                    value={playerForm.email || ''}
+                    onChange={e => setPlayerForm(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs lowercase font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Dirección */}
+              <div>
+                <label className="mb-0.5 block">Dirección</label>
+                <input
+                  type="text"
+                  value={playerForm.address || ''}
+                  onChange={e => setPlayerForm(prev => ({ ...prev, address: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none"
+                />
+              </div>
+
+              {/* Altura, Peso y Pierna Hábil */}
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="mb-0.5 block">Altura (m)</label>
+                  <input
+                    type="number" step="0.01" min="0"
+                    placeholder="Ej 1.75"
+                    value={playerForm.height || ''}
+                    onChange={e => setPlayerForm(prev => ({ ...prev, height: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-red-500"
+                  />
+                </div>
+                <div>
+                  <label className="mb-0.5 block">Peso (kg)</label>
+                  <input
+                    type="number" step="0.1" min="0"
+                    placeholder="Ej 70"
+                    value={playerForm.weight || ''}
+                    onChange={e => setPlayerForm(prev => ({ ...prev, weight: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-red-500"
+                  />
+                </div>
+                <div>
+                  <label className="mb-0.5 block">Pierna Hábil</label>
+                  <select
+                    value={playerForm.dominantFoot || 'DERECHA'}
+                    onChange={e => setPlayerForm(prev => ({ ...prev, dominantFoot: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-semibold bg-white focus:ring-1 focus:ring-red-500"
+                  >
+                    <option value="DERECHA">DERECHA</option>
+                    <option value="IZQUIERDA">IZQUIERDA</option>
+                    <option value="AMBAS">AMBAS</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Categoría y Equipo */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="mb-0.5 block">Categoría *</label>
+                  <input
+                    type="text" required
+                    value={playerForm.category}
+                    onChange={e => setPlayerForm(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="mb-0.5 block">Equipo *</label>
+                  <input
+                    type="text" required
+                    value={playerForm.team}
+                    onChange={e => setPlayerForm(prev => ({ ...prev, team: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Dorsal, Edad y Posición */}
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="mb-0.5 block">Dorsal (#)</label>
                   <input
                     type="number"
                     value={playerForm.dorsal}
                     onChange={e => setPlayerForm(prev => ({ ...prev, dorsal: parseInt(e.target.value) || 0 }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
+                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block">Edad *</label>
+                  <label className="mb-0.5 block">Edad *</label>
                   <input
                     type="number" required
                     value={playerForm.age}
                     onChange={e => setPlayerForm(prev => ({ ...prev, age: parseInt(e.target.value) || '' }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
+                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block">Posición *</label>
+                  <label className="mb-0.5 block">Posición *</label>
                   <select
                     value={playerForm.position}
                     onChange={e => setPlayerForm(prev => ({ ...prev, position: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none bg-white"
+                    className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-semibold bg-white focus:ring-1 focus:ring-red-500 focus:outline-none"
                   >
                     <option value="Arquero">Arquero</option>
                     <option value="Cierre">Cierre</option>
@@ -1697,94 +1814,76 @@ export default function AdminGestionDeportiva() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              {/* Estado Físico y Estadísticas */}
+              <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="mb-1 block">Categoría *</label>
-                  <input
-                    type="text" required
-                    value={playerForm.category}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">Equipo *</label>
-                  <input
-                    type="text" required
-                    value={playerForm.team}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, team: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block">Fecha de Nacimiento</label>
-                  <input
-                    type="date"
-                    value={playerForm.birthDate}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, birthDate: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">Estado Físico / Sanción</label>
+                  <label className="mb-0.5 block">Estado Físico / Sanción</label>
                   <select
                     value={playerForm.playerStatus}
                     onChange={e => setPlayerForm(prev => ({ ...prev, playerStatus: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none bg-white"
+                    className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-semibold bg-white focus:ring-1 focus:ring-red-500"
                   >
                     <option value="ACTIVE">ACTIVO</option>
                     <option value="INJURED">LESIONADO</option>
                     <option value="SUSPENDED">SUSPENDIDO</option>
                   </select>
                 </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  <div>
+                    <label className="mb-0.5 block text-[8px]">PJ</label>
+                    <input
+                      type="number"
+                      value={playerForm.matchesPlayed}
+                      onChange={e => setPlayerForm(prev => ({ ...prev, matchesPlayed: parseInt(e.target.value) || 0 }))}
+                      className="w-full border border-gray-300 rounded-lg p-1 text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-0.5 block text-[8px]">Goles</label>
+                    <input
+                      type="number"
+                      value={playerForm.goals}
+                      onChange={e => setPlayerForm(prev => ({ ...prev, goals: parseInt(e.target.value) || 0 }))}
+                      className="w-full border border-gray-300 rounded-lg p-1 text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-0.5 block text-[8px]">Asist</label>
+                    <input
+                      type="number"
+                      value={playerForm.assists}
+                      onChange={e => setPlayerForm(prev => ({ ...prev, assists: parseInt(e.target.value) || 0 }))}
+                      className="w-full border border-gray-300 rounded-lg p-1 text-xs"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="mb-1 block">Partidos Jugados</label>
-                  <input
-                    type="number"
-                    value={playerForm.matchesPlayed}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, matchesPlayed: parseInt(e.target.value) || 0 }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">Goles</label>
-                  <input
-                    type="number"
-                    value={playerForm.goals}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, goals: parseInt(e.target.value) || 0 }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">Asistencias</label>
-                  <input
-                    type="number"
-                    value={playerForm.assists}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, assists: parseInt(e.target.value) || 0 }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-              </div>
-
+              {/* Observaciones */}
               <div>
-                <label className="mb-1 block">Foto de Perfil</label>
+                <label className="mb-0.5 block">Observaciones</label>
+                <textarea
+                  value={playerForm.observations || ''}
+                  onChange={e => setPlayerForm(prev => ({ ...prev, observations: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-2.5 py-1 text-xs h-9 resize-none font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none"
+                />
+              </div>
+
+              {/* Foto de Perfil */}
+              <div>
+                <label className="mb-0.5 block">Foto de Perfil</label>
                 <MediaUploadUniversal
                   value={playerForm.photoUrl}
                   onChange={url => setPlayerForm(prev => ({ ...prev, photoUrl: url }))}
                   category="multimedia"
                   allowedTypes={['image']}
+                  compact={true}
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-jn-red hover:bg-red-700 text-white font-black uppercase tracking-wider py-3.5 rounded-xl text-xs transition-colors mt-2"
+                className="w-full bg-jn-red hover:bg-red-700 text-white font-black uppercase tracking-wider py-3 rounded-xl text-xs transition-colors mt-2"
               >
                 {playerModal.editId ? 'Guardar Cambios' : 'Confirmar Registro'}
               </button>

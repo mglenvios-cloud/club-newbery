@@ -52,7 +52,7 @@ export default function LiveScoreboard({ liveMatch }) {
         <LiveBadge animate={liveMatch.status === 'LIVE'} text={liveMatch.status === 'LIVE' ? "EN VIVO" : "FINALIZADO"} className="bg-red-500/10 border border-red-500/20 px-3 py-1 rounded-full" />
         <span className="flex items-center gap-1 text-xs font-mono text-zinc-400 mt-1 font-bold">
           <Clock size={14} className="text-red-500" />
-          MINUTO {liveMatch.liveMinute || 0}'
+          MINUTO {liveMatch.liveMinute || 0}&apos;
         </span>
       </div>
     </div>

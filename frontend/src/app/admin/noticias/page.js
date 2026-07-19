@@ -13,10 +13,13 @@ export default function AdminNoticias() {
 
   // Form State
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("GENERAL");
   const [tag, setTag] = useState("INFO");
   const [imageUrl, setImageUrl] = useState("");
+  const [author, setAuthor] = useState("Admin");
+  const [status, setStatus] = useState("DRAFT");
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
@@ -58,7 +61,7 @@ export default function AdminNoticias() {
       return;
     }
 
-    const payload = { title, content, category, tag, imageUrl };
+    const payload = { title, description, content, category, tag, imageUrl, author, status };
     const method = isEditing ? 'PUT' : 'POST';
     const url = isEditing ? `/api/news/${editId}` : '/api/news';
 
@@ -76,10 +79,13 @@ export default function AdminNoticias() {
       if (res.ok) {
         setSuccessMsg(isEditing ? "¡Novedad actualizada con éxito!" : "¡Novedad publicada con éxito!");
         setTitle("");
+        setDescription("");
         setContent("");
         setCategory("GENERAL");
         setTag("INFO");
         setImageUrl("");
+        setAuthor("Admin");
+        setStatus("DRAFT");
         setIsEditing(false);
         setEditId(null);
         fetchNews();
@@ -97,10 +103,13 @@ export default function AdminNoticias() {
     setIsEditing(true);
     setEditId(item.id);
     setTitle(item.title);
+    setDescription(item.description || "");
     setContent(item.content);
     setCategory(item.category);
     setTag(item.tag || "INFO");
     setImageUrl(item.imageUrl || "");
+    setAuthor(item.author || "Admin");
+    setStatus(item.status || "DRAFT");
     setErrorMsg("");
     setSuccessMsg("");
   };
@@ -109,10 +118,13 @@ export default function AdminNoticias() {
     setIsEditing(false);
     setEditId(null);
     setTitle("");
+    setDescription("");
     setContent("");
     setCategory("GENERAL");
     setTag("INFO");
     setImageUrl("");
+    setAuthor("Admin");
+    setStatus("DRAFT");
     setErrorMsg("");
     setSuccessMsg("");
   };
@@ -164,6 +176,7 @@ export default function AdminNoticias() {
                 onChange={e => setTitle(e.target.value)}
                 placeholder="Ej. Inscripciones Abiertas Futsal 2026" 
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-jn-red/45 outline-none font-bold"
+                required
               />
             </div>
 
@@ -197,6 +210,42 @@ export default function AdminNoticias() {
                 </select>
               </div>
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Autor</label>
+                <input 
+                  type="text" 
+                  value={author}
+                  onChange={e => setAuthor(e.target.value)}
+                  placeholder="Ej. Admin" 
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-jn-red/45 outline-none font-bold"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Estado</label>
+                <select 
+                  value={status}
+                  onChange={e => setStatus(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-jn-red/45 outline-none font-bold bg-white"
+                >
+                  <option value="DRAFT">Borrador 📁</option>
+                  <option value="PUBLISHED">Publicado 🚀</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Resumen Breve</label>
+              <input 
+                type="text" 
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                placeholder="Breve introducción de la noticia..." 
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-jn-red/45 outline-none font-bold"
+              />
+            </div>
  
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Imagen de Portada</label>
@@ -216,6 +265,7 @@ export default function AdminNoticias() {
                 onChange={e => setContent(e.target.value)}
                 placeholder="Detalles sobre horarios, aranceles, inscripciones, etc..." 
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-jn-red/45 outline-none resize-none font-bold"
+                required
               ></textarea>
             </div>
 
@@ -302,12 +352,17 @@ export default function AdminNoticias() {
                           <img src={item.imageUrl.startsWith('http') || item.imageUrl.startsWith('/') ? (item.imageUrl.startsWith('/') && !item.imageUrl.startsWith('/uploads') ? item.imageUrl : `${API_URL}${item.imageUrl}`) : item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
                         </div>
                       )}
+                      {item.description && (
+                        <p className="text-xs text-gray-500 font-bold italic mb-2">{item.description}</p>
+                      )}
                       <p className="text-sm text-gray-600 leading-relaxed font-light">{item.content}</p>
                     </div>
 
                     <div className="border-t border-gray-100 mt-4 pt-3 flex items-center justify-between text-xs text-gray-400 font-bold uppercase tracking-wider">
-                      <span className="flex items-center gap-1.5"><Calendar size={12} /> {new Date(item.createdAt).toLocaleDateString('es-AR')}</span>
-                      <span>Publicado</span>
+                      <span className="flex items-center gap-1.5"><Calendar size={12} /> {new Date(item.createdAt).toLocaleDateString('es-AR')} | Por: {item.author || 'Admin'}</span>
+                      <span className={item.status === 'PUBLISHED' ? 'text-green-600' : 'text-yellow-600'}>
+                        {item.status === 'PUBLISHED' ? 'Publicado 🚀' : 'Borrador 📁'}
+                      </span>
                     </div>
                   </div>
                 );

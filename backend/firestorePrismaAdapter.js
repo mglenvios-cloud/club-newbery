@@ -621,18 +621,19 @@ class FirestoreCollection {
       if (val) {
         const relConfig = this.relations[key];
         if (relConfig) {
+          const queryParams = {};
+          if (typeof val === 'object' && val.include) {
+            queryParams.include = val.include;
+          }
           if (relConfig.type === 'one') {
-            record[key] = await exports[relConfig.model].findFirst({
-              where: { [relConfig.foreignKey]: record.id }
-            });
+            queryParams.where = { [relConfig.foreignKey]: record.id };
+            record[key] = await exports[relConfig.model].findFirst(queryParams);
           } else if (relConfig.type === 'belongsTo') {
-            record[key] = await exports[relConfig.model].findUnique({
-              where: { id: record[relConfig.foreignKey] }
-            });
+            queryParams.where = { id: record[relConfig.foreignKey] };
+            record[key] = await exports[relConfig.model].findUnique(queryParams);
           } else if (relConfig.type === 'many') {
-            record[key] = await exports[relConfig.model].findMany({
-              where: { [relConfig.foreignKey]: record.id }
-            });
+            queryParams.where = { [relConfig.foreignKey]: record.id };
+            record[key] = await exports[relConfig.model].findMany(queryParams);
           }
         }
       }
@@ -654,7 +655,8 @@ const collectionsConfig = {
   futsalMatch: {
     matchBroadcasts: { model: 'matchBroadcast', type: 'many', foreignKey: 'matchId' },
     matchEvents: { model: 'matchEvent', type: 'many', foreignKey: 'matchId' },
-    highlightClips: { model: 'highlightClip', type: 'many', foreignKey: 'matchId' }
+    highlightClips: { model: 'highlightClip', type: 'many', foreignKey: 'matchId' },
+    playerStatistics: { model: 'playerStatistic', type: 'many', foreignKey: 'matchId' }
   },
   matchBroadcast: {
     match: { model: 'futsalMatch', type: 'belongsTo', foreignKey: 'matchId' },
@@ -694,9 +696,12 @@ const collectionsConfig = {
   schedule: {},
   booking: {},
   sponsor: {
-    contracts: { model: 'contractHistory', type: 'many', foreignKey: 'sponsorId' }
+    contracts: { model: 'contractHistory', type: 'many', foreignKey: 'sponsorId' },
+    advertisements: { model: 'advertisement', type: 'many', foreignKey: 'sponsorId' }
   },
-  banner: {},
+  banner: {
+    advertisements: { model: 'advertisement', type: 'many', foreignKey: 'bannerId' }
+  },
   campaign: {},
   contractHistory: {
     sponsor: { model: 'sponsor', type: 'belongsTo', foreignKey: 'sponsorId' }
@@ -715,7 +720,9 @@ const collectionsConfig = {
     socio: { model: 'member', type: 'belongsTo', foreignKey: 'socioId' },
     plan: { model: 'membershipPlan', type: 'belongsTo', foreignKey: 'planId' }
   },
-  playerProfile: {},
+  playerProfile: {
+    playerStatistics: { model: 'playerStatistic', type: 'many', foreignKey: 'playerId' }
+  },
   coach: {},
   technicalStaff: {},
   clubEvent: {},
@@ -743,7 +750,15 @@ const collectionsConfig = {
   },
   playlist: {},
   streamStatistic: {},
-  broadcastSponsor: {}
+  broadcastSponsor: {},
+  advertisement: {
+    sponsor: { model: 'sponsor', type: 'belongsTo', foreignKey: 'sponsorId' },
+    banner: { model: 'banner', type: 'belongsTo', foreignKey: 'bannerId' }
+  },
+  playerStatistic: {
+    player: { model: 'playerProfile', type: 'belongsTo', foreignKey: 'playerId' },
+    match: { model: 'futsalMatch', type: 'belongsTo', foreignKey: 'matchId' }
+  }
 };
 
 for (const [colName, relations] of Object.entries(collectionsConfig)) {
