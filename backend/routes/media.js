@@ -35,19 +35,9 @@ const admin = require('../config/firebase-admin');
 const bucket = admin.storage().bucket();
 const firebaseStorage = require('../config/storage');
 
-// Middleware to authenticate JWT token
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  
-  if (!token) return res.sendStatus(401);
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
+// Middleware to authenticate JWT or Firebase token
+const { dualAuth } = require('../middleware/firebaseAuth');
+const authenticateToken = dualAuth;
 
 // Middleware to enforce admin, operator or super admin role
 const requireAdmin = (req, res, next) => {
