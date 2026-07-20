@@ -1,11 +1,11 @@
 {
-  "name": "Club Newbery Kids Champions",
-  "short_name": "NK Kids",
-  "description": "Plataforma gaming premium para los chicos del Club Newbery",
-  "start_url": "/kids",
+  "name": "Club Digital Pro",
+  "short_name": "ClubPro",
+  "description": "Plataforma de gestión integral y portal de socios para clubes deportivos",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#0D0F1A",
-  "theme_color": "#1E90FF",
+  "background_color": "#0a0d14",
+  "theme_color": "#cc0000",
   "orientation": "portrait",
   "icons": [
     {
@@ -21,19 +21,28 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["games", "sports", "kids"],
+  "categories": ["sports", "productivity", "social"],
   "lang": "es",
-  "screenshots": [],
   "shortcuts": [
     {
-      "name": "Juegos",
-      "url": "/kids/juegos",
-      "description": "Ir a los juegos"
+      "name": "Portal del Socio",
+      "url": "/portal",
+      "description": "Acceso al carnet y estado de cuenta"
     },
     {
-      "name": "Torneos",
-      "url": "/kids/torneos",
-      "description": "Ver torneos activos"
+      "name": "Carnet QR",
+      "url": "/portal?tab=carnet",
+      "description": "Ver credencial digital"
+    },
+    {
+      "name": "Newbery TV",
+      "url": "/newbery-tv",
+      "description": "Transmisiones en vivo"
+    },
+    {
+      "name": "System Status",
+      "url": "/system-status",
+      "description": "Panel de estado técnico"
     }
   ]
 }

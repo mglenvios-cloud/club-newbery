@@ -140,14 +140,17 @@ export default function AdminLayout({ children }) {
                 <Plug size={20} />
                 Liga Pro Studio
               </Link>
-              <Link href="/admin/newbery-tv" className={`flex items-center gap-3 p-3 rounded-lg hover:bg-jn-red/20 hover:text-jn-red transition-colors ${pathname === '/admin/newbery-tv' ? 'bg-jn-red/10 text-jn-red' : ''}`}>
-                <Tv size={20} />
-                Newbery TV
+              <Link href="/system-status" className={`flex items-center gap-3 p-3 rounded-lg hover:bg-jn-red/20 hover:text-jn-red transition-colors ${pathname === '/system-status' ? 'bg-jn-red/10 text-jn-red' : ''}`}>
+                <Activity size={20} className="text-emerald-400" />
+                🖥️ System Status
               </Link>
             </>
           )}
         </nav>
-        <div className="p-4 border-t border-gray-800 text-center">
+        <div className="p-4 border-t border-gray-800 text-center space-y-2">
+          <div className="text-[10px] text-gray-500 font-mono">
+            Club Digital Pro v1.0.0
+          </div>
           <button 
             onClick={() => {
               document.cookie = "adminAuth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";

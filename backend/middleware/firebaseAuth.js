@@ -121,23 +121,58 @@ const optionalAuth = async (req, res, next) => {
 };
 
 /**
- * Guard: solo ADMIN
+ * Guard: exige uno de los roles autorizados
+ * @param {string[]} allowedRoles 
  */
-const requireAdmin = (req, res, next) => {
-  if (!req.user || (req.user.role !== 'ADMIN' && req.user.role !== 'SUPER_ADMIN')) {
-    return res.status(403).json({ error: 'Acceso denegado. Se requieren permisos de administrador.' });
-  }
-  next();
+const authorizeRoles = (allowedRoles = []) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Sesión no válida o token ausente." });
+    }
+
+    if (req.user.role === 'SUPER_ADMIN') {
+      return next();
+    }
+
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({
+        error: `Acceso restringido. Se requiere uno de los siguientes roles: ${allowedRoles.join(', ')}`
+      });
+    }
+
+    next();
+  };
 };
 
 /**
- * Guard: ADMIN, FUTSAL u OPERADOR
+ * Guard: verifica pertenencia al club de la request
  */
-const requireAdminOrStaff = (req, res, next) => {
-  if (!req.user || (!['ADMIN', 'FUTSAL', 'OPERADOR', 'SUPER_ADMIN'].includes(req.user.role))) {
-    return res.status(403).json({ error: 'Acceso denegado. Se requieren permisos de administrador o personal de staff.' });
+const verifyClubMembership = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "No autorizado. Sesión inválida." });
   }
+
+  if (req.user.role === 'SUPER_ADMIN') {
+    return next();
+  }
+
+  if (req.club && req.user.clubId && req.user.clubId !== req.club.id) {
+    return res.status(403).json({
+      error: "Acceso denegado. No perteneces a esta institución deportiva.",
+      userClub: req.user.clubId,
+      requestedClub: req.club.id
+    });
+  }
+
   next();
 };
 
-module.exports = { dualAuth, optionalAuth, requireAdmin, requireAdminOrStaff };
+module.exports = {
+  dualAuth,
+  optionalAuth,
+  requireAdmin,
+  requireAdminOrStaff,
+  authorizeRoles,
+  verifyClubMembership
+};
+

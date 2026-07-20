@@ -153,6 +153,8 @@ async function runSuite() {
       
       console.log('⏳ Esperando a que los emuladores estén listos...');
       await waitForPort(FIRESTORE_PORT, 25000);
+      await waitForPort(AUTH_PORT, 25000);
+      await waitForPort(STORAGE_PORT, 25000);
       console.log('✅ Emuladores listos.');
     } else {
       console.log('✅ Firebase Local Emulators ya están en ejecución.');

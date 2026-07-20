@@ -1,11 +1,15 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
 
+// ─── Versionado Unificado ──────────────────────────────────────────────────────
+const versionInfo = require('../shared/version');
+
 // ─── Validación de variables de entorno (debe ser lo primero) ─────────────────
 const { PORT, FRONTEND_URL, NODE_ENV } = require('./config/env');
-
 
 const authRoutes = require('./routes/auth');
 const memberRoutes = require('./routes/members');
@@ -39,14 +43,42 @@ const finanzasRoutes = require('./routes/finanzas');
 const ligaProStudioRoutes = require('./routes/ligaProStudio');
 const reservasRoutes = require('./routes/reservas');
 const newberytvRoutes = require('./routes/newberytv');
+// ─── Nuevas rutas Fase 7 & 7.1 ─────────────────────────────────────────────────
+const systemStatusRoutes = require('./routes/systemStatus');
+const backupRoutes = require('./routes/backup');
+const tenantMiddleware = require('./middleware/tenantMiddleware');
+const { provisionNewClub } = require('./services/clubProvisioning.service');
 
+const startTime = Date.now();
 const app = express();
+
+// ─── SEGURIDAD: Helmet & Rate Limiting ─────────────────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: false, // Desactivado para flexibilizar fuentes de imágenes y streaming
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 300, // Límite de 300 peticiones por ventana
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Demasiadas peticiones desde esta IP, intente más tarde." }
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20, // Límite estricto de logins
+  message: { error: "Demasiados intentos de acceso, intente más tarde." }
+});
+
+app.use(globalLimiter);
+app.use('/api/auth/login', authLimiter);
 
 // ─── CORS — Lista blanca de orígenes permitidos ────────────────────────────────
 const allowedOrigins = [
   FRONTEND_URL,
-  'https://frontend-indol-rho-38.vercel.app', // Respaldo explícito para producción en Vercel
-  // En desarrollo local, permitir localhost
+  'https://frontend-indol-rho-38.vercel.app',
   ...(NODE_ENV !== 'production' ? [
     'http://localhost:3000',
     'http://localhost:3001',
@@ -56,31 +88,27 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Permitir peticiones sin origin (curl, Postman, mobile apps)
     if (!origin) return callback(null, true);
-
-    // Normalizar origen entrante
     const normalizedOrigin = origin.trim().replace(/\/$/, '');
-
-    // Validar si el origen está permitido por lista o coincide con wildcard de Vercel
     const isAllowed = allowedOrigins.includes(normalizedOrigin) || 
                       normalizedOrigin.endsWith('.vercel.app');
 
     if (isAllowed) {
       return callback(null, true);
     }
-
     console.error(`[CORS] Origen bloqueado: ${origin}`);
-    // No lanzar error Express (evita respuesta 500 en preflight OPTIONS), solo retornar false
     return callback(null, false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Club-Slug'],
   optionsSuccessStatus: 200,
 }));
 
 app.use(express.json());
+
+// ─── Resolution de Inquilino (Multi-Tenant) ────────────────────────────────────
+app.use(tenantMiddleware);
 
 // ─── Middleware Global de Auditoría ──────────────────────────────────────────
 const prisma = require('./prismaClient');
@@ -109,21 +137,23 @@ app.use((req, res, next) => {
         result
       });
       
-      prisma.auditLog.create({
-        data: {
-          action: req.method,
-          entity: moduleName,
-          entityId,
-          entityName: `${req.method} ${req.originalUrl}`,
-          userId,
-          userName,
-          details: detailsStr.substring(0, 1000),
-          ipAddress: ip,
-          clubId: req.user ? req.user.clubId || 1 : 1
-        }
-      }).catch(err => {
-        console.error('[AuditLog Error]', err.message);
-      });
+      if (prisma && prisma.auditLog) {
+        prisma.auditLog.create({
+          data: {
+            action: req.method,
+            entity: moduleName,
+            entityId,
+            entityName: `${req.method} ${req.originalUrl}`,
+            userId,
+            userName,
+            details: detailsStr.substring(0, 1000),
+            ipAddress: ip,
+            clubId: req.user ? req.user.clubId || 1 : (req.club ? req.club.id : 1)
+          }
+        }).catch(err => {
+          console.error('[AuditLog Error]', err.message);
+        });
+      }
       
       return originalJson.call(this, body);
     };
@@ -156,7 +186,7 @@ app.use('/api/futsal/teams', teamRoutes);
 app.use('/api/futsal/players', playerRoutes);
 app.use('/api/futsal/matches', matchRoutes);
 
-// ─── Rutas Comerciales directas (para /api/sponsors y /api/banners) ─────────
+// ─── Rutas Comerciales directas ───────────────────────────────────────────────
 app.use('/api', publicidadRoutes);
 
 // ─── Nuevas rutas Fase 2 ───────────────────────────────────────────────────────
@@ -173,10 +203,39 @@ app.use('/api/liga-pro-studio', ligaProStudioRoutes);
 app.use('/api/reservas', reservasRoutes);
 app.use('/api/newberytv', newberytvRoutes);
 
+// ─── Nuevas rutas Fase 7 & 7.1 ─────────────────────────────────────────────────
+app.use('/api/system-status', systemStatusRoutes);
+app.use('/api/admin-general/backups', backupRoutes);
+
+// Endpoint de consulta de logs de auditoría
+app.get('/api/admin-general/audit-logs', async (req, res) => {
+  try {
+    if (!prisma || !prisma.auditLog) {
+      return res.json([]);
+    }
+    const logs = await prisma.auditLog.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 100
+    });
+    res.json(logs);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al consultar logs de auditoría' });
+  }
+});
+
+// Endpoint de auto-provisionamiento de club
+app.post('/api/admin-general/provision-club', async (req, res) => {
+  try {
+    const { nombre, slug, emailAdmin, passwordAdmin } = req.body;
+    const result = await provisionNewClub({ nombre, slug, emailAdmin, passwordAdmin });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al provisionar club: ' + err.message });
+  }
+});
+
 // Servir archivos estáticos subidos de publicidad/sponsors
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-
 
 // Alias directos requeridos para verificación
 app.get('/api/tutores', async (req, res) => {
@@ -197,33 +256,44 @@ app.get('/api/carnets', async (req, res) => {
   }
 });
 
-// Health check — usado por Render para verificar que el servicio está vivo
+// ─── Health Check Extendido (FASE 7.1 Standard) ────────────────────────────────
 app.get(['/health', '/api/health'], async (req, res) => {
+  let dbStatus = 'disconnected';
+  let isDegraded = false;
+
   try {
-    const prisma = require('./prismaClient');
-    await prisma.$queryRaw`SELECT 1`;
-    res.status(200).json({
-      status: 'ok',
-      message: 'API del Club Jorge Newbery operativa.',
-      version: '2.0',
-      database: 'connected',
-      timestamp: new Date().toISOString()
-    });
+    if (prisma && prisma.$queryRaw) {
+      await prisma.$queryRaw`SELECT 1`;
+    }
+    dbStatus = 'connected';
   } catch (dbError) {
-    res.status(503).json({
-      status: 'error',
-      message: 'Base de datos no disponible.',
-      timestamp: new Date().toISOString()
-    });
+    dbStatus = 'disconnected';
+    isDegraded = true;
   }
+
+  const overallStatus = isDegraded ? 'degraded' : 'ok';
+  const statusCode = isDegraded ? 503 : 200;
+
+  res.status(statusCode).json({
+    status: overallStatus,
+    version: versionInfo.VERSION,
+    environment: NODE_ENV || 'production',
+    uptime: Math.floor((Date.now() - startTime) / 1000),
+    database: dbStatus,
+    api: 'operational',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Root — información básica de la API
 app.get('/', (req, res) => {
   res.json({
-    message: 'API del Club Jorge Newbery funcionando correctamente.',
-    version: '2.0',
-    health: '/health',
+    message: `${versionInfo.APP_NAME} API funcionando correctamente.`,
+    version: versionInfo.VERSION,
+    apiVersion: versionInfo.API_VERSION,
+    buildDate: versionInfo.BUILD_DATE,
+    health: '/api/health',
+    statusUrl: '/api/system-status',
     timestamp: new Date().toISOString()
   });
 });
@@ -242,5 +312,5 @@ app.use((err, req, res, next) => {
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);
-  console.log(`📦 Versión 2.0 - ERP Deportivo Club Jorge Newbery`);
+  console.log(`📦 Versión ${versionInfo.VERSION} - ${versionInfo.APP_NAME}`);
 });

@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "prisma db push && prisma generate && node seed_users.js",
+    "migrate": "node scripts/migrate_and_check.js",
     "start": "node index.js",
     "seed:test": "node -e \"process.env.APP_ENV='TEST'; require('./seed_demo.js')\"",
     "verify:test": "node verify_emulators.js",
@@ -24,8 +25,10 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.6.0",
     "firebase-admin": "^12.0.0",
     "firebase-functions": "^6.0.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "mercadopago": "^3.1.0",
     "multer": "^2.2.0",

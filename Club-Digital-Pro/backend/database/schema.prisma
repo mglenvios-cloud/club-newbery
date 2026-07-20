@@ -1,0 +1,310 @@
+// schema.prisma - Club Digital Pro SaaS Base Schema
+// Compatible con PostgreSQL y SQLite para desarrollo local
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Club {
+  id              String   @id @default(uuid())
+  nombre          String
+  slug            String   @unique
+  logo            String?
+  escudo          String?
+  banner          String?
+
+  // Temas e Identidad Visual (Hexadecimal)
+  colorPrimario   String   @default("#cc0000")
+  colorSecundario String   @default("#000000")
+  colorAcento     String   @default("#f59e0b")
+  colorMenu       String   @default("#111111")
+  colorHeader     String   @default("#18181b")
+  colorFooter     String   @default("#09090b")
+  colorTarjetas   String   @default("#18181b")
+  colorBotones    String   @default("#cc0000")
+  colorBotonesHover String @default("#b30000")
+  colorFondo      String   @default("#0c0c0f")
+  colorTextoPrincipal String @default("#ffffff")
+  colorTextoSecundario String @default("#a1a1aa")
+  colorBordes     String   @default("#27272a")
+  colorIconos     String   @default("#a1a1aa")
+  colorKPIs       String   @default("#cc0000")
+  colorAlertas    String   @default("#f59e0b")
+  colorExito      String   @default("#10b981")
+  colorAdvertencias String @default("#f59e0b")
+  colorError      String   @default("#ef4444")
+  tipografia      String   @default("Inter")
+
+  // Nuevos Campos de Gestión SaaS (Fase 3)
+  dominio         String?  // Dominio personalizado (ej: www.jorgenewbery.com)
+  plan            String   @default("FREE") // FREE, PRO, PREMIUM
+  estadoActivo    Boolean  @default(true)
+  
+  // Ubicación y Contacto
+  email           String?
+  telefono        String?
+  direccion       String?
+  ciudad          String?
+  provincia       String?
+  pais            String   @default("Argentina")
+
+  // Redes Sociales y Sitio Web
+  sitioWeb        String?
+  instagram       String?
+  facebook        String?
+  youtube         String?
+  tiktok          String?
+
+  // Relaciones
+  usuarios        User[]
+  socios          Socio[]
+  membershipPlans MembershipPlan[]
+  payments        Payment[]
+  invoices        Invoice[]
+  sports          Sport[]
+  categories      Category[]
+  teams           Team[]
+  players         Player[]
+  coaches         Coach[]
+  matches         Match[]
+  sponsors        Sponsor[]
+  advertisements  Advertisement[]
+  campaigns       Campaign[]
+  socialPosts     SocialPost[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  nombre       String
+  passwordHash String
+  role         String   @default("SOCIO") // SUPER_ADMIN, ADMIN_CLUB, SECRETARIA, PROFESOR, PERIODISTA, SOCIO
+  clubId       String?
+  club         Club?    @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SuperAdmin {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  passwordHash   String
+  totalLicenses  Int      @default(10)
+  activeLicenses Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// ─── 1. CENTRO DE SOCIOS MODELOS ─────────────────────────────────────────────
+
+model Socio {
+  id           String      @id @default(uuid())
+  nombre       String
+  apellido     String
+  dni          String
+  email        String?
+  telefono     String?
+  direccion    String?
+  estado       String      @default("ACTIVO") // ACTIVO, INACTIVO, MOROSO
+  photoUrl     String?
+  tutorId      String?
+  tutor        Tutor?      @relation(fields: [tutorId], references: [id], onDelete: SetNull)
+  digitalCard  DigitalCard?
+  payments     Payment[]
+  clubId       String
+  club         Club        @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Tutor {
+  id        String   @id @default(uuid())
+  nombre    String
+  apellido  String
+  dni       String
+  email     String?
+  telefono  String?
+  socios    Socio[]
+  createdAt DateTime @default(now())
+}
+
+model DigitalCard {
+  id        String   @id @default(uuid())
+  qrCode    String
+  barcode   String?
+  active    Boolean  @default(true)
+  socioId   String   @unique
+  socio     Socio    @relation(fields: [socioId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+// ─── 2. CUOTAS Y FINANZAS MODELOS ────────────────────────────────────────────
+
+model MembershipPlan {
+  id          String   @id @default(uuid())
+  name        String
+  price       Float
+  frequency   String   @default("MENSUAL") // MENSUAL, ANUAL
+  description String?
+  clubId      String
+  club        Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+model Payment {
+  id        String   @id @default(uuid())
+  amount    Float
+  date      DateTime @default(now())
+  method    String   @default("Efectivo") // MercadoPago, Efectivo, Transferencia
+  status    String   @default("PAID") // PENDING, PAID, FAILED
+  socioId   String
+  socio     Socio    @relation(fields: [socioId], references: [id], onDelete: Cascade)
+  invoice   Invoice?
+  clubId    String
+  club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Invoice {
+  id            String   @id @default(uuid())
+  invoiceNumber String   @unique
+  amount        Float
+  issueDate     DateTime @default(now())
+  paymentId     String   @unique
+  payment       Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  clubId        String
+  club          Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+}
+
+// ─── 3. GESTIÓN DEPORTIVA MODELOS ────────────────────────────────────────────
+
+model Sport {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  categories  Category[]
+  clubId      String
+  club        Club       @relation(fields: [clubId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  type      String   @default("DISCIPLINA") // DISCIPLINA, COMPETENCIA
+  price     Float
+  sportId   String
+  sport     Sport    @relation(fields: [sportId], references: [id], onDelete: Cascade)
+  clubId    String
+  club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+}
+
+model Team {
+  id        String   @id @default(uuid())
+  name      String
+  category  String
+  season    String
+  coachId   String?
+  coach     Coach?   @relation(fields: [coachId], references: [id], onDelete: SetNull)
+  players   Player[]
+  clubId    String
+  club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+}
+
+model Player {
+  id           String   @id @default(uuid())
+  name         String
+  lastName     String
+  dorsal       Int      @default(0)
+  age          Int
+  position     String
+  playerStatus String   @default("ACTIVE") // ACTIVE, INJURED, SUSPENDED
+  photoUrl     String?
+  dni          String
+  birthDate    String?
+  teamId       String?
+  team         Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  clubId       String
+  club         Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+}
+
+model Coach {
+  id        String   @id @default(uuid())
+  name      String
+  role      String   @default("ENTRENADOR") // ENTRENADOR, PF, AYUDANTE
+  license   String?
+  email     String?
+  phone     String?
+  teams     Team[]
+  clubId    String
+  club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+}
+
+model Match {
+  id            String   @id @default(uuid())
+  opponent      String
+  homeTeam      String
+  awayTeam      String
+  date          DateTime
+  timeSlot      String
+  ourScore      Int?
+  opponentScore Int?
+  status        String   @default("UPCOMING") // UPCOMING, LIVE, COMPLETED
+  venue         String
+  competition   String
+  season        String
+  clubId        String
+  club          Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+}
+
+// ─── 4 & 5. MARKETING & SPONSORS MODELOS ──────────────────────────────────────
+
+model Sponsor {
+  id        String     @id @default(uuid())
+  name      String
+  logoUrl   String?
+  website   String?
+  email     String?
+  isActive  Boolean    @default(true)
+  campaigns Campaign[]
+  clubId    String
+  club      Club       @relation(fields: [clubId], references: [id], onDelete: Cascade)
+}
+
+model Advertisement {
+  id        String   @id @default(uuid())
+  title     String
+  bannerUrl String
+  type      String   @default("BANNER") // BANNER, POPUP
+  clubId    String
+  club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+}
+
+model Campaign {
+  id        String   @id @default(uuid())
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  sponsorId String
+  sponsor   Sponsor  @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+  clubId    String
+  club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+}
+
+model SocialPost {
+  id           String    @id @default(uuid())
+  platform     String // instagram, facebook, tiktok, youtube, twitter
+  content      String?
+  imageUrl     String?
+  status       String    @default("PENDING") // PENDING, POSTED, FAILED
+  scheduledFor DateTime?
+  clubId       String
+  club         Club      @relation(fields: [clubId], references: [id], onDelete: Cascade)
+}

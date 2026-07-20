@@ -1,0 +1,17 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Allow: /portal
+Allow: /disciplinas
+Allow: /newbery-tv
+Allow: /comunidad
+Allow: /galeria
+Allow: /tienda
+Allow: /asociate
+
+# Bloquear rutas administrativas internas y APIs
+Disallow: /admin/
+Disallow: /api/
+Disallow: /system-status
+
+Sitemap: https://frontend-indol-rho-38.vercel.app/sitemap.xml

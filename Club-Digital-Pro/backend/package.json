@@ -1,0 +1,19 @@
+{
+  "name": "club-digital-pro-backend",
+  "version": "1.0.0",
+  "description": "Backend base de Club Digital Pro (Multi-Tenant SaaS)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "prisma:generate": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3"
+  },
+  "devDependencies": {
+    "prisma": "^5.10.0"
+  }
+}

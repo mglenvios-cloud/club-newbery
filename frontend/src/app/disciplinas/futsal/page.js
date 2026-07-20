@@ -443,9 +443,15 @@ export default function FutsalAFA() {
                 <div className="border-t border-white/5 pt-4 flex justify-between items-center flex-wrap gap-4 text-xs text-gray-400">
                   <span>Competencia: {proximoPartido.competition}</span>
                   {proximoPartido.liveStreamUrl || proximoPartido.provider === 'LIGA_PRO_STUDIO' ? (
-                    <Link href={proximoPartido.liveStreamUrl || '#'} target="_blank" className="bg-jn-red hover:bg-jn-darkred text-white font-black text-[10px] uppercase px-5 py-2.5 rounded-xl flex items-center gap-1.5 tracking-wider shadow shadow-jn-red/35">
-                      <PlayCircle size={14} className="animate-pulse" /> VER TRANSMISIÓN
-                    </Link>
+                    proximoPartido.provider === 'LIGA_PRO_STUDIO' ? (
+                      <Link href="/disciplinas/futsal/en-vivo" className="bg-jn-red hover:bg-jn-darkred text-white font-black text-[10px] uppercase px-5 py-2.5 rounded-xl flex items-center gap-1.5 tracking-wider shadow shadow-jn-red/35">
+                        <PlayCircle size={14} className="animate-pulse" /> VER TRANSMISIÓN
+                      </Link>
+                    ) : (
+                      <a href={proximoPartido.liveStreamUrl} target="_blank" rel="noopener noreferrer" className="bg-jn-red hover:bg-jn-darkred text-white font-black text-[10px] uppercase px-5 py-2.5 rounded-xl flex items-center gap-1.5 tracking-wider shadow shadow-jn-red/35">
+                        <PlayCircle size={14} className="animate-pulse" /> VER TRANSMISIÓN
+                      </a>
+                    )
                   ) : (
                     <span className="text-[10px] font-bold text-gray-500 uppercase">Sin Transmisión Definida</span>
                   )}

@@ -1,10 +1,10 @@
-﻿"use client";
+"use client";
 import React, { useState } from 'react';
 import {
   Trophy, Tv, Users, Activity, Brain, Image as ImageIcon,
   Calendar, Check, ShieldAlert, Sparkles, Building2, User,
   Mail, Phone, Send, ArrowRight, BarChart2, Star, CheckCircle, DollarSign,
-  ChevronRight
+  ChevronRight, Sliders
 } from 'lucide-react';
 
 import { API_URL } from '@/config';
@@ -290,6 +290,144 @@ export default function ClubDigitalPro() {
                   </div>
                 ))}
               </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ── NEWBERY TV EXPERIENCE ── */}
+        <section className="space-y-8 bg-[#0b0b0d] border border-white/5 p-8 md:p-12 rounded-3xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-red-900/5 rounded-full blur-[120px] pointer-events-none" />
+          
+          <div className="text-center space-y-2">
+            <span className="text-jn-red text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5">
+              <Tv size={12} /> Demostración Interactiva
+            </span>
+            <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight">Newbery TV Experience</h2>
+            <p className="text-xs text-gray-500 max-w-xl mx-auto">
+              Probá las capacidades profesionales de streaming, analítica e inteligencia artificial que potencian la difusión de tu club.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* COLUMN 1: LIVE PLAYER & SCOREBOARD (8 Cols) */}
+            <div className="lg:col-span-8 space-y-6">
+              
+              {/* Scoreboard Widget */}
+              <div className="bg-black/60 border border-white/5 rounded-2xl p-4 flex justify-between items-center text-center">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-jn-red flex items-center justify-center text-[10px] font-black">JN</div>
+                  <span className="font-black text-xs uppercase tracking-wider text-white">Jorge Newbery</span>
+                </div>
+                <div className="flex items-center gap-4 bg-zinc-900/80 px-4 py-2 rounded-xl border border-white/5">
+                  <span className="text-xl font-black text-white">3</span>
+                  <span className="text-[10px] text-jn-red font-black tracking-widest animate-pulse">LIVE 38'</span>
+                  <span className="text-xl font-black text-white">2</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="font-black text-xs uppercase tracking-wider text-white">Franja de Oro</span>
+                  <div className="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-[10px] font-black text-black">FO</div>
+                </div>
+              </div>
+
+              {/* Player Simulator */}
+              <div className="relative aspect-video rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-zinc-950 flex flex-col justify-between p-4">
+                {/* Simulated Stream Background */}
+                <div className="absolute inset-0 bg-cover bg-center opacity-60" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&auto=format&fit=crop&q=60')" }} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/80 pointer-events-none" />
+
+                {/* Stream Header */}
+                <div className="relative z-10 flex justify-between items-center">
+                  <span className="bg-emerald-500 text-black text-[9px] font-black uppercase px-2 py-0.5 rounded flex items-center gap-1 shadow-lg shadow-emerald-500/20">
+                    ● EN VIVO
+                  </span>
+                  <span className="text-white text-[10px] font-black tracking-widest uppercase bg-black/40 px-3 py-1 rounded-lg backdrop-blur-sm border border-white/5">
+                    1080p @60FPS
+                  </span>
+                </div>
+
+                {/* Overlay Sponsor Ads (Pre-Roll Simulator) */}
+                <div className="relative z-10 mx-auto my-auto bg-black/85 border border-white/15 p-4 rounded-2xl max-w-xs text-center backdrop-blur-md shadow-2xl space-y-2 animate-fadeIn">
+                  <span className="text-[8px] bg-zinc-800 text-zinc-400 font-bold px-1.5 py-0.5 rounded tracking-wide">PUBLICIDAD SPONSOR</span>
+                  <p className="text-[10px] text-white font-black uppercase">¡10% de Descuento en Tienda Oficial!</p>
+                  <div className="text-[9px] text-jn-red font-bold uppercase tracking-wider cursor-pointer hover:underline">Visitar Sitio Web ↗</div>
+                </div>
+
+                {/* Stream Controls */}
+                <div className="relative z-10 flex justify-between items-center text-xs font-bold text-gray-300">
+                  <div className="flex items-center gap-4">
+                    <button className="text-white hover:text-jn-red cursor-pointer">▶</button>
+                    <span className="text-[10px]">🔈 100%</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-mono text-zinc-400">00:38:15</span>
+                    <button className="text-white hover:opacity-80 cursor-pointer">⛶</button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sponsors Banner Rotation */}
+              <div className="bg-[#141416] border border-white/5 p-3 rounded-2xl flex items-center justify-around gap-4 overflow-hidden">
+                <span className="text-[8px] text-zinc-500 font-black uppercase tracking-wider">Patrocinadores de la transmisión:</span>
+                <span className="text-[10px] font-black uppercase text-gray-300 tracking-widest bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">⚡ LIGA PRO STUDIO</span>
+                <span className="text-[10px] font-black uppercase text-gray-300 tracking-widest bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">🔥 SPONSOR JORGE NEWBERY</span>
+              </div>
+
+            </div>
+
+            {/* COLUMN 2: ANALYTICS, IA & EDITOR (4 Cols) */}
+            <div className="lg:col-span-4 space-y-6 text-left">
+              
+              {/* IA Cronica Generator Widget */}
+              <div className="bg-zinc-950 border border-white/5 p-5 rounded-2xl space-y-3">
+                <div className="flex items-center gap-2">
+                  <Brain size={16} className="text-jn-red" />
+                  <span className="font-black text-xs uppercase tracking-wider text-white">Crónica Técnica IA</span>
+                </div>
+                <div className="p-3 bg-zinc-900 border border-white/5 rounded-xl space-y-2">
+                  <p className="text-[10px] text-zinc-400 leading-relaxed font-light">
+                    "El Jorge Newbery se impone en el Clásico de Futsal con gran efectividad táctica. Lucas González se corona figura con 4 paradas claves y un 86% de acierto..."
+                  </p>
+                  <div className="flex justify-between items-center pt-1.5 border-t border-white/5">
+                    <span className="text-[8px] text-zinc-500 font-mono">Modelo: Gemini 1.5 Pro</span>
+                    <button 
+                      onClick={() => alert("Generando análisis táctico de partido...")}
+                      className="bg-jn-red hover:bg-red-700 text-white font-black uppercase text-[8px] px-2.5 py-1 rounded-lg cursor-pointer"
+                    >
+                      Regenerar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Fast Video Trimmer (Editor Multimedia) */}
+              <div className="bg-zinc-950 border border-white/5 p-5 rounded-2xl space-y-4">
+                <div className="flex items-center gap-2">
+                  <Sliders size={16} className="text-jn-red" />
+                  <span className="font-black text-xs uppercase tracking-wider text-white">Trimmer de Video</span>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-[8px] font-bold text-gray-400 block mb-1 uppercase">Punto de inicio (segundos)</label>
+                    <input type="range" min="0" max="100" defaultValue="15" className="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
+                  </div>
+                  <div>
+                    <label className="text-[8px] font-bold text-gray-400 block mb-1 uppercase">Punto de finalización</label>
+                    <input type="range" min="0" max="100" defaultValue="85" className="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-[8px] text-zinc-500 font-bold uppercase">Duración Clip: 70s</span>
+                    <button 
+                      onClick={() => alert("Guardando recorte de clip multimedia...")}
+                      className="bg-white hover:bg-zinc-200 text-black font-black uppercase text-[8px] px-3 py-1.5 rounded-lg cursor-pointer"
+                    >
+                      Guardar Recorte
+                    </button>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
           </div>

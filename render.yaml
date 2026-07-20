@@ -1,28 +1,22 @@
-databases:
-  - name: club-newbery-db
-    plan: free                  # Base de datos PostgreSQL creada en Render
-
 services:
   - type: web
-    name: club-newbery          # Web Service Render
+    name: club-digital-pro-backend
     env: node
     plan: free
-    region: oregon              # Región gratuita de Render
-    rootDir: backend            # Directorio raíz del backend en el monorepo
+    region: oregon
+    rootDir: backend
     buildCommand: npm install && npm run build
     startCommand: npm start
-    healthCheckPath: /health    # Endpoint dedicado con verificación de DB
+    healthCheckPath: /api/health
     envVars:
       - key: PORT
         value: 5000
       - key: DATABASE_URL
-        fromDatabase:
-          name: club-newbery-db
-          property: connectionString
+        sync: false
       - key: JWT_SECRET
-        sync: false       # REQUERIDO: Clave fuerte >= 64 caracteres (Render Dashboard)
+        sync: false
       - key: MP_ACCESS_TOKEN
-        sync: false       # REQUERIDO para pagos: Token real MercadoPago (Render Dashboard)
+        sync: false
       - key: FRONTEND_URL
         value: https://frontend-indol-rho-38.vercel.app
       - key: NODE_ENV

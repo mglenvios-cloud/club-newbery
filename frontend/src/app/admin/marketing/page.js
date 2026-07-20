@@ -632,6 +632,28 @@ export default function MarketingAdmin() {
     }
   };
 
+  const handleExportExcel = () => {
+    try {
+      let tsvContent = "Sponsor\tImpresiones\tClics\tCTR\n";
+      sponsors.forEach(s => {
+        const ctr = s.views > 0 ? ((s.clicks / s.views) * 100).toFixed(2) : '0.00';
+        tsvContent += `${s.name}\t${s.views || 0}\t${s.clicks || 0}\t${ctr}%\n`;
+      });
+
+      const blob = new Blob([tsvContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `reporte_marketing_${Date.now()}.xls`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Exportación de Estadísticas Excel completada');
+    } catch {
+      showToast('Falla al exportar Excel', 'error');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-jn-black text-white p-6 font-sans">
       
@@ -1227,12 +1249,20 @@ export default function MarketingAdmin() {
                   <h4 className="text-xs font-black uppercase text-white">Exportación de Reportes Comerciales</h4>
                   <p className="text-[10px] text-gray-400">Descarga los datos compilados de CTR de sponsors y campañas en un formato contable.</p>
                 </div>
-                <button
-                  onClick={handleExportCSV}
-                  className="bg-green-650 hover:bg-green-700 text-white font-black uppercase text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer"
-                >
-                  <FileSpreadsheet size={16} /> Exportar Excel/CSV
-                </button>
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={handleExportCSV}
+                    className="bg-green-650 hover:bg-green-700 text-white font-black uppercase text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <FileSpreadsheet size={16} /> Exportar CSV
+                  </button>
+                  <button
+                    onClick={handleExportExcel}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <FileSpreadsheet size={16} /> Exportar Excel
+                  </button>
+                </div>
               </div>
 
               {/* CHARTS GRID */}

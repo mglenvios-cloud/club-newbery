@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dynamic Theme Variables Fallbacks */
+  --color-primary: #cc0000;
+  --color-secondary: #000000;
+  --color-accent: #f59e0b;
+  --color-menu: #111111;
+  --color-header: #18181b;
+  --color-footer: #09090b;
+  --color-card: #18181b;
+  --color-button: #cc0000;
+  --color-button-hover: #b30000;
+  --color-bg: #0c0c0f;
+  --color-text-main: #ffffff;
+  --color-text-sub: #a1a1aa;
+  --color-border: #27272a;
+  --color-icon: #a1a1aa;
+  --color-kpi: #cc0000;
+  --color-alert: #f59e0b;
+  --color-success: #10b981;
+  --color-warn: #f59e0b;
+  --color-error: #ef4444;
+
+  --font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-main);
+  font-family: var(--font-family);
+  margin: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Animations helper */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
+}

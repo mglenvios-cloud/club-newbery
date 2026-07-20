@@ -4,7 +4,7 @@ import {
   Users, Calendar, FileText, Clipboard, Plus, Edit, Trash, X, Check,
   AlertCircle, Save, Clock, Shield, Award, Activity, Heart, Search,
   Trophy, UserCheck, HelpCircle, FileCheck, RefreshCw, BarChart2, Star,
-  Wifi, WifiOff, Database, Server, Zap, Circle
+  Wifi, WifiOff, Database, Server, Zap, Circle, Printer
 } from 'lucide-react';
 import { apiFetch } from '@/lib/apiClient';
 import { API_URL, DEMO_MODE } from '@/config';
@@ -347,6 +347,158 @@ export default function AdminGestionDeportiva() {
         fetchAllData();
       }
     } catch {}
+  };
+
+  const handlePrintPlayerFicha = (player) => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const birthDateFormatted = player.birthDate ? new Date(player.birthDate).toLocaleDateString('es-AR') : 'No especificada';
+    const photoHtml = player.photoUrl 
+      ? `<img src="${player.photoUrl}" style="width: 140px; height: 140px; border-radius: 12px; object-fit: cover; border: 3px solid #cc0000;" />`
+      : `<div style="width: 140px; height: 140px; border-radius: 12px; background: #e5e7eb; display: flex; align-items: center; justify-content: center; border: 3px solid #ccc; color: #666; font-size: 11px; font-weight: bold; text-align: center; line-height: 140px;">SIN FOTO</div>`;
+
+    const htmlContent = `
+      <html>
+        <head>
+          <title>Ficha Profesional - ${player.name} ${player.lastName}</title>
+          <style>
+            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; margin: 30px; line-height: 1.4; }
+            .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #cc0000; padding-bottom: 15px; margin-bottom: 25px; }
+            .logo-area { display: flex; align-items: center; gap: 12px; }
+            .logo-text { font-size: 20px; font-weight: 900; color: #000; letter-spacing: -0.5px; }
+            .logo-subtext { font-size: 9px; color: #cc0000; font-weight: 700; text-transform: uppercase; tracking-wider: 1px; }
+            .title-area { text-align: right; }
+            .title-area h1 { margin: 0; font-size: 22px; font-weight: 900; text-transform: uppercase; color: #000; }
+            .title-area p { margin: 3px 0 0 0; font-size: 10px; color: #666; font-weight: bold; }
+            .profile-card { display: flex; gap: 25px; background: #fafafa; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; margin-bottom: 25px; }
+            .profile-info { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px; }
+            .info-group { margin-bottom: 4px; }
+            .info-label { font-size: 9px; color: #666; font-weight: bold; text-transform: uppercase; }
+            .info-value { font-size: 13px; font-weight: 700; color: #111; margin-top: 1px; }
+            .section-title { font-size: 12px; font-weight: 900; text-transform: uppercase; color: #cc0000; border-bottom: 2px solid #eaeaea; padding-bottom: 4px; margin-bottom: 12px; margin-top: 25px; }
+            .grid-3 { display: grid; grid-template-cols: 1fr 1fr 1fr; gap: 15px; }
+            .observations { background: #fef2f2; border: 1px solid #fee2e2; border-radius: 12px; padding: 12px; font-size: 11px; color: #7f1d1d; font-style: italic; }
+            .footer { margin-top: 50px; font-size: 9px; color: #999; text-align: center; border-top: 1px solid #eee; padding-top: 10px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="logo-area">
+              <div style="font-size: 28px;">⚽</div>
+              <div>
+                <div class="logo-text">Jorge Newbery</div>
+                <div class="logo-subtext">ERP Gestión Deportiva</div>
+              </div>
+            </div>
+            <div class="title-area">
+              <h1>Ficha de Deportista</h1>
+              <p>ID Registro: JN-2026-${player.id || 'NEW'}</p>
+            </div>
+          </div>
+
+          <div class="profile-card">
+            <div>${photoHtml}</div>
+            <div class="profile-info">
+              <div class="info-group">
+                <div class="info-label">Nombre Completo</div>
+                <div class="info-value" style="font-size: 16px; color: #000;">${player.name} ${player.lastName}</div>
+              </div>
+              <div class="info-group">
+                <div class="info-label">DNI / Identificación</div>
+                <div class="info-value">${player.dni || 'No especificado'}</div>
+              </div>
+              <div class="info-group">
+                <div class="info-label">Fecha de Nacimiento</div>
+                <div class="info-value">${birthDateFormatted}</div>
+              </div>
+              <div class="info-group">
+                <div class="info-label">Edad del Deportista</div>
+                <div class="info-value">${player.age ? player.age + ' años' : 'No especificada'}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-title">Datos Deportivos y Plantel</div>
+          <div class="grid-3" style="font-size: 12px; margin-bottom: 25px;">
+            <div class="info-group">
+              <div class="info-label">Equipo / Disciplina</div>
+              <div class="info-value">${player.team || 'No asignado'}</div>
+            </div>
+            <div class="info-group">
+              <div class="info-label">Categoría Federada</div>
+              <div class="info-value">${player.category || 'No asignada'}</div>
+            </div>
+            <div class="info-group">
+              <div class="info-label">Posición en Campo</div>
+              <div class="info-value">${player.position || 'Ala'}</div>
+            </div>
+            <div class="info-group">
+              <div class="info-label">Número de Camiseta</div>
+              <div class="info-value">#${player.dorsal || '0'}</div>
+            </div>
+            <div class="info-group">
+              <div class="info-label">Pierna Hábil</div>
+              <div class="info-value">${player.dominantFoot || 'DERECHA'}</div>
+            </div>
+            <div class="info-group">
+              <div class="info-label">Estado de Ficha</div>
+              <div class="info-value" style="color: ${player.playerStatus === 'ACTIVE' ? 'green' : 'red'};">${player.playerStatus === 'ACTIVE' ? 'ACTIVO (Apto para competir)' : player.playerStatus === 'INJURED' ? 'LESIONADO (Baja médica)' : 'SUSPENDIDO (Sanción disciplinaria)'}</div>
+            </div>
+          </div>
+
+          <div class="section-title">Datos Fisiológicos y Médicos</div>
+          <div class="grid-3" style="font-size: 12px; margin-bottom: 25px;">
+            <div class="info-group">
+              <div class="info-label">Estatura</div>
+              <div class="info-value">${player.height ? player.height + ' m' : 'No especificada'}</div>
+            </div>
+            <div class="info-group">
+              <div class="info-label">Peso Corporal</div>
+              <div class="info-value">${player.weight ? player.weight + ' kg' : 'No especificado'}</div>
+            </div>
+            <div class="info-group">
+              <div class="info-label">Certificación Aptitud Médica</div>
+              <div class="info-value" style="color: green;">APTO FÍSICO AL DÍA ✅</div>
+            </div>
+          </div>
+
+          <div class="section-title">Datos de Contacto</div>
+          <div class="grid-3" style="font-size: 12px; margin-bottom: 25px;">
+            <div class="info-group">
+              <div class="info-label">Teléfono de Contacto</div>
+              <div class="info-value">${player.phone || 'No especificado'}</div>
+            </div>
+            <div class="info-group">
+              <div class="info-label">Correo Electrónico</div>
+              <div class="info-value" style="text-transform: lowercase;">${player.email || 'No especificado'}</div>
+            </div>
+            <div class="info-group">
+              <div class="info-label">Dirección Residencial</div>
+              <div class="info-value">${player.address || 'No especificada'}</div>
+            </div>
+          </div>
+
+          ${player.observations ? `
+            <div class="section-title">Observaciones Técnicas / Médicas</div>
+            <div class="observations">${player.observations}</div>
+          ` : ''}
+
+          <div class="footer">
+            Jorge Newbery Digital 2.5 - Documento oficial del club para control de planteles de Primera, Reserva, Inferiores y Escuelita.
+          </div>
+
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
   };
 
   // CRUD ENTRENADORES Y CUERPO TECNICO
@@ -1887,6 +2039,16 @@ export default function AdminGestionDeportiva() {
               >
                 {playerModal.editId ? 'Guardar Cambios' : 'Confirmar Registro'}
               </button>
+
+              {playerModal.editId && (
+                <button
+                  type="button"
+                  onClick={() => handlePrintPlayerFicha(playerForm)}
+                  className="w-full bg-black hover:bg-zinc-800 text-white font-black uppercase tracking-wider py-3 rounded-xl text-xs transition-colors mt-2 flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Printer size={14} /> Imprimir Ficha / PDF
+                </button>
+              )}
             </form>
           </div>
         </div>
