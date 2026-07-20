@@ -17,8 +17,6 @@ services:
       - key: MP_ACCESS_TOKEN
         sync: false
       - key: FRONTEND_URL
-        value: https://frontend-indol-rho-38.vercel.app
+        sync: false
       - key: NODE_ENV
         value: production
-      - key: GCLOUD_PROJECT
-        value: club-newbery-digital

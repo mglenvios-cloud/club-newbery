@@ -6,7 +6,7 @@
  *  1. Header `x-club-slug`
  *  2. Query Param `?club=slug`
  *  3. Subdominio en el Header `Host`
- *  4. Fallback por defecto: `jorge-newbery`
+ *  4. Fallback por defecto: `demo` / `jorge-newbery` (Cliente Demo)
  */
 
 const prisma = require('../prismaClient');
@@ -14,11 +14,20 @@ const prisma = require('../prismaClient');
 const CLUBS_FALLBACK = [
   {
     id: 1,
-    nombre: "Club Atlético Jorge Newbery",
+    nombre: "Club Jorge Newbery (Demo)",
     slug: "jorge-newbery",
     colorPrimario: "#cc0000",
     colorSecundario: "#000000",
     email: "contacto@jorge-newbery.com",
+    estado: "ACTIVO"
+  },
+  {
+    id: 2,
+    nombre: "Club Deportivo Demo",
+    slug: "demo",
+    colorPrimario: "#0066cc",
+    colorSecundario: "#ffffff",
+    email: "contacto@clubdemo.com",
     estado: "ACTIVO"
   }
 ];
@@ -36,7 +45,7 @@ module.exports = async function tenantMiddleware(req, res, next) {
     }
 
     if (!clubSlug) {
-      clubSlug = 'jorge-newbery';
+      clubSlug = 'jorge-newbery'; // Cliente de demostración por defecto
     }
 
     let activeClub = null;

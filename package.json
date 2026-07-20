@@ -1,12 +1,17 @@
 {
-  "name": "club-newbery-monorepo",
+  "name": "club-digital-pro-monorepo",
   "version": "1.0.0",
-  "description": "Root package for Club Jorge Newbery Monorepo",
+  "description": "Plataforma SaaS Multi-Club para la gestión integral de instituciones deportivas",
   "scripts": {
     "build": "npm install --prefix backend && npm run build --prefix backend",
     "start": "npm start --prefix backend"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "keywords": [
+    "saas",
+    "sports-management",
+    "multi-tenant",
+    "club-digital-pro"
+  ],
+  "author": "Club Digital Pro Team",
+  "license": "MIT"
 }

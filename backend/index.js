@@ -78,7 +78,6 @@ app.use('/api/auth/login', authLimiter);
 // ─── CORS — Lista blanca de orígenes permitidos ────────────────────────────────
 const allowedOrigins = [
   FRONTEND_URL,
-  'https://frontend-indol-rho-38.vercel.app',
   ...(NODE_ENV !== 'production' ? [
     'http://localhost:3000',
     'http://localhost:3001',
@@ -91,6 +90,7 @@ app.use(cors({
     if (!origin) return callback(null, true);
     const normalizedOrigin = origin.trim().replace(/\/$/, '');
     const isAllowed = allowedOrigins.includes(normalizedOrigin) || 
+                      (FRONTEND_URL && normalizedOrigin === FRONTEND_URL.trim().replace(/\/$/, '')) ||
                       normalizedOrigin.endsWith('.vercel.app');
 
     if (isAllowed) {

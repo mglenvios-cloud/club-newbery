@@ -26,7 +26,7 @@ export default function AdminLayout({ children }) {
       <aside className="w-64 bg-jn-black text-white hidden md:flex flex-col flex-shrink-0">
         <div className="p-6 border-b border-gray-800">
           <h2 className="text-xl font-black text-jn-red">Panel Admin</h2>
-          <p className="text-sm text-gray-400">Club Jorge Newbery</p>
+          <p className="text-sm text-gray-400">{process.env.NEXT_PUBLIC_APP_NAME || "Club Digital Pro"}</p>
           <span className="inline-block mt-2 bg-white/10 px-2 py-0.5 rounded text-[10px] font-bold text-gray-300">
             {role === 'ADMIN' ? 'General' : 'Coord. Futsal'}
           </span>

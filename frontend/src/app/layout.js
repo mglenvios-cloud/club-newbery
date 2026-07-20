@@ -5,9 +5,11 @@ import FloatingIA from "@/components/FloatingIA";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const appName = process.env.NEXT_PUBLIC_APP_NAME || "Club Digital Pro";
+
 export const metadata = {
-  title: "Club Digital Pro — ERP Deportivo & Portal del Socio",
-  description: "Plataforma integral SaaS para clubes deportivos. Carnet digital QR, pagos con Mercado Pago, transmisiones Newbery TV y gestión administrativa.",
+  title: `${appName} — ERP Deportivo & Portal del Socio`,
+  description: "Plataforma SaaS Multi-Club para la gestión integral de instituciones deportivas.",
   manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
@@ -15,16 +17,15 @@ export const metadata = {
     apple: "/icon-512.png",
   },
   openGraph: {
-    title: "Club Digital Pro — ERP Deportivo & Portal del Socio",
+    title: `${appName} — ERP Deportivo & Portal del Socio`,
     description: "Plataforma SaaS para la gestión integral e interactiva de clubes deportivos.",
-    url: "https://frontend-indol-rho-38.vercel.app",
-    siteName: "Club Digital Pro",
+    siteName: appName,
     locale: "es_AR",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Club Digital Pro",
+    title: appName,
     description: "Gestión deportiva integral, carnet digital y portal interactivo.",
   },
 };

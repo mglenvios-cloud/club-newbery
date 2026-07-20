@@ -71,7 +71,7 @@ router.get('/', async (req, res) => {
     },
     frontend: {
       status: 'operational',
-      url: process.env.FRONTEND_URL || 'https://frontend-indol-rho-38.vercel.app'
+      url: process.env.FRONTEND_URL || 'Non-configured'
     },
     database: {
       status: dbStatus,

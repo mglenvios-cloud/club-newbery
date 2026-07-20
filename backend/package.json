@@ -1,7 +1,7 @@
 {
-  "name": "backend",
+  "name": "club-digital-pro-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "API Backend SaaS Multi-Club para Club Digital Pro",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
