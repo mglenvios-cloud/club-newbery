@@ -23,7 +23,7 @@ export default function AdminLayout({ children }) {
   return (
     <div className="flex h-screen bg-gray-100 text-jn-black">
       {/* Sidebar */}
-      <aside className="w-64 bg-jn-black text-white hidden md:flex flex-col flex-shrink-0">
+      <aside className="w-64 bg-jn-black text-white hidden md:flex flex-col flex-shrink-0 print:hidden no-print">
         <div className="p-6 border-b border-gray-800">
           <h2 className="text-xl font-black text-jn-red">Panel Admin</h2>
           <p className="text-sm text-gray-400">{process.env.NEXT_PUBLIC_APP_NAME || "Club Digital Pro"}</p>
@@ -74,10 +74,6 @@ export default function AdminLayout({ children }) {
             </Link>
           )}
 
-          <Link href="/admin/futsal" className={`flex items-center gap-3 p-3 rounded-lg hover:bg-jn-red/20 hover:text-jn-red transition-colors ${pathname.startsWith('/admin/futsal') ? 'bg-jn-red/10 text-jn-red' : ''}`}>
-            <Trophy size={20} />
-            Gestión Futsal
-          </Link>
 
           {role === "ADMIN" && (
             <>
@@ -116,9 +112,9 @@ export default function AdminLayout({ children }) {
               <div className="pt-3 pb-1 px-3">
                 <span className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Gestión del Club</span>
               </div>
-              <Link href="/admin/gestion-deportiva" className={`flex items-center gap-3 p-3 rounded-lg hover:bg-jn-red/20 hover:text-jn-red transition-colors ${pathname.startsWith('/admin/gestion-deportiva') ? 'bg-jn-red/10 text-jn-red' : ''}`}>
+              <Link href="/admin/gestion-deportiva" className={`flex items-center gap-3 p-3 rounded-lg hover:bg-jn-red/20 hover:text-jn-red transition-colors ${pathname.startsWith('/admin/gestion-deportiva') || pathname.startsWith('/admin/futsal') ? 'bg-jn-red/10 text-jn-red font-bold' : ''}`}>
                 <Trophy size={20} className="text-jn-red" />
-                🏆 Gestión Deportiva
+                🏆 Gestión Deportiva & Futsal
               </Link>
               <Link href="/admin/administracion-general" className={`flex items-center gap-3 p-3 rounded-lg hover:bg-jn-red/20 hover:text-jn-red transition-colors ${pathname.startsWith('/admin/administracion-general') ? 'bg-jn-red/10 text-jn-red' : ''}`}>
                 <Settings size={20} />
@@ -149,7 +145,7 @@ export default function AdminLayout({ children }) {
         </nav>
         <div className="p-4 border-t border-gray-800 text-center space-y-2">
           <div className="text-[10px] text-gray-500 font-mono">
-            Club Digital Pro v1.0.0
+            Club Atlético Jorge Newbery
           </div>
           <button 
             onClick={() => {
@@ -170,7 +166,7 @@ export default function AdminLayout({ children }) {
       
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 bg-white shadow-sm flex items-center justify-between px-6 flex-shrink-0">
+        <header className="h-16 bg-white shadow-sm flex items-center justify-between px-6 flex-shrink-0 print:hidden no-print">
           <h1 className="text-lg font-bold">Administración</h1>
           <div className="md:hidden flex gap-2">
             <Link href="/admin/futsal" className="text-xs bg-jn-red text-white font-bold px-3 py-1.5 rounded-lg uppercase">Futsal</Link>

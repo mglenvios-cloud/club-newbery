@@ -9,6 +9,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tool
 import { QRCodeSVG } from 'qrcode.react';
 import { apiFetch } from '@/lib/apiClient';
 import { API_URL } from '@/config';
+import ReceiptPDF from '@/components/ReceiptPDF';
 
 const fetch = apiFetch;
 
@@ -309,38 +310,10 @@ export default function GestionFinanzas() {
     showToast("Reporte de pagos exportado a CSV");
   };
 
-  const printReceipt = () => {
-    const printContent = receiptPrintRef.current.innerHTML;
-    const windowUrl = 'about:blank';
-    const uniqueName = new Date();
-    const windowName = 'Print' + uniqueName.getTime();
-    const printWindow = window.open(windowUrl, windowName, 'left=50000,top=50000,width=0,height=0');
-    
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Recibo Oficial de Pago - Club Jorge Newbery</title>
-          <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-          <style>
-            @media print {
-              body { -webkit-print-color-adjust: exact; }
-            }
-          </style>
-        </head>
-        <body class="flex items-center justify-center p-8 bg-white">
-          <div class="w-[800px] border p-8 rounded-xl shadow-lg">
-            ${printContent}
-          </div>
-          <script>
-            window.onload = function() {
-              window.print();
-              window.close();
-            }
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
+  const printReceipt = (receipt = selectedPayment) => {
+    if (!receipt) return;
+    const receiptId = receipt.numero || receipt.receiptNumber || receipt.id || 'REC-100001';
+    window.open(`/receipt/${receiptId}`, '_blank');
   };
 
   // Toggle Column Visibility
@@ -673,7 +646,7 @@ export default function GestionFinanzas() {
               📊 Evolución de Flujo de Caja (Ingresos vs Egresos)
             </h3>
             <div className="h-64 text-xs font-semibold">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={100}>
                 <AreaChart data={monthlyIncomesData}>
                   <defs>
                     <linearGradient id="colorIngresos" x1="0" y1="0" x2="0" y2="1">
@@ -704,7 +677,7 @@ export default function GestionFinanzas() {
                 💳 Distribución por Medio de Pago
               </h3>
               <div className="h-44 text-xs font-semibold">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={100}>
                   <BarChart data={methodDistributionData}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                     <XAxis dataKey="name" stroke="#94a3b8" />
@@ -1216,7 +1189,10 @@ export default function GestionFinanzas() {
                   {/* Operational actions inside side-panel */}
                   <div className="grid grid-cols-2 gap-2 pt-2 border-t text-center text-[9px] font-black uppercase">
                     <button
-                      onClick={() => setInvoicePreviewModal(true)}
+                      onClick={() => {
+                        console.log('[DIAGNOSTIC] 1. Click en "Ver A4 PDF"');
+                        setInvoicePreviewModal(true);
+                      }}
                       className="bg-slate-900 hover:bg-slate-800 text-white py-2 rounded-md flex items-center justify-center gap-1 transition-all"
                     >
                       <FileText size={11} /> Ver A4 PDF
@@ -1405,7 +1381,7 @@ export default function GestionFinanzas() {
             </h3>
             <div className="flex gap-4 items-center">
               <div className="h-36 w-36 shrink-0 text-xs font-semibold">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={100}>
                   <PieChart>
                     <Pie data={[{ name: 'Al día', value: totalSocioAlDia }, { name: 'Morosos', value: totalMorosoCount }]} cx="50%" cy="50%" innerRadius={35} outerRadius={50} paddingAngle={3} dataKey="value">
                       <Cell fill="#10b981" />
@@ -1436,7 +1412,7 @@ export default function GestionFinanzas() {
             </h3>
             <div className="flex gap-4 items-center">
               <div className="h-36 w-36 shrink-0 text-xs font-semibold">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={100}>
                   <PieChart>
                     <Pie data={disciplineData} cx="50%" cy="50%" outerRadius={50} dataKey="value">
                       {disciplineData.map((entry, index) => (
@@ -1724,115 +1700,12 @@ export default function GestionFinanzas() {
         </div>
       )}
 
-      {/* MODAL PREVIEW RECIBO PREMIUM A4 */}
-      {invoicePreviewModal && selectedPayment && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-950 text-white rounded-2xl max-w-2xl w-full shadow-2xl p-5 border border-slate-800 animate-scale-in">
-            <div className="flex justify-between items-center border-b border-slate-800 pb-2.5 mb-3">
-              <h3 className="font-black text-xs uppercase tracking-widest text-slate-300">Recibo Oficial Premium A4</h3>
-              <button onClick={() => setInvoicePreviewModal(false)} className="text-white/60 hover:text-white transition-colors">
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Printable content wrapper */}
-            <div className="max-h-[500px] overflow-y-auto bg-white text-slate-800 p-6 rounded-lg border border-slate-200" ref={receiptPrintRef}>
-              <div className="space-y-6 text-xs text-left">
-                {/* Header */}
-                <div className="flex justify-between items-start border-b pb-4">
-                  <div>
-                    <h2 className="text-lg font-black uppercase text-jn-red tracking-tight">Club Jorge Newbery</h2>
-                    <p className="text-[9px] text-slate-400 uppercase font-black tracking-wide mt-0.5">Asociación Civil y Deportiva</p>
-                    <p className="text-[9px] text-slate-500 font-semibold leading-relaxed mt-1">
-                      Calle Italia 450, Rufino, Santa Fe<br/>
-                      CUIT: 30-58472394-8
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-2xl font-black text-slate-200 border-2 border-slate-200 px-3 py-1 rounded-md">X</span>
-                    <p className="font-mono font-bold mt-2 text-slate-900">RECIBO Nº REC-0{selectedPayment.id}</p>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase mt-0.5">Fecha: {new Date(selectedPayment.createdAt).toLocaleDateString('es-AR')}</p>
-                  </div>
-                </div>
-
-                {/* Partner and receipt info */}
-                <div className="grid grid-cols-2 gap-4 border-b pb-4">
-                  <div>
-                    <span className="text-[8px] text-slate-400 font-black uppercase block">Detalles del Socio</span>
-                    <p className="font-black text-sm text-slate-900 mt-1">{selectedPayment.socio ? `${selectedPayment.socio.lastName}, ${selectedPayment.socio.firstName}` : "Cobro Directo"}</p>
-                    <p className="font-mono text-slate-500 leading-normal mt-0.5">
-                      DNI: {selectedPayment.socio?.dni || "N/A"}<br/>
-                      Socio N°: #{selectedPayment.socio?.socioNumber || "N/A"}<br/>
-                      Categoría: {selectedPayment.socio?.category || 'ACTIVO'}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-[8px] text-slate-400 font-black uppercase block">Detalles del Pago</span>
-                    <p className="font-semibold text-slate-800 mt-1">Método: <span className="font-mono uppercase font-bold">{selectedPayment.metodoPago}</span></p>
-                    <p className="font-semibold text-slate-800">Concepto: <span className="font-bold">{selectedPayment.plan?.nombre || "Cuota Social Directa"}</span></p>
-                    <p className="font-semibold text-slate-800">Período: <span className="font-bold">Julio 2026</span></p>
-                  </div>
-                </div>
-
-                {/* Items and total table */}
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50 border-b text-[8px] text-slate-400 font-black uppercase tracking-wider">
-                      <th className="p-2">Descripción / Plan</th>
-                      <th className="p-2 text-center">Período</th>
-                      <th className="p-2 text-right">Subtotal</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b font-semibold">
-                      <td className="p-2">{selectedPayment.plan?.nombre || "Cuota Social Directa"}</td>
-                      <td className="p-2 text-center">Julio 2026</td>
-                      <td className="p-2 text-right font-mono">${parseFloat(selectedPayment.importe).toFixed(2)}</td>
-                    </tr>
-                    <tr className="font-bold text-slate-900">
-                      <td colSpan="2" className="p-2 text-right text-[10px] font-black uppercase text-slate-400">Total Recaudado</td>
-                      <td className="p-2 text-right text-base font-black text-jn-red font-mono">${parseFloat(selectedPayment.importe).toFixed(2)}</td>
-                    </tr>
-                  </tbody>
-                </table>
-
-                {/* QR and digital signature footer */}
-                <div className="flex justify-between items-end border-t pt-5 mt-6">
-                  <div>
-                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-wider mb-2">Comprobante oficial homologado</p>
-                    <div className="bg-white p-1 rounded border shadow-2xs w-20 h-20 flex items-center justify-center">
-                      <QRCodeSVG id="invoice-qr" value={`https://clubnewbery.digital/invoice/verify/${selectedPayment.id}`} size={70} />
-                    </div>
-                  </div>
-                  <div className="text-center font-semibold text-slate-400 w-44">
-                    <div className="border-b border-dashed border-slate-300 h-10 mb-1 flex items-end justify-center font-mono text-[9px] text-slate-500">Club Jorge Newbery Digital</div>
-                    <span className="text-[8px] font-black uppercase tracking-wider block">Firma autorizada secretaría</span>
-                  </div>
-                </div>
-
-                <div className="text-center text-[8px] text-slate-400 font-black uppercase tracking-wide border-t pt-2 mt-4 leading-normal">
-                  ¡Gracias por mantener al día tu cuota y apoyar el crecimiento institucional del club!
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-2 pt-4 border-t border-slate-800">
-              <button
-                onClick={printReceipt}
-                className="flex-1 bg-jn-red hover:bg-red-700 text-white py-2 rounded-lg font-black uppercase text-[10px] transition-colors flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
-              >
-                <Printer size={12} /> Imprimir Comprobante
-              </button>
-              <button
-                onClick={() => setInvoicePreviewModal(false)}
-                className="flex-1 bg-white/5 hover:bg-white/10 text-white py-2 rounded-lg font-black uppercase text-[10px] transition-colors border border-slate-800 active:scale-95"
-              >
-                Cerrar Vista
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal Recibo Oficial Independiente en PDF */}
+      <ReceiptPDF
+        isOpen={invoicePreviewModal}
+        onClose={() => setInvoicePreviewModal(false)}
+        receipt={selectedPayment}
+      />
     </div>
   );
 }

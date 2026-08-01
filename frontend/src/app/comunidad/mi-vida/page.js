@@ -127,7 +127,7 @@ export default function MiVidaSocial() {
     };
 
     try {
-      const res = await fetch('/api/posts', {
+      const res = await apiFetch('/api/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

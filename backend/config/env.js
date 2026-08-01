@@ -1,63 +1,11 @@
-/**
- * ─── Validación de Variables de Entorno (Club Digital Pro SaaS) ────────────────
- *
- * Este módulo valida las variables dinámicas de entorno necesarias para operar.
- * NUNCA usar URLs de producción o secretos hardcodeados.
- */
+require('dotenv').config();
 
-'use strict';
-
-const REQUIRED_VARS = [
-  { key: 'JWT_SECRET',   description: 'Clave secreta para firmar y verificar tokens JWT' },
-  { key: 'DATABASE_URL', description: 'URL de conexion a la base de datos (PostgreSQL)' },
-  { key: 'FRONTEND_URL', description: 'URL del frontend para CORS' },
-];
-
-const OPTIONAL_VARS = [
-  { key: 'APP_NAME',                description: 'Nombre de la aplicación SaaS (default: Club Digital Pro)' },
-  { key: 'MP_ACCESS_TOKEN',         description: 'Token de acceso de MercadoPago (requerido para pagos)' },
-  { key: 'GEMINI_API_KEY',          description: 'Clave de API de Gemini IA' },
-  { key: 'PORT',                    description: 'Puerto de escucha del servidor' },
-];
-
-const cleanEnvVar = (val) => typeof val === 'string' ? val.trim().replace(/[\r\n]/g, '') : val;
-
-function validateEnv() {
-  const missing = [];
-
-  for (const { key, description } of REQUIRED_VARS) {
-    const value = cleanEnvVar(process.env[key]);
-    if (!value) {
-      missing.push(`  - ${key}: ${description}`);
-    }
-  }
-
-  if (missing.length > 0) {
-    console.error('\n[ENV] VARIABLES DE ENTORNO CRITICAS NO DEFINIDAS:');
-    missing.forEach((m) => console.error('[ENV]' + m));
-    console.error('\n[ENV] Configurar estas variables antes de iniciar el servidor.\n');
-    process.exit(1);
-  }
-
-  for (const { key, description } of OPTIONAL_VARS) {
-    const value = cleanEnvVar(process.env[key]);
-    if (!value) {
-      console.warn(`[ENV] ADVERTENCIA: ${key} no definida: ${description}`);
-    }
-  }
-
-  console.log('[ENV] Variables de entorno criticas: OK');
-}
-
-validateEnv();
+const PORT = process.env.PORT || 4000;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 module.exports = {
-  APP_NAME:        cleanEnvVar(process.env.APP_NAME) || 'Club Digital Pro',
-  JWT_SECRET:      cleanEnvVar(process.env.JWT_SECRET),
-  DATABASE_URL:    cleanEnvVar(process.env.DATABASE_URL),
-  FRONTEND_URL:    cleanEnvVar(process.env.FRONTEND_URL),
-  MP_ACCESS_TOKEN: cleanEnvVar(process.env.MP_ACCESS_TOKEN) || null,
-  GEMINI_API_KEY:  cleanEnvVar(process.env.GEMINI_API_KEY) || null,
-  NODE_ENV:        cleanEnvVar(process.env.NODE_ENV) || 'development',
-  PORT:            parseInt(process.env.PORT, 10) || 5000,
+  PORT,
+  FRONTEND_URL,
+  NODE_ENV,
 };

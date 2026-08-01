@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
 import ClubShield from '@/components/ClubShield';
-import { API_URL } from '@/config';
+import { apiFetch } from '@/lib/apiClient';
 
 export default function AsociatePage() {
   const [firstName, setFirstName] = useState('');
@@ -24,7 +24,7 @@ export default function AsociatePage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/auth/register`, {
+      const res = await apiFetch(`/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

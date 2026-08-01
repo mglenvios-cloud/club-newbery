@@ -42,3 +42,34 @@ body {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Reglas de Impresión Estrictas para Aislar Comprobante */
+@media print {
+  aside, 
+  header, 
+  nav, 
+  footer, 
+  .no-print,
+  .sidebar,
+  .header,
+  button,
+  [role="navigation"] {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  #receipt-pdf-render-container {
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding: 20px !important;
+    display: block !important;
+  }
+}

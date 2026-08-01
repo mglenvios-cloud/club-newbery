@@ -1,15 +1,21 @@
 # Reporte de Auditoría de Configuración CORS y Direccionamiento de API
 
-Este informe documenta la investigación, solución y verificación de las políticas de CORS y del direccionamiento de la API de comunicación entre el frontend (desplegado en Vercel) y el backend del **Club Jorge Newbery Digital**.
+Este informe documenta la investigación, solución y verificación de las políticas de CORS y del direccionamiento de la API de comunicación entre el frontend (desplegado en Vercel: `https://club-jorge-newbery-portal.vercel.app`) y el backend en Render (`https://club-newbery-backend.onrender.com`).
 
 ---
 
-## 🔍 Análisis del Problema
+## 🔍 Análisis del Estado y Verificación
 
-* **Error Reportado:** `ERR_CONNECTION_REFUSED` o bloqueo de CORS en peticiones del frontend a `http://localhost:5000` cuando la aplicación corre en producción (`https://frontend-indol-rho-38.vercel.app`).
-* **Causa Raíz:**
-  1. El archivo `.env` del backend tenía configurada la variable `FRONTEND_URL` apuntando a `http://localhost:3000` (entorno local). Por consiguiente, cuando el frontend de producción en Vercel intentaba enviar cabeceras con el origen `https://frontend-indol-rho-38.vercel.app`, el middleware de CORS de Express rechazaba la petición de inmediato, lanzando un error 500/bloqueo de origen.
-  2. Había inconsistencia sobre qué variable usar en el frontend para apuntar a producción, intentando forzar llamadas de localhost.
+* **Dominio Oficial Vercel:** `https://club-jorge-newbery-portal.vercel.app`
+* **Dominio Oficial Backend (Render):** `https://club-newbery-backend.onrender.com`
+* **Resultado de Pruebas CORS Live:**
+  * `[GET] /api/health` ➔ `200 OK` (`Access-Control-Allow-Origin: https://club-jorge-newbery-portal.vercel.app`)
+  * `[GET] /api/publicidad/sponsors` ➔ `200 OK` (`Access-Control-Allow-Origin: https://club-jorge-newbery-portal.vercel.app`)
+  * `[GET] /api/publicidad/banners` ➔ `200 OK` (`Access-Control-Allow-Origin: https://club-jorge-newbery-portal.vercel.app`)
+  * `[GET] /api/newberytv/videos` ➔ `200 OK` (`Access-Control-Allow-Origin: https://club-jorge-newbery-portal.vercel.app`)
+  * `[GET] /api/futsal-news` ➔ `200 OK` (`Access-Control-Allow-Origin: https://club-jorge-newbery-portal.vercel.app`)
+  * `[OPTIONS] /api/auth/login` ➔ `200 OK` (`Access-Control-Allow-Credentials: true`)
+  * `[OPTIONS] /api/members/me` ➔ `200 OK` (`Access-Control-Allow-Credentials: true`)
 
 ---
 

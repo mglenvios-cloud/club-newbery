@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   CreditCard, Check, AlertCircle, FileText, ExternalLink,
@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 
 import { API_URL } from '@/config';
+import ReceiptPDF from '@/components/ReceiptPDF';
 
 export default function MisCuotasSocio() {
   const [loading, setLoading] = useState(false);
@@ -17,6 +18,7 @@ export default function MisCuotasSocio() {
 
   // Mercado Pago simulated modal
   const [checkoutModal, setCheckoutModal] = useState({ isOpen: false, payment: null, preferenceId: '' });
+  const [receiptModal, setReceiptModal] = useState({ isOpen: false, payment: null });
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -326,23 +328,13 @@ export default function MisCuotasSocio() {
                     ) : (
                       <div className="flex gap-2 justify-end items-center">
                         <span className="text-[10px] text-gray-400 font-bold uppercase">Pagado</span>
-                        {p.invoices && p.invoices.length > 0 ? (
-                          <button
-                            onClick={() => downloadInvoice(p.invoices[0].id)}
-                            className="p-1 text-jn-red hover:bg-red-50 rounded border border-red-100 flex items-center justify-center bg-white cursor-pointer"
-                            title="Descargar Recibo"
-                          >
-                            <FileText size={14} />
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => showToast('Comprobante interno en generación', 'success')}
-                            className="p-1 text-gray-400 hover:text-gray-600"
-                            title="Recibo en preparación"
-                          >
-                            <FileText size={14} />
-                          </button>
-                        )}
+                        <button
+                          onClick={() => setReceiptModal({ isOpen: true, payment: p })}
+                          className="p-1.5 text-jn-red hover:bg-red-50 rounded border border-red-100 flex items-center justify-center bg-white cursor-pointer transition-all shadow-xs"
+                          title="Ver / Descargar Comprobante PDF Oficial"
+                        >
+                          <FileText size={14} />
+                        </button>
                       </div>
                     )}
                   </td>
@@ -418,6 +410,12 @@ export default function MisCuotasSocio() {
         </div>
       )}
 
+      {/* Modal Recibo Oficial Independiente en PDF */}
+      <ReceiptPDF
+        isOpen={receiptModal.isOpen}
+        onClose={() => setReceiptModal({ isOpen: false, payment: null })}
+        receipt={receiptModal.payment}
+      />
     </div>
   );
 }

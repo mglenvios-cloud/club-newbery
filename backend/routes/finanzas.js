@@ -276,107 +276,85 @@ router.get('/invoices/:id', authenticateToken, async (req, res) => {
     }
 
     doc.fillColor('#111111');
-    doc.fontSize(16).font('Helvetica-Bold').text('CLUB ATLETICO JORGE NEWBERY', textStartX, 35);
-    doc.fontSize(9).font('Helvetica').fillColor('#555555').text('Av. Jorge Newbery 1234, CABA | CUIT: 30-12345678-9', textStartX, 54);
-    doc.text('Asociación Civil sin Fines de Lucro | Fundado en 1916', textStartX, 66);
-    doc.text('contacto@jorgenewbery.com.ar | www.jorgenewbery.com.ar', textStartX, 78);
+    doc.fontSize(16).font('Helvetica-Bold').text('JN - Club Atlético Jorge Newbery', textStartX, 32);
+    doc.fontSize(11).font('Helvetica-Bold').fillColor('#CC0000').text('Comprobante de Pago Oficial', textStartX, 52);
+    doc.fontSize(9).font('Helvetica').fillColor('#555555').text('Alpatacal 3026, Villa Devoto. C.A.B.A. | CUIT: 30-12345678-9', textStartX, 68);
+    doc.text('contacto@clubjorgenewbery.com.ar | www.clubjorgenewbery.com.ar', textStartX, 80);
 
-    // Encabezado del Recibo (Derecha)
-    doc.fillColor('#CC0000');
-    doc.fontSize(12).font('Helvetica-Bold').text('RECIBO OFICIAL', 400, 35, { align: 'right' });
-    doc.fontSize(10).font('Helvetica-Bold').fillColor('#111111').text(`Número: ${invoice.numero}`, 400, 52, { align: 'right' });
-    doc.fontSize(9).font('Helvetica').fillColor('#555555').text(`Emisión: ${new Date(invoice.fechaEmision).toLocaleDateString('es-AR')}`, 400, 68, { align: 'right' });
-    
-    // Estado del Pago en badge de color
-    const payState = (invoice.payment.estado || 'PENDIENTE').toUpperCase();
-    let badgeBg = '#FFF3CD';
-    let badgeText = '#856404';
-    if (payState === 'PAGADO') {
-      badgeBg = '#D4EDDA';
-      badgeText = '#155724';
-    } else if (payState === 'RECHAZADO' || payState === 'CANCELADO') {
-      badgeBg = '#F8D7DA';
-      badgeText = '#721C24';
-    }
-    
-    doc.rect(doc.page.width - 130, 84, 80, 16).fill(badgeBg);
-    doc.fontSize(8).font('Helvetica-Bold').fillColor(badgeText).text(payState, doc.page.width - 130, 88, { width: 80, align: 'center' });
+    // Encabezado del Recibo (Derecha) - Caja "X" / Recibo de Caja
+    doc.roundedRect(doc.page.width - 150, 30, 100, 48, 4).stroke('#E2E8F0');
+    doc.fontSize(16).font('Helvetica-Bold').fillColor('#111111').text('X', doc.page.width - 150, 36, { width: 100, align: 'center' });
+    doc.fontSize(8).font('Helvetica-Bold').fillColor('#666666').text('Recibo de Caja', doc.page.width - 150, 58, { width: 100, align: 'center' });
+
+    const receiptNumStr = String(invoice.numero || (100000 + invoice.id)).startsWith('REC-')
+      ? invoice.numero || `REC-${100000 + invoice.id}`
+      : `REC-${invoice.numero || (100000 + invoice.id)}`;
+
+    doc.fontSize(10).font('Helvetica-Bold').fillColor('#111111').text(`N° ${receiptNumStr}`, 380, 86, { align: 'right' });
+
+    // Fecha de emisión formateada con hora
+    const fechaEmisionObj = new Date(invoice.fechaEmision || invoice.createdAt || Date.now());
+    const hoursFin = String(fechaEmisionObj.getHours()).padStart(2, '0');
+    const minsFin = String(fechaEmisionObj.getMinutes()).padStart(2, '0');
+    const fechaFormattedStr = `${fechaEmisionObj.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}, ${hoursFin}:${minsFin} hs`;
+    doc.fontSize(8).font('Helvetica').fillColor('#555555').text(`Fecha de Emisión: ${fechaFormattedStr}`, 380, 100, { align: 'right' });
 
     // Línea separadora
-    doc.moveTo(50, 110).lineTo(doc.page.width - 50, 110).stroke('#E2E8F0');
+    doc.moveTo(50, 118).lineTo(doc.page.width - 50, 118).stroke('#E2E8F0');
 
-    // DATOS DEL SOCIO
-    doc.fontSize(10).font('Helvetica-Bold').fillColor('#CC0000').text('DATOS DEL SOCIO', 50, 125);
+    // DATOS DEL SOCIO / CLIENTE
+    const socio = invoice.payment.socio || {};
+    const fullName = `${socio.firstName || ''} ${socio.lastName || ''}`.trim() || 'Martin Perez';
     
-    // Contenedor de datos del socio (rounded rect)
-    doc.roundedRect(50, 140, doc.page.width - 100, 65, 6).stroke('#E2E8F0');
-    
-    // Textos de Datos de Socio
-    const socio = invoice.payment.socio;
-    const fullName = `${socio.firstName || ''} ${socio.lastName || ''}`.trim();
-    doc.fontSize(9).font('Helvetica-Bold').fillColor('#111111');
-    
-    // Columna 1
-    doc.text('Nombre completo:', 65, 152);
-    doc.font('Helvetica').text(fullName, 160, 152);
-    doc.font('Helvetica-Bold').text('Documento / DNI:', 65, 168);
-    doc.font('Helvetica').text(socio.dni || '-', 160, 168);
-    doc.font('Helvetica-Bold').text('Categoría:', 65, 184);
-    doc.font('Helvetica').text(socio.category || 'ACTIVO', 160, 184);
+    doc.fontSize(9).font('Helvetica-Bold').fillColor('#CC0000').text('SOCIO / CLIENTE', 50, 130);
+    doc.fontSize(12).font('Helvetica-Bold').fillColor('#111111').text(fullName, 50, 144);
+    if (socio.dni) {
+      doc.fontSize(8).font('Helvetica').fillColor('#666666').text(`DNI: ${socio.dni} | N° Socio: #${socio.socioNumber || '-'} | Categoría: ${socio.category || 'ACTIVO'}`, 50, 160);
+    }
 
-    // Columna 2
-    doc.font('Helvetica-Bold').text('Número de socio:', 310, 152);
-    doc.font('Helvetica').text(String(socio.socioNumber || '-'), 400, 152);
-    doc.font('Helvetica-Bold').text('Plan de membresía:', 310, 168);
-    doc.font('Helvetica').text(invoice.payment.plan.nombre || '-', 400, 168);
+    // CONCEPTO Y DETALLE DEL PAGO
+    doc.fontSize(9).font('Helvetica-Bold').fillColor('#CC0000').text('CONCEPTO', 50, 182);
+    const conceptoText = invoice.payment.plan?.nombre || 'Cuota Social';
+    doc.fontSize(10).font('Helvetica-Bold').fillColor('#111111').text(conceptoText, 50, 196);
 
-    // DETALLE DEL PAGO
-    doc.fontSize(10).font('Helvetica-Bold').fillColor('#CC0000').text('DETALLE DEL PAGO', 50, 225);
+    doc.fontSize(9).font('Helvetica-Bold').fillColor('#CC0000').text('DETALLE DEL PAGO', 50, 218);
+    const detalleText = invoice.payment.observaciones || invoice.payment.detalles || 'Sin descripción de detalles.';
+    doc.fontSize(9).font('Helvetica').fillColor('#444444').text(detalleText, 50, 232);
 
-    // Encabezado de la tabla de detalles
-    doc.rect(50, 240, doc.page.width - 100, 18).fill('#F8FAFC');
-    doc.fontSize(8).font('Helvetica-Bold').fillColor('#475569');
-    doc.text('Concepto', 60, 245);
-    doc.text('Período', 210, 245);
-    doc.text('Subtotal', 300, 245, { width: 60, align: 'right' });
-    doc.text('Descuento', 360, 245, { width: 60, align: 'right' });
-    doc.text('Recargo', 420, 245, { width: 60, align: 'right' });
-    doc.text('Total', 480, 245, { width: 60, align: 'right' });
+    // TABLA DE MONTOS / TOTAL RECAUDADO
+    doc.rect(50, 255, doc.page.width - 100, 22).fill('#F8FAFC');
+    doc.fontSize(9).font('Helvetica-Bold').fillColor('#475569');
+    doc.text('Ítem / Descripción', 60, 261);
+    doc.text('Período', 280, 261);
+    doc.text('Importe', 450, 261, { width: 90, align: 'right' });
 
-    // FASE 7: Importes obtenidos desde la base de datos
-    const subtotalVal = parseFloat(invoice.payment.importe) || 0;
-    const discountVal = 0.0;
-    const surchargeVal = 0.0;
-    const totalVal = subtotalVal - discountVal + surchargeVal;
+    const totalVal = parseFloat(invoice.payment.importe) || 0;
+    const amountFormatted = `$${totalVal.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
-    // Fila única de detalle
     doc.fontSize(9).font('Helvetica').fillColor('#111111');
-    doc.text(invoice.payment.plan.nombre || 'Cuota Social General', 60, 266, { width: 145 });
-    doc.text(periodo, 210, 266);
-    doc.text(`$${subtotalVal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 300, 266, { width: 60, align: 'right' });
-    doc.text(`$${discountVal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 360, 266, { width: 60, align: 'right' });
-    doc.text(`$${surchargeVal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 420, 266, { width: 60, align: 'right' });
-    doc.font('Helvetica-Bold').text(`$${totalVal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 480, 266, { width: 60, align: 'right' });
+    doc.text(conceptoText, 60, 285);
+    doc.text(periodo, 280, 285);
+    doc.font('Helvetica-Bold').text(amountFormatted, 450, 285, { width: 90, align: 'right' });
 
-    // Línea divisoria de tabla
-    doc.moveTo(50, 286).lineTo(doc.page.width - 50, 286).stroke('#E2E8F0');
+    doc.moveTo(50, 305).lineTo(doc.page.width - 50, 305).stroke('#E2E8F0');
 
-    // Métodos de pago y Total box
-    doc.fontSize(9).font('Helvetica-Bold').fillColor('#111111').text('Medio de pago:', 60, 305);
-    doc.font('Helvetica').text(invoice.payment.metodoPago || 'EFECTIVO', 140, 305);
-    doc.font('Helvetica-Bold').text('Fecha de pago:', 60, 321);
-    doc.font('Helvetica').text(invoice.payment.fechaPago ? new Date(invoice.payment.fechaPago).toLocaleString('es-AR') : 'Pendiente', 140, 321);
+    // RESUMEN Y ESTADO DEL PAGO
+    doc.roundedRect(320, 320, 225, 45, 6).fill('#F0FDF4');
+    doc.roundedRect(320, 320, 225, 45, 6).stroke('#BBF7D0');
+    
+    doc.fillColor('#166534').fontSize(9).font('Helvetica-Bold').text('TOTAL RECAUDADO', 335, 328);
+    doc.fontSize(14).font('Helvetica-Bold').fillColor('#15803D').text(amountFormatted, 430, 326, { width: 105, align: 'right' });
+    
+    const payState = (invoice.payment.estado || 'PAGADO').toUpperCase();
+    const isCompleted = payState === 'PAGADO' || payState === 'COMPLETADO';
+    const statusLabel = isCompleted ? '✓ Pago Completado' : `Estado: ${payState}`;
+    
+    doc.fontSize(9).font('Helvetica-Bold').fillColor(isCompleted ? '#166534' : '#991B1B').text(statusLabel, 335, 348);
 
-    // TOTAL ABONADO BOX
-    doc.rect(340, 298, 205, 38).fill('#F8FAFC');
-    doc.rect(340, 298, 3, 38).fill('#CC0000'); // acento rojo lateral
-    doc.fillColor('#111111').fontSize(9).font('Helvetica-Bold').text('TOTAL ABONADO:', 352, 312);
-    doc.fontSize(12).font('Helvetica-Bold').fillColor('#CC0000').text(`$${totalVal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ARS`, 435, 310, { width: 105, align: 'right' });
-
-    // FASE 6: Código QR Real
+    // VERIFICACIÓN DIGITAL Y QR
     const validationUrl = process.env.INVOICE_VALIDATION_URL 
       ? `${process.env.INVOICE_VALIDATION_URL.replace(/\/$/, '')}/verify/invoice/${invoice.id}`
-      : `https://www.jorgenewbery.com.ar/portal/verify/invoice/${invoice.id}`;
+      : `https://www.clubjorgenewbery.com.ar/verify/invoice/${invoice.id}`;
     
     let qrBuffer = null;
     try {
@@ -385,32 +363,24 @@ router.get('/invoices/:id', authenticateToken, async (req, res) => {
       console.error('Error al generar buffer de QR real:', qrErr);
     }
 
-    doc.moveTo(50, 355).lineTo(doc.page.width - 50, 355).stroke('#E2E8F0');
-
-    // VALIDACIÓN DIGITAL CONTAINER
-    doc.fontSize(10).font('Helvetica-Bold').fillColor('#CC0000').text('VALIDACIÓN DIGITAL Y CONTROL', 50, 370);
-    
+    doc.fontSize(9).font('Helvetica-Bold').fillColor('#CC0000').text('VERIFICACIÓN DIGITAL', 50, 330);
     if (qrBuffer) {
       try {
-        doc.image(qrBuffer, 50, 390, { width: 75, height: 75 });
-      } catch (qrDrawErr) {
-        console.error('Error dibujando QR en PDF:', qrDrawErr);
-      }
+        doc.image(qrBuffer, 50, 345, { width: 65, height: 65 });
+      } catch (e) {}
     }
     
-    const qrInfoStartX = qrBuffer ? 140 : 50;
-    doc.fillColor('#111111').fontSize(9).font('Helvetica-Bold').text('INFORMACIÓN DE VERIFICACIÓN:', qrInfoStartX, 390);
-    doc.fontSize(8).font('Helvetica').fillColor('#475569');
-    doc.text(`Código de control único: REC-${invoice.numero}-${invoice.id}-${new Date(invoice.createdAt).getTime()}`, qrInfoStartX, 405);
-    doc.text('Este documento digital sirve como comprobante de pago oficial de las obligaciones sociales y deportivas descritas.', qrInfoStartX, 418, { width: 380 });
-    doc.text('Para verificar su validez en el portal oficial del Club Jorge Newbery, escanee el código QR con su dispositivo celular.', qrInfoStartX, 438, { width: 380 });
+    const qrInfoX = qrBuffer ? 125 : 50;
+    doc.fontSize(8).font('Helvetica').fillColor('#555555');
+    doc.text(`Comprobante N°: ${receiptNumStr}`, qrInfoX, 348);
+    doc.text(`Medio de Pago: ${invoice.payment.metodoPago || 'EFECTIVO'}`, qrInfoX, 360);
+    doc.text('Escanee el código QR para validar la autenticidad en línea.', qrInfoX, 372);
 
-    // FASE 7: Pie del documento
-    doc.moveTo(50, doc.page.height - 70).lineTo(doc.page.width - 50, doc.page.height - 70).stroke('#E2E8F0');
-    doc.fontSize(8).font('Helvetica').fillColor('#94A3B8');
-    doc.text('Club Atlético Jorge Newbery - Asociación Civil sin Fines de Lucro', 50, doc.page.height - 60);
-    doc.text('Sistema de Gestión Digital ERP v2.0 - Comprobante de emisión digital automática', 50, doc.page.height - 48);
-    doc.text(`Emisión: ${new Date().toLocaleString('es-AR')}`, 450, doc.page.height - 60, { width: 95, align: 'right' });
+    // PIE LEGAL Y DIRECCIÓN
+    doc.moveTo(50, doc.page.height - 85).lineTo(doc.page.width - 50, doc.page.height - 85).stroke('#E2E8F0');
+    doc.fontSize(8).font('Helvetica').fillColor('#475569');
+    doc.text('Este comprobante tiene carácter de recibo oficial de pago electrónico para el Club Social y Deportivo Jorge Newbery.', 50, doc.page.height - 72, { align: 'center', width: doc.page.width - 100 });
+    doc.font('Helvetica-Bold').fillColor('#111111').text('Alpatacal 3026, Villa Devoto. C.A.B.A.', 50, doc.page.height - 58, { align: 'center', width: doc.page.width - 100 });
 
     doc.end();
   } catch (error) {

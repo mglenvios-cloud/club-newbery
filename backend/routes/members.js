@@ -5,23 +5,13 @@ const jwt = require('jsonwebtoken');
 const router = express.Router();
 const { JWT_SECRET } = require('../config/env');
 
-// Middleware para verificar token JWT
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  
-  if (!token) return res.sendStatus(401);
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
+const { dualAuth } = require('../middleware/firebaseAuth');
+const authenticateToken = dualAuth;
 
 // Obtener todos los socios (Solo ADMIN)
 router.get('/', authenticateToken, async (req, res) => {
-  if (req.user.role !== 'ADMIN' && req.user.role !== 'SUPER_ADMIN') return res.status(403).json({ error: 'Acceso denegado' });
+  const role = (req.user?.role || req.user?.rol || '').toUpperCase();
+  if (role !== 'ADMIN' && role !== 'SUPER_ADMIN') return res.status(403).json({ error: 'Acceso denegado' });
 
   try {
     const members = await prisma.member.findMany({

@@ -13,7 +13,11 @@ import { API_URL } from '../config';
 
 const getAuthHeaders = () => {
   if (typeof window === 'undefined') return {};
-  const token = localStorage.getItem('jn-auth-token') || localStorage.getItem('token');
+  let token = localStorage.getItem('jn-auth-token') || localStorage.getItem('token') || localStorage.getItem('adminAuth');
+  if (!token) {
+    const match = document.cookie.match(/(?:^|; )(?:jn-auth-token|token|adminAuth)=([^;]*)/);
+    if (match) token = decodeURIComponent(match[1]);
+  }
   if (!token) return {};
   return {
     Authorization: `Bearer ${token}`

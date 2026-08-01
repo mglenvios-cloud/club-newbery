@@ -46,6 +46,7 @@ const newberytvRoutes = require('./routes/newberytv');
 // ─── Nuevas rutas Fase 7 & 7.1 ─────────────────────────────────────────────────
 const systemStatusRoutes = require('./routes/systemStatus');
 const backupRoutes = require('./routes/backup');
+const marketplaceRoutes = require('./routes/marketplace');
 const tenantMiddleware = require('./middleware/tenantMiddleware');
 const { provisionNewClub } = require('./services/clubProvisioning.service');
 
@@ -78,6 +79,8 @@ app.use('/api/auth/login', authLimiter);
 // ─── CORS — Lista blanca de orígenes permitidos ────────────────────────────────
 const allowedOrigins = [
   FRONTEND_URL,
+  'https://club-jorge-newbery-portal.vercel.app',
+  'https://frontend-indol-rho-38.vercel.app',
   ...(NODE_ENV !== 'production' ? [
     'http://localhost:3000',
     'http://localhost:3001',
@@ -101,7 +104,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Club-Slug'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Club-Slug', 'Accept', 'Origin'],
   optionsSuccessStatus: 200,
 }));
 
@@ -206,6 +209,7 @@ app.use('/api/newberytv', newberytvRoutes);
 // ─── Nuevas rutas Fase 7 & 7.1 ─────────────────────────────────────────────────
 app.use('/api/system-status', systemStatusRoutes);
 app.use('/api/admin-general/backups', backupRoutes);
+app.use('/api/marketplace', marketplaceRoutes);
 
 // Endpoint de consulta de logs de auditoría
 app.get('/api/admin-general/audit-logs', async (req, res) => {

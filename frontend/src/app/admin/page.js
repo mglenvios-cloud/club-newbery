@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, 
@@ -397,7 +397,7 @@ export default function AdminDashboard() {
                 <span>No hay datos de ingresos disponibles para graficar.</span>
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={100}>
                 <AreaChart data={dataIngresos}>
                   <defs>
                     <linearGradient id="colorIngresos" x1="0" y1="0" x2="0" y2="1">
@@ -513,7 +513,7 @@ export default function AdminDashboard() {
                 Sin datos
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={100}>
                 <PieChart>
                   <Pie
                     data={dataSocios}
@@ -550,7 +550,7 @@ export default function AdminDashboard() {
                 <span>No hay noticias publicadas para graficar.</span>
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={100}>
                 <BarChart data={dataNews}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f5f5f5" />
                   <XAxis dataKey="name" axisLine={false} tickLine={false} className="text-[10px] font-bold" />

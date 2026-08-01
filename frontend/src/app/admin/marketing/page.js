@@ -794,7 +794,7 @@ export default function MarketingAdmin() {
                   <div className="lg:col-span-2 bg-gray-950 border border-gray-800 rounded-2xl p-5">
                     <h3 className="text-xs font-black uppercase tracking-wider mb-6 text-gray-400">Rendimiento por clics (Últimos 7 días)</h3>
                     <div className="h-64">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={100}>
                         <LineChart data={stats.clicksByDay || []}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#222" />
                           <XAxis dataKey="date" stroke="#666" fontSize={11} />
@@ -811,7 +811,7 @@ export default function MarketingAdmin() {
                     <div>
                       <h3 className="text-xs font-black uppercase tracking-wider mb-6 text-gray-400">Acceso por dispositivo</h3>
                       <div className="h-48 flex items-center justify-center">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={100}>
                           <PieChart>
                             <Pie
                               data={[
@@ -927,7 +927,7 @@ export default function MarketingAdmin() {
                       <div>
                         <div className="flex items-start justify-between mb-4">
                           {s.logoUrl ? (
-                            <img src={s.logoUrl} alt={s.name} className="h-10 object-contain max-w-[120px] rounded-lg" />
+                            <img src={s.logoUrl} alt={s.name} className="h-10 object-contain max-w-[120px] rounded-lg" onError={(e) => { e.target.onerror = null; e.target.src = '/images/logo.png'; }} />
                           ) : (
                             <div className="w-10 h-10 bg-gray-950 border border-gray-800 rounded-xl flex items-center justify-center font-black text-sm text-jn-red">SP</div>
                           )}
@@ -1272,7 +1272,7 @@ export default function MarketingAdmin() {
                 <div className="bg-gray-950 border border-gray-800 rounded-2xl p-5">
                   <h3 className="text-xs font-black uppercase tracking-wider mb-6 text-gray-400">CTR vs Clics Diarios</h3>
                   <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={100}>
                       <AreaChart data={stats.clicksByDay || []}>
                         <defs>
                           <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
@@ -1294,7 +1294,7 @@ export default function MarketingAdmin() {
                 <div className="bg-gray-950 border border-gray-800 rounded-2xl p-5">
                   <h3 className="text-xs font-black uppercase tracking-wider mb-6 text-gray-400">Rendimiento por Campaña (Clicks)</h3>
                   <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={100}>
                       <BarChart data={campaigns.slice(0, 5)}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#222" />
                         <XAxis dataKey="title" stroke="#666" fontSize={10} />

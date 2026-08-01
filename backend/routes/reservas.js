@@ -173,4 +173,119 @@ router.delete('/bookings/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// ─── SCHEDULES & MAINTENANCE BLOCKS ENDPOINTS ──────────────────────────────────────
+
+// GET /api/reservas/schedules?facilityId=X
+router.get('/schedules', async (req, res) => {
+  const { facilityId } = req.query;
+  try {
+    if (facilityId) {
+      const list = await schedulesService.getSchedulesByFacility(facilityId);
+      return res.json(list);
+    }
+    const allSchedules = await prisma.schedule.findMany({
+      include: { facility: true },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(allSchedules);
+  } catch (error) {
+    logError({ module: 'Reservas', action: 'getSchedules', error, req });
+    res.status(500).json({ error: 'Error al obtener bloqueos de horario.' });
+  }
+});
+
+// POST /api/reservas/schedules
+router.post('/schedules', authenticateToken, async (req, res) => {
+  const isStaff = ['ADMIN', 'FUTSAL', 'OPERADOR', 'SUPER_ADMIN'].includes(req.user.role);
+  if (!isStaff) return res.status(403).json({ error: 'Acceso denegado. Se requieren permisos de administrador.' });
+
+  try {
+    const { facilityId, dayOfWeek, startTime, endTime, isBlocked, reason } = req.body;
+    if (!facilityId || !startTime || !endTime) {
+      return res.status(400).json({ error: 'Faltan datos requeridos para crear el bloqueo.' });
+    }
+    const newSchedule = await schedulesService.createSchedule({
+      facilityId,
+      dayOfWeek: dayOfWeek !== undefined ? dayOfWeek : 1,
+      startTime,
+      endTime,
+      isBlocked: isBlocked !== undefined ? isBlocked : true,
+      reason
+    });
+    res.status(201).json(newSchedule);
+  } catch (error) {
+    logError({ module: 'Reservas', action: 'createSchedule', error, req });
+    res.status(500).json({ error: 'Error al registrar bloqueo de cancha.' });
+  }
+});
+
+// DELETE /api/reservas/schedules/:id
+router.delete('/schedules/:id', authenticateToken, async (req, res) => {
+  const isStaff = ['ADMIN', 'FUTSAL', 'OPERADOR', 'SUPER_ADMIN'].includes(req.user.role);
+  if (!isStaff) return res.status(403).json({ error: 'Acceso denegado.' });
+
+  const { id } = req.params;
+  try {
+    await prisma.schedule.delete({ where: { id: parseInt(id, 10) } });
+    res.json({ message: 'Bloqueo / horario liberado exitosamente.' });
+  } catch (error) {
+    logError({ module: 'Reservas', action: 'deleteSchedule', error, req });
+    res.status(500).json({ error: 'Error al eliminar bloqueo de horario.' });
+  }
+});
+
+// ─── PRICE RULES / TARIFAS ENDPOINTS ──────────────────────────────────────────────
+
+// GET /api/reservas/prices?facilityId=X
+router.get('/prices', async (req, res) => {
+  const { facilityId } = req.query;
+  try {
+    if (facilityId) {
+      const list = await pricesService.getPriceRulesByFacility(facilityId);
+      return res.json(list);
+    }
+    const allRules = await prisma.priceRule.findMany({
+      include: { facility: true },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(allRules);
+  } catch (error) {
+    logError({ module: 'Reservas', action: 'getPrices', error, req });
+    res.status(500).json({ error: 'Error al obtener tarifas de canchas.' });
+  }
+});
+
+// POST /api/reservas/prices
+router.post('/prices', authenticateToken, async (req, res) => {
+  const isStaff = ['ADMIN', 'FUTSAL', 'OPERADOR', 'SUPER_ADMIN'].includes(req.user.role);
+  if (!isStaff) return res.status(403).json({ error: 'Acceso denegado. Se requieren permisos de administrador.' });
+
+  try {
+    const { facilityId, userType, isPeakHour, price } = req.body;
+    if (!facilityId || !userType || !price) {
+      return res.status(400).json({ error: 'Faltan datos requeridos para la tarifa (facilityId, userType, price).' });
+    }
+    const rule = await pricesService.createPriceRule({ facilityId, userType, isPeakHour, price });
+    res.status(201).json(rule);
+  } catch (error) {
+    logError({ module: 'Reservas', action: 'createPriceRule', error, req });
+    res.status(500).json({ error: 'Error al guardar regla de tarifa.' });
+  }
+});
+
+// DELETE /api/reservas/prices/:id
+router.delete('/prices/:id', authenticateToken, async (req, res) => {
+  const isStaff = ['ADMIN', 'FUTSAL', 'OPERADOR', 'SUPER_ADMIN'].includes(req.user.role);
+  if (!isStaff) return res.status(403).json({ error: 'Acceso denegado.' });
+
+  const { id } = req.params;
+  try {
+    await prisma.priceRule.delete({ where: { id: parseInt(id, 10) } });
+    res.json({ message: 'Regla de tarifa eliminada.' });
+  } catch (error) {
+    logError({ module: 'Reservas', action: 'deletePriceRule', error, req });
+    res.status(500).json({ error: 'Error al eliminar regla de tarifa.' });
+  }
+});
+
 module.exports = router;

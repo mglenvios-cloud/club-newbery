@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', (req, res) => {
-  res.json({ success: true, message: 'Sistema de backup activo', backups: [] });
+  res.json({ success: true, modules: [] });
 });
 
 module.exports = router;

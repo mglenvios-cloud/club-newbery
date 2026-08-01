@@ -1,12 +1,20 @@
 'use strict';
 
 /**
- * ─── Prisma Client — Firebase Firestore Adapter ────────────────────────────────
+ * ─── Prisma Client — SQLite Native Connection ─────────────────────────────────
  *
- * Mapea todas las llamadas de base de datos a colecciones Firestore emulando Prisma.
+ * Utiliza Prisma Client v7 con el adaptador nativo @prisma/adapter-better-sqlite3
+ * conectado directamente a la base de datos SQLite (dev.db).
  */
-const prisma = require('./firestorePrismaAdapter');
+const { PrismaClient } = require('@prisma/client');
+const { PrismaBetterSqlite3 } = require('@prisma/adapter-better-sqlite3');
+const path = require('path');
 
-console.log('[Prisma-Firestore] Inicializando adaptador para base de datos Firestore');
+const dbPath = process.env.DATABASE_URL
+  ? process.env.DATABASE_URL.replace('file:', '')
+  : path.join(__dirname, 'dev.db');
+
+const adapter = new PrismaBetterSqlite3({ url: `file:${dbPath}` });
+const prisma = new PrismaClient({ adapter });
 
 module.exports = prisma;

@@ -13,7 +13,7 @@ export default function Newbery3DHero() {
     // Verificar si WebGL está soportado por el navegador
     if (!BABYLON.Engine.isSupported()) {
       console.warn("WebGL no está soportado en este navegador. Cargando fallback.");
-      setWebGLSupported(false);
+      setTimeout(() => setWebGLSupported(false), 0);
       return;
     }
 

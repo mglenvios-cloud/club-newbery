@@ -1,51 +1,32 @@
 "use client";
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  Users, Calendar, FileText, Clipboard, Plus, Edit, Trash, X, Check,
-  AlertCircle, Save, Clock, Shield, Award, Activity, Heart, Search,
-  Trophy, UserCheck, HelpCircle, FileCheck, RefreshCw, BarChart2, Star,
-  Wifi, WifiOff, Database, Server, Zap, Circle, Printer
+  LayoutDashboard, Trophy, Users, Sprout, Calendar, UserCheck,
+  FileText, BarChart2, RefreshCw, Wifi, WifiOff, Database,
+  AlertCircle, CheckCircle, Zap, Activity, ChevronRight,
+  Plus, Edit, Trash2, X, Save, Clock, Shield, Star,
+  Search, Filter, Medal, Settings, Newspaper, Camera
 } from 'lucide-react';
 import { apiFetch } from '@/lib/apiClient';
-import { API_URL, DEMO_MODE } from '@/config';
+import { API_URL } from '@/config';
+
+// ── Sub-Components ────────────────────────────────────────────────────────────
+import DashboardTab from './_components/DashboardTab';
+import CategoriasTab from './_components/CategoriasTab';
+import PlantelTab from './_components/PlantelTab';
+import SemilleroTab from './_components/SemilleroTab';
+import CalendarioTab from './_components/CalendarioTab';
+import ReportesTab from './_components/ReportesTab';
+import GaleriaTab from './_components/GaleriaTab';
 import MediaUploadUniversal from '@/components/MediaUploadUniversal';
 
-const fetch = apiFetch;
+// ── Official Categories ───────────────────────────────────────────────────────
+const OFFICIAL_CATEGORIES = [
+  'Primera', 'Reserva', '3ra', '4ta', '5ta', '6ta', '7ma', '8va',
+  'Escuelita', 'Pre Infantil', 'Infantil'
+];
 
-// ─── DEMO DATA FOR DEVELOPMENT ONLY ───────────────────────────────────────────
-const DEMO_TEAMS = [
-  { id: 1, name: 'Primera (Demo)', category: 'Primera Masculina', season: '2026', coach: 'Prof. Martínez', assistantCoach: 'Prof. López', preparadorFisico: 'Prof. García', status: 'ACTIVE', description: 'Equipo de primera división masculino', imageUrl: '' },
-  { id: 2, name: 'Reserva (Demo)', category: 'Reserva Masculina', season: '2026', coach: 'Prof. Rodríguez', assistantCoach: '', preparadorFisico: '', status: 'ACTIVE', description: 'Equipo de reserva masculino', imageUrl: '' }
-];
-const DEMO_CATEGORIES = [
-  { id: 1, name: 'Categoría 2012 (Demo)', type: 'DISCIPLINA', price: 3500, description: 'Jugadores nacidos en 2012' }
-];
-const DEMO_PLAYERS = [
-  { id: 1, name: 'Lucas (Demo)', lastName: 'González', dorsal: 1, age: 22, category: 'Primera Masculina', position: 'Arquero', team: 'Primera', matchesPlayed: 18, goals: 0, assists: 2, yellowCards: 1, redCards: 0, cleanSheets: 9, playerStatus: 'ACTIVE', birthDate: '2004-07-15T00:00:00.000Z', photoUrl: null }
-];
-const DEMO_COACHES = [
-  { id: 1, name: 'Carlos Martínez (Demo)', role: 'ENTRENADOR', categories: 'Primera, Reserva', license: 'ATFA Pro', phone: '351-555-0101', email: 'cmartinez@newbery.com', biography: 'DT con 10 años de experiencia en futsal de alto rendimiento.', photoUrl: null }
-];
-const DEMO_MATCHES = [
-  { id: 1, category: 'Primera Masculina', opponent: 'Talleres (Demo)', homeTeam: 'Jorge Newbery', awayTeam: 'Talleres', date: new Date(Date.now() + 7*24*60*60*1000).toISOString(), timeSlot: '20:00', ourScore: null, opponentScore: null, status: 'UPCOMING', competition: 'AFA Primera', venue: 'Cancha Jorge Newbery', season: '2026', isFeatured: true }
-];
-const DEMO_STATS = {
-  totalTeams: 2,
-  totalCategories: 1,
-  totalPlayers: 1,
-  totalCoaches: 1,
-  totalAssistants: 0,
-  totalPFs: 0,
-  trainingsToday: 0,
-  injuredPlayers: 0,
-  suspendedPlayers: 0,
-  upcomingMatches: [],
-  weeklyTrainings: [],
-  birthdays: [],
-  publishedNews: 0
-};
-
-// ─── FETCH WITH RETRY ─────────────────────────────────────────────────────────
+// ── Fetch with Retry ──────────────────────────────────────────────────────────
 async function fetchWithRetry(url, options = {}, maxRetries = 3) {
   let lastError;
   for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -65,30 +46,606 @@ async function fetchWithRetry(url, options = {}, maxRetries = 3) {
   throw lastError;
 }
 
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function Toast({ toast }) {
+  if (!toast) return null;
+  const colors = {
+    success: 'bg-green-600',
+    error: 'bg-red-600',
+    warn: 'bg-yellow-600',
+    info: 'bg-blue-600',
+  };
+  return (
+    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl text-white text-sm font-black shadow-2xl transition-all ${colors[toast.type] || colors.info}`}>
+      {toast.type === 'success' && <CheckCircle size={16} />}
+      {toast.type === 'error' && <AlertCircle size={16} />}
+      {toast.type === 'warn' && <AlertCircle size={16} />}
+      {toast.message}
+    </div>
+  );
+}
 
-export default function AdminGestionDeportiva() {
+// ── Coach Form Modal ──────────────────────────────────────────────────────────
+function CoachModal({ isOpen, editId, form, onChange, onSave, onClose, loading }) {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <h2 className="text-xl font-black text-gray-900">{editId ? 'Editar Cuerpo Técnico' : 'Nuevo Miembro'}</h2>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl"><X size={18} /></button>
+        </div>
+        <form onSubmit={onSave} className="p-6 space-y-4">
+          <div className="flex justify-center mb-2">
+            <MediaUploadUniversal
+              value={form.photoUrl}
+              onChange={(url) => onChange({ target: { name: 'photoUrl', value: url } })}
+              label="Foto"
+              accept="image/*"
+              compact
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase tracking-wider">Nombre completo *</label>
+              <input name="name" value={form.name} onChange={onChange} required className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase tracking-wider">Rol</label>
+              <select name="role" value={form.role} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none">
+                <option value="ENTRENADOR">Entrenador</option>
+                <option value="ASISTENTE">Asistente</option>
+                <option value="PREPARADOR_FISICO">Preparador Físico</option>
+                <option value="DELEGADO">Delegado</option>
+                <option value="MEDICO">Médico</option>
+                <option value="KINESIOLOGO">Kinesiólogo</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase tracking-wider">Categorías</label>
+              <input name="categories" value={form.categories} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" placeholder="Primera, Reserva..." />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase tracking-wider">Licencia</label>
+              <input name="license" value={form.license} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase tracking-wider">Teléfono</label>
+              <input name="phone" value={form.phone} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase tracking-wider">Email</label>
+              <input type="email" name="email" value={form.email} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase tracking-wider">Biografía</label>
+              <textarea name="biography" value={form.biography} onChange={onChange} rows={3} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none resize-none" />
+            </div>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button type="submit" disabled={loading} className="flex-1 py-2.5 bg-jn-red text-white rounded-xl font-black text-sm hover:bg-red-700 transition-colors disabled:opacity-50">
+              {loading ? 'Guardando...' : editId ? 'Actualizar' : 'Registrar'}
+            </button>
+            <button type="button" onClick={onClose} className="px-6 py-2.5 border border-gray-200 rounded-xl font-bold text-sm hover:bg-gray-50 transition-colors">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Match Modal ───────────────────────────────────────────────────────────────
+function MatchModal({ isOpen, editId, form, onChange, onSave, onClose, loading }) {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
+          <h2 className="text-xl font-black text-gray-900">{editId ? 'Editar Partido' : 'Nuevo Partido'}</h2>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl"><X size={18} /></button>
+        </div>
+        <form onSubmit={onSave} className="p-6 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Categoría</label>
+              <select name="category" value={form.category} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none">
+                {OFFICIAL_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Rival *</label>
+              <input name="opponent" value={form.opponent} onChange={onChange} required className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" placeholder="Nombre del equipo rival" />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Fecha</label>
+              <input type="date" name="date" value={form.date} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Hora</label>
+              <input name="timeSlot" value={form.timeSlot} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" placeholder="20:00" />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Estado</label>
+              <select name="status" value={form.status} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none">
+                <option value="UPCOMING">Próximo</option>
+                <option value="LIVE">En Vivo</option>
+                <option value="COMPLETED">Finalizado</option>
+                <option value="CANCELLED">Cancelado</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Competencia</label>
+              <input name="competition" value={form.competition} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Goles Newbery</label>
+              <input type="number" name="ourScore" value={form.ourScore} onChange={onChange} min="0" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Goles Rival</label>
+              <input type="number" name="opponentScore" value={form.opponentScore} onChange={onChange} min="0" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Cancha</label>
+              <input name="venue" value={form.venue} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" />
+            </div>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button type="submit" disabled={loading} className="flex-1 py-2.5 bg-jn-red text-white rounded-xl font-black text-sm hover:bg-red-700 transition-colors disabled:opacity-50">
+              {loading ? 'Guardando...' : editId ? 'Actualizar' : 'Registrar Partido'}
+            </button>
+            <button type="button" onClick={onClose} className="px-6 py-2.5 border border-gray-200 rounded-xl font-bold text-sm hover:bg-gray-50">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Training Modal ────────────────────────────────────────────────────────────
+function TrainingModal({ isOpen, editId, form, onChange, onSave, onClose, loading }) {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <h2 className="text-xl font-black text-gray-900">{editId ? 'Editar Entrenamiento' : 'Nuevo Entrenamiento'}</h2>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl"><X size={18} /></button>
+        </div>
+        <form onSubmit={onSave} className="p-6 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Categoría</label>
+              <select name="category" value={form.category} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none">
+                {OFFICIAL_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Fecha</label>
+              <input type="date" name="date" value={form.date} onChange={onChange} required className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Horario</label>
+              <input name="timeSlot" value={form.timeSlot} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" placeholder="19:00" />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Cancha</label>
+              <input name="court" value={form.court} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Entrenador</label>
+              <input name="coach" value={form.coach} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Objetivo</label>
+              <input name="objective" value={form.objective} onChange={onChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none" />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-black text-gray-700 mb-1 uppercase">Notas</label>
+              <textarea name="notes" value={form.notes} onChange={onChange} rows={2} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-jn-red outline-none resize-none" />
+            </div>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button type="submit" disabled={loading} className="flex-1 py-2.5 bg-jn-red text-white rounded-xl font-black text-sm hover:bg-red-700 transition-colors disabled:opacity-50">
+              {loading ? 'Guardando...' : editId ? 'Actualizar' : 'Registrar Entrenamiento'}
+            </button>
+            <button type="button" onClick={onClose} className="px-6 py-2.5 border border-gray-200 rounded-xl font-bold text-sm hover:bg-gray-50">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Coaches Tab ───────────────────────────────────────────────────────────────
+function CoachesTab({ coaches, onSaveCoach, onDeleteCoach, loading }) {
+  const [coachModal, setCoachModal] = useState({ isOpen: false, editId: null });
+  const [coachForm, setCoachForm] = useState({ photoUrl: '', name: '', role: 'ENTRENADOR', categories: '', license: '', phone: '', email: '', biography: '' });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCoachForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEdit = (coach) => {
+    setCoachForm({ ...coach });
+    setCoachModal({ isOpen: true, editId: coach.id });
+  };
+
+  const handleSave = (e) => {
+    e.preventDefault();
+    onSaveCoach(coachForm, coachModal.editId);
+    setCoachModal({ isOpen: false, editId: null });
+  };
+
+  const ROLE_LABELS = {
+    ENTRENADOR: 'Entrenador',
+    ASISTENTE: 'Asistente',
+    PREPARADOR_FISICO: 'Prep. Físico',
+    DELEGADO: 'Delegado',
+    MEDICO: 'Médico',
+    KINESIOLOGO: 'Kinesiólogo',
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-black text-gray-900">Cuerpo Técnico</h2>
+          <p className="text-sm text-gray-400 font-medium">{coaches.length} miembros registrados</p>
+        </div>
+        <button onClick={() => { setCoachForm({ photoUrl: '', name: '', role: 'ENTRENADOR', categories: '', license: '', phone: '', email: '', biography: '' }); setCoachModal({ isOpen: true, editId: null }); }} className="flex items-center gap-2 px-5 py-2.5 bg-jn-red text-white rounded-xl text-sm font-black hover:bg-red-700 transition-all shadow-lg shadow-red-500/30">
+          <Plus size={16} />
+          Nuevo Miembro
+        </button>
+      </div>
+
+      {coaches.length === 0 ? (
+        <div className="text-center py-20 text-gray-400">
+          <UserCheck size={48} className="text-gray-200 mx-auto mb-4" />
+          <h3 className="text-lg font-black text-gray-500">Sin cuerpo técnico registrado</h3>
+          <p className="text-sm font-medium mt-1">Comenzá registrando el primer entrenador</p>
+          <button onClick={() => { setCoachForm({ photoUrl: '', name: '', role: 'ENTRENADOR', categories: '', license: '', phone: '', email: '', biography: '' }); setCoachModal({ isOpen: true, editId: null }); }} className="mt-4 px-6 py-3 bg-jn-red text-white rounded-xl text-sm font-black">+ Registrar Entrenador</button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {coaches.map(coach => (
+            <div key={coach.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1 group">
+              <div className="h-36 bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden">
+                {coach.photoUrl ? (
+                  <img src={coach.photoUrl} alt={coach.name} className="w-full h-full object-cover object-top opacity-80" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center">
+                      <UserCheck size={24} className="text-white/40" />
+                    </div>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-3">
+                  <span className="text-[9px] font-black bg-jn-red text-white px-2 py-0.5 rounded-full uppercase">
+                    {ROLE_LABELS[coach.role] || coach.role}
+                  </span>
+                </div>
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => handleEdit(coach)} className="p-1.5 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-lg">
+                    <Edit size={12} className="text-white" />
+                  </button>
+                  <button onClick={() => onDeleteCoach(coach.id)} className="p-1.5 bg-red-500/60 hover:bg-red-500 backdrop-blur-sm rounded-lg">
+                    <Trash2 size={12} className="text-white" />
+                  </button>
+                </div>
+              </div>
+              <div className="p-4">
+                <h3 className="font-black text-gray-900 text-sm">{coach.name}</h3>
+                {coach.categories && <p className="text-[10px] text-gray-400 font-bold mt-0.5">{coach.categories}</p>}
+                {coach.license && (
+                  <div className="flex items-center gap-1 mt-2">
+                    <Shield size={10} className="text-jn-red" />
+                    <span className="text-[10px] font-bold text-gray-500">{coach.license}</span>
+                  </div>
+                )}
+                {coach.biography && (
+                  <p className="text-[10px] text-gray-400 mt-2 line-clamp-2 leading-relaxed">{coach.biography}</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <CoachModal isOpen={coachModal.isOpen} editId={coachModal.editId} form={coachForm} onChange={handleChange} onSave={handleSave} onClose={() => setCoachModal({ isOpen: false, editId: null })} loading={loading} />
+    </div>
+  );
+}
+
+// ── Matches Tab ───────────────────────────────────────────────────────────────
+function MatchesTab({ matches, onSaveMatch, onDeleteMatch, loading }) {
+  const [matchModal, setMatchModal] = useState({ isOpen: false, editId: null });
+  const [filterCat, setFilterCat] = useState('ALL');
+  const [filterStatus, setFilterStatus] = useState('ALL');
+  const [matchForm, setMatchForm] = useState({
+    category: 'Primera', opponent: '', homeTeam: 'Jorge Newbery', awayTeam: '',
+    referee: '', attendance: 0, date: '', timeSlot: '', ourScore: 0, opponentScore: 0,
+    status: 'UPCOMING', competition: 'AFA Futsal', venue: 'Cancha Jorge Newbery', season: '2026', isFeatured: false
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setMatchForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = (e) => {
+    e.preventDefault();
+    onSaveMatch(matchForm, matchModal.editId);
+    setMatchModal({ isOpen: false, editId: null });
+  };
+
+  const handleEdit = (match) => {
+    setMatchForm({
+      ...match,
+      date: match.date ? new Date(match.date).toISOString().split('T')[0] : '',
+    });
+    setMatchModal({ isOpen: true, editId: match.id });
+  };
+
+  const STATUS_LABELS = { UPCOMING: 'Próximo', LIVE: 'En Vivo', COMPLETED: 'Finalizado', CANCELLED: 'Cancelado' };
+  const STATUS_COLORS = {
+    UPCOMING: 'bg-blue-100 text-blue-700',
+    LIVE: 'bg-red-100 text-red-700',
+    COMPLETED: 'bg-gray-100 text-gray-600',
+    CANCELLED: 'bg-yellow-100 text-yellow-700',
+  };
+
+  const filtered = matches.filter(m => {
+    const matchCat = filterCat === 'ALL' || (m.category || '').toLowerCase().includes(filterCat.toLowerCase());
+    const matchStatus = filterStatus === 'ALL' || m.status === filterStatus;
+    return matchCat && matchStatus;
+  });
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-black text-gray-900">Partidos</h2>
+          <p className="text-sm text-gray-400 font-medium">{filtered.length} partidos</p>
+        </div>
+        <button onClick={() => { setMatchForm({ category: 'Primera', opponent: '', homeTeam: 'Jorge Newbery', awayTeam: '', referee: '', attendance: 0, date: '', timeSlot: '', ourScore: 0, opponentScore: 0, status: 'UPCOMING', competition: 'AFA Futsal', venue: 'Cancha Jorge Newbery', season: '2026', isFeatured: false }); setMatchModal({ isOpen: true, editId: null }); }} className="flex items-center gap-2 px-5 py-2.5 bg-jn-red text-white rounded-xl text-sm font-black hover:bg-red-700 transition-all shadow-lg shadow-red-500/30">
+          <Plus size={16} />
+          Nuevo Partido
+        </button>
+      </div>
+
+      {/* Filters */}
+      <div className="flex gap-3 flex-wrap">
+        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} className="px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold focus:border-jn-red outline-none shadow-sm">
+          <option value="ALL">Todas las categorías</option>
+          {OFFICIAL_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+        {['ALL', 'UPCOMING', 'LIVE', 'COMPLETED', 'CANCELLED'].map(s => (
+          <button key={s} onClick={() => setFilterStatus(s)} className={`px-3 py-2 rounded-xl text-xs font-black transition-all ${filterStatus === s ? 'bg-gray-900 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+            {s === 'ALL' ? 'Todos' : STATUS_LABELS[s]}
+          </button>
+        ))}
+      </div>
+
+      {/* Matches List */}
+      {filtered.length === 0 ? (
+        <div className="text-center py-20 text-gray-400">
+          <Trophy size={48} className="text-gray-200 mx-auto mb-4" />
+          <h3 className="text-lg font-black text-gray-500">Sin partidos</h3>
+          <button onClick={() => { setMatchForm({ category: 'Primera', opponent: '', homeTeam: 'Jorge Newbery', awayTeam: '', date: '', timeSlot: '', ourScore: 0, opponentScore: 0, status: 'UPCOMING', competition: 'AFA Futsal', venue: 'Cancha Jorge Newbery', season: '2026', isFeatured: false, referee: '', attendance: 0 }); setMatchModal({ isOpen: true, editId: null }); }} className="mt-4 px-6 py-3 bg-jn-red text-white rounded-xl text-sm font-black">+ Cargar Primer Partido</button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map(m => {
+            const won = m.status === 'COMPLETED' && m.ourScore > m.opponentScore;
+            const draw = m.status === 'COMPLETED' && m.ourScore === m.opponentScore;
+            const lost = m.status === 'COMPLETED' && m.ourScore < m.opponentScore;
+            return (
+              <div key={m.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 hover:shadow-md transition-all">
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${m.status === 'LIVE' ? 'bg-red-100' : m.status === 'UPCOMING' ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                    {m.status === 'LIVE' ? <Activity size={18} className="text-red-600 animate-pulse" /> : <Trophy size={18} className="text-gray-500" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <p className="font-black text-gray-900 text-sm">Jorge Newbery vs {m.opponent}</p>
+                      {m.isFeatured && <Star size={12} className="text-yellow-500" fill="#EAB308" />}
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                      <span className="font-bold">{m.category}</span>
+                      <span>·</span>
+                      <span>{m.competition}</span>
+                      {m.date && <><span>·</span><span>{new Date(m.date).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })}</span></>}
+                      {m.timeSlot && <span>{m.timeSlot}</span>}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {m.status === 'COMPLETED' && (
+                      <div className="text-center">
+                        <span className={`text-2xl font-black ${won ? 'text-green-600' : draw ? 'text-yellow-600' : 'text-red-600'}`}>
+                          {m.ourScore} - {m.opponentScore}
+                        </span>
+                        <p className={`text-[9px] font-black ${won ? 'text-green-600' : draw ? 'text-yellow-600' : 'text-red-600'}`}>
+                          {won ? 'VICTORIA' : draw ? 'EMPATE' : 'DERROTA'}
+                        </p>
+                      </div>
+                    )}
+                    <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${STATUS_COLORS[m.status] || STATUS_COLORS.UPCOMING}`}>
+                      {STATUS_LABELS[m.status] || m.status}
+                    </span>
+                    <div className="flex gap-1">
+                      <button onClick={() => handleEdit(m)} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"><Edit size={14} className="text-gray-500" /></button>
+                      <button onClick={() => onDeleteMatch(m.id)} className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={14} className="text-red-500" /></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <MatchModal isOpen={matchModal.isOpen} editId={matchModal.editId} form={matchForm} onChange={handleChange} onSave={handleSave} onClose={() => setMatchModal({ isOpen: false, editId: null })} loading={loading} />
+    </div>
+  );
+}
+
+// ── Trainings Tab ─────────────────────────────────────────────────────────────
+function TrainingsTab({ trainings, onSaveTraining, onDeleteTraining, loading }) {
+  const [trainingModal, setTrainingModal] = useState({ isOpen: false, editId: null });
+  const [filterCat, setFilterCat] = useState('ALL');
+  const [trainingForm, setTrainingForm] = useState({
+    date: '', timeSlot: '', category: 'Primera', team: '', coach: '',
+    court: 'Cancha Parquet', objective: '', notes: '', status: 'SCHEDULED'
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setTrainingForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = (e) => {
+    e.preventDefault();
+    onSaveTraining(trainingForm, trainingModal.editId);
+    setTrainingModal({ isOpen: false, editId: null });
+  };
+
+  const handleEdit = (t) => {
+    setTrainingForm({ ...t, date: t.date ? new Date(t.date).toISOString().split('T')[0] : '' });
+    setTrainingModal({ isOpen: true, editId: t.id });
+  };
+
+  const filtered = filterCat === 'ALL' ? trainings : trainings.filter(t => (t.category || '').toLowerCase().includes(filterCat.toLowerCase()));
+
+  const today = new Date().toDateString();
+  const todayTrainings = filtered.filter(t => new Date(t.date).toDateString() === today);
+  const upcoming = filtered.filter(t => new Date(t.date) > new Date()).sort((a, b) => new Date(a.date) - new Date(b.date));
+  const past = filtered.filter(t => new Date(t.date) < new Date()).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-black text-gray-900">Entrenamientos</h2>
+          <p className="text-sm text-gray-400 font-medium">{todayTrainings.length} hoy · {upcoming.length} próximos</p>
+        </div>
+        <button onClick={() => { setTrainingForm({ date: '', timeSlot: '', category: 'Primera', team: '', coach: '', court: 'Cancha Parquet', objective: '', notes: '', status: 'SCHEDULED' }); setTrainingModal({ isOpen: true, editId: null }); }} className="flex items-center gap-2 px-5 py-2.5 bg-jn-red text-white rounded-xl text-sm font-black hover:bg-red-700 transition-all shadow-lg shadow-red-500/30">
+          <Plus size={16} />
+          Nuevo Entrenamiento
+        </button>
+      </div>
+
+      <select value={filterCat} onChange={e => setFilterCat(e.target.value)} className="px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold focus:border-jn-red outline-none shadow-sm">
+        <option value="ALL">Todas las categorías</option>
+        {OFFICIAL_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+      </select>
+
+      {todayTrainings.length > 0 && (
+        <div>
+          <h3 className="text-sm font-black text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            HOY
+          </h3>
+          <div className="space-y-2">
+            {todayTrainings.map(t => (
+              <TrainingItem key={t.id} training={t} onEdit={handleEdit} onDelete={onDeleteTraining} highlight />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {upcoming.length > 0 && (
+        <div>
+          <h3 className="text-sm font-black text-gray-500 uppercase tracking-wider mb-3">PRÓXIMOS</h3>
+          <div className="space-y-2">
+            {upcoming.slice(0, 10).map(t => (
+              <TrainingItem key={t.id} training={t} onEdit={handleEdit} onDelete={onDeleteTraining} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {past.length > 0 && (
+        <div>
+          <h3 className="text-sm font-black text-gray-500 uppercase tracking-wider mb-3">HISTORIAL</h3>
+          <div className="space-y-2">
+            {past.slice(0, 10).map(t => (
+              <TrainingItem key={t.id} training={t} onEdit={handleEdit} onDelete={onDeleteTraining} past />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {filtered.length === 0 && (
+        <div className="text-center py-20 text-gray-400">
+          <Calendar size={48} className="text-gray-200 mx-auto mb-4" />
+          <h3 className="text-lg font-black text-gray-500">Sin entrenamientos</h3>
+          <button onClick={() => { setTrainingForm({ date: '', timeSlot: '', category: 'Primera', team: '', coach: '', court: 'Cancha Parquet', objective: '', notes: '', status: 'SCHEDULED' }); setTrainingModal({ isOpen: true, editId: null }); }} className="mt-4 px-6 py-3 bg-jn-red text-white rounded-xl text-sm font-black">+ Cargar Entrenamiento</button>
+        </div>
+      )}
+
+      <TrainingModal isOpen={trainingModal.isOpen} editId={trainingModal.editId} form={trainingForm} onChange={handleChange} onSave={handleSave} onClose={() => setTrainingModal({ isOpen: false, editId: null })} loading={loading} />
+    </div>
+  );
+}
+
+function TrainingItem({ training, onEdit, onDelete, highlight, past }) {
+  return (
+    <div className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all hover:shadow-sm ${highlight ? 'bg-red-50 border-jn-red/20' : past ? 'bg-gray-50 border-gray-100 opacity-70' : 'bg-white border-gray-100'}`}>
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${highlight ? 'bg-jn-red/10' : 'bg-gray-100'}`}>
+        <Calendar size={16} className={highlight ? 'text-jn-red' : 'text-gray-400'} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-black text-gray-900 text-sm">{training.category} {training.coach ? `· ${training.coach}` : ''}</p>
+        <p className="text-[11px] text-gray-400 font-bold">
+          {new Date(training.date).toLocaleDateString('es-AR', { weekday: 'long', day: '2-digit', month: 'long' })}
+          {training.timeSlot ? ` · ${training.timeSlot}` : ''}
+          {training.court ? ` · ${training.court}` : ''}
+        </p>
+        {training.objective && <p className="text-[10px] text-gray-400 truncate">{training.objective}</p>}
+      </div>
+      <div className="flex gap-1 flex-shrink-0">
+        <button onClick={() => onEdit(training)} className="p-1.5 hover:bg-gray-100 rounded-lg"><Edit size={13} className="text-gray-500" /></button>
+        <button onClick={() => onDelete(training.id)} className="p-1.5 hover:bg-red-50 rounded-lg"><Trash2 size={13} className="text-red-500" /></button>
+      </div>
+    </div>
+  );
+}
+
+// ── Sidebar Nav ───────────────────────────────────────────────────────────────
+const NAV_ITEMS = [
+  { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { key: 'categorias', label: 'Categorías', icon: Trophy },
+  { key: 'planteles', label: 'Planteles', icon: Users },
+  { key: 'semillero', label: 'El Semillero', icon: Sprout },
+  { key: 'matches', label: 'Partidos', icon: Activity },
+  { key: 'trainings', label: 'Entrenamientos', icon: Calendar },
+  { key: 'coaches', label: 'Cuerpo Técnico', icon: UserCheck },
+  { key: 'galeria', label: 'Galería', icon: Camera },
+  { key: 'calendario', label: 'Calendario', icon: Calendar },
+  { key: 'reportes', label: 'Reportes', icon: BarChart2 },
+];
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
+export default function GestionDeportivaPage() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [stats, setStats] = useState(null);
   const [players, setPlayers] = useState([]);
   const [trainings, setTrainings] = useState([]);
-  const [documents, setDocuments] = useState([]);
   const [teams, setTeams] = useState([]);
   const [coaches, setCoaches] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [matches, setMatches] = useState([]);
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
   const [skeletonLoading, setSkeletonLoading] = useState(true);
   const [usingDemoData, setUsingDemoData] = useState(false);
-  const [lastSync, setLastSync] = useState(null);
-  const [responseTime, setResponseTime] = useState(null);
-  const [apiStatus, setApiStatus] = useState({ api: null, db: null, server: null });
-  const [failedEndpoints, setFailedEndpoints] = useState([]);
-  const [syncPulse, setSyncPulse] = useState(false);
+  const [apiStatus, setApiStatus] = useState({ api: null });
+  const [filterCategory, setFilterCategory] = useState('ALL');
   const autoRefreshRef = useRef(null);
-  const CACHE_KEY = 'jn_gestion_cache';
+  const CACHE_KEY = 'jn_gestion_v2_cache';
 
-  // ─── Helpers de caché local ──────────────────────────────────────────────
   const saveCache = (data) => {
     try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ...data, cachedAt: Date.now() })); } catch {}
   };
@@ -97,2507 +654,370 @@ export default function AdminGestionDeportiva() {
       const raw = localStorage.getItem(CACHE_KEY);
       if (!raw) return null;
       const d = JSON.parse(raw);
-      if (Date.now() - d.cachedAt > 30 * 60 * 1000) return null; // 30 min TTL
+      if (Date.now() - d.cachedAt > 30 * 60 * 1000) return null;
       return d;
     } catch { return null; }
   };
-
-  // Modales
-  const [teamModal, setTeamModal] = useState({ isOpen: false, editId: null });
-  const [playerModal, setPlayerModal] = useState({ isOpen: false, editId: null });
-  const [trainingModal, setTrainingModal] = useState({ isOpen: false, editId: null });
-  const [coachModal, setCoachModal] = useState({ isOpen: false, editId: null });
-  const [categoryModal, setCategoryModal] = useState({ isOpen: false, editId: null });
-  const [matchModal, setMatchModal] = useState({ isOpen: false, editId: null });
-  const [docModal, setDocModal] = useState({ isOpen: false });
-
-  // Modales Adicionales
-  const [assignModal, setAssignModal] = useState({ isOpen: false, player: null });
-
-  // Forms
-  const [teamForm, setTeamForm] = useState({
-    name: '', category: 'Primera Masculina', season: '2026', imageUrl: '', description: '', coach: '', assistantCoach: '', preparadorFisico: '', status: 'ACTIVE'
-  });
-
-  const [playerForm, setPlayerForm] = useState({
-    name: '', lastName: '', age: '', dorsal: 0, category: 'Primera Masculina', position: 'Ala', team: 'Futsal AFA', achievements: '', matchesPlayed: 0, goals: 0, assists: 0, yellowCards: 0, redCards: 0, cleanSheets: 0, playerStatus: 'ACTIVE', description: '', birthDate: '', photoUrl: '',
-    phone: '', email: '', address: '', dni: '', dominantFoot: 'DERECHA', height: '', weight: '', observations: ''
-  });
-
-  const [trainingForm, setTrainingForm] = useState({
-    date: '', timeSlot: '', category: 'Primera Masculina', team: '', coach: '', court: 'Cancha Parquet', objective: '', notes: '', status: 'SCHEDULED'
-  });
-
-  const [coachForm, setCoachForm] = useState({
-    photoUrl: '', name: '', role: 'ENTRENADOR', categories: '', license: '', phone: '', email: '', biography: ''
-  });
-
-  const [categoryForm, setCategoryForm] = useState({
-    name: '', type: 'DISCIPLINA', price: 0, description: ''
-  });
-
-  const [matchForm, setMatchForm] = useState({
-    category: 'Primera Masculina', opponent: '', homeTeam: 'Jorge Newbery', awayTeam: '', referee: '', attendance: 0, date: '', timeSlot: '', ourScore: 0, opponentScore: 0, status: 'UPCOMING', competition: 'AFA Primera', venue: 'Cancha Jorge Newbery', season: '2026', isFeatured: false
-  });
-
-  const [docForm, setDocForm] = useState({
-    title: '', url: '', category: 'Reglamento', description: ''
-  });
-
-  // Filtros
-  const [searchPlayer, setSearchPlayer] = useState('');
-  const [filterTeam, setFilterTeam] = useState('ALL');
-  const [reportFilter, setReportFilter] = useState({
-    type: 'team', id: '', category: '', season: '2026'
-  });
-
-  // Calendar State
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 4000);
   };
 
-  // ─── Fetching General con recuperación automática ──────────────────────
   const fetchAllData = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true);
-    setSkeletonLoading(true);
-    const failed = [];
-    const startTime = Date.now();
+    if (!silent) setSkeletonLoading(true);
 
-    const tryFetch = async (label, url) => {
+    const tryFetch = async (url) => {
       try {
         const res = await fetchWithRetry(url);
-        if (!res.ok) {
-          failed.push(`${label} → HTTP ${res.status}`);
-          console.error(`[API] ${label} falló con status ${res.status}`);
-          return null;
-        }
+        if (!res.ok) return null;
         return await res.json();
-      } catch (err) {
-        failed.push(`${label} → ${err.name === 'AbortError' ? 'Timeout' : err.message}`);
-        console.error(`[API] ${label} error:`, err.message);
-        return null;
-      }
+      } catch { return null; }
     };
 
-    // Verificar salud de la API primero
     let apiOnline = false;
     try {
       const healthRes = await fetchWithRetry(`${API_URL}/`, {}, 2);
       apiOnline = healthRes.ok;
-    } catch {
-      apiOnline = false;
-    }
-    const elapsed = Date.now() - startTime;
-    setResponseTime(elapsed);
-    setApiStatus({ api: apiOnline, db: apiOnline, server: apiOnline });
+    } catch { apiOnline = false; }
+
+    setApiStatus({ api: apiOnline });
 
     if (!apiOnline) {
-      // Intentar cargar desde caché
       const cached = loadCache();
       if (cached) {
         setStats(cached.stats || null);
         setPlayers(cached.players || []);
         setTrainings(cached.trainings || []);
-        setDocuments(cached.documents || []);
         setTeams(cached.teams || []);
         setCoaches(cached.coaches || []);
-        setCategories(cached.categories || []);
         setMatches(cached.matches || []);
-        setUsingDemoData(false);
-        showToast('⚠️ API no disponible — usando datos en caché', 'warn');
-      } else {
-        setStats(null);
-        setPlayers([]);
-        setTrainings([]);
-        setDocuments([]);
-        setTeams([]);
-        setCoaches([]);
-        setCategories([]);
-        setMatches([]);
-        setUsingDemoData(false);
-        showToast('🔌 API offline — No se pudieron cargar los datos', 'error');
+        if (!silent) showToast('⚠️ Usando datos en caché', 'warn');
       }
-      setFailedEndpoints([`Servidor no responde`]);
-      setLoading(false);
       setSkeletonLoading(false);
       return;
     }
 
-    // API online — obtener datos reales en paralelo
-    const [statsData, playersData, trainingsData, docsData, teamsData, coachesData, catsData, matchesData] = await Promise.all([
-      tryFetch('Stats deportivos', `/api/gestion-deportiva/stats`),
-      tryFetch('Jugadores', `/api/players`),
-      tryFetch('Entrenamientos', `/api/gestion-deportiva/trainings`),
-      tryFetch('Documentos', `/api/gestion-deportiva/documents`),
-      tryFetch('Equipos', `/api/teams`),
-      tryFetch('Entrenadores', `/api/gestion-deportiva/coaches`),
-      tryFetch('Categorías', `/api/categories`),
-      tryFetch('Partidos', `/api/matches`),
+    const [statsData, playersData, trainingsData, teamsData, coachesData, matchesData] = await Promise.all([
+      tryFetch(`/api/gestion-deportiva/stats`),
+      tryFetch(`/api/players`),
+      tryFetch(`/api/gestion-deportiva/trainings`),
+      tryFetch(`/api/teams`),
+      tryFetch(`/api/gestion-deportiva/coaches`),
+      tryFetch(`/api/matches`),
     ]);
 
-    const newStats     = statsData    || null;
-    const newPlayers   = playersData  || [];
-    const newTrainings = trainingsData || [];
-    const newDocs      = docsData     || [];
-    const newTeams     = teamsData    || [];
-    const newCoaches   = coachesData  || [];
-    const newCats      = catsData     || [];
-    const newMatches   = matchesData  || [];
+    const newStats = statsData || null;
+    const newPlayers = Array.isArray(playersData) ? playersData : [];
+    const newTrainings = Array.isArray(trainingsData) ? trainingsData : [];
+    const newTeams = Array.isArray(teamsData) ? teamsData : [];
+    const newCoaches = Array.isArray(coachesData) ? coachesData : [];
+    const newMatches = Array.isArray(matchesData) ? matchesData : [];
 
     setStats(newStats);
     setPlayers(newPlayers);
     setTrainings(newTrainings);
-    setDocuments(newDocs);
     setTeams(newTeams);
     setCoaches(newCoaches);
-    setCategories(newCats);
     setMatches(newMatches);
-    setFailedEndpoints(failed);
-    setUsingDemoData(false);
 
-    // Guardar en caché
-    saveCache({ stats: newStats, players: newPlayers, trainings: newTrainings, documents: newDocs, teams: newTeams, coaches: newCoaches, categories: newCats, matches: newMatches });
-
-    const now = new Date();
-    setLastSync(now);
-    setSyncPulse(true);
-    setTimeout(() => setSyncPulse(false), 2000);
-
-    if (failed.length > 0) {
-      console.error('[GestionDeportiva] Endpoints con errores:', failed);
-      if (!silent) showToast(`⚠️ ${failed.length} endpoint(s) con error`, 'warn');
-    }
-
-    setLoading(false);
+    saveCache({ stats: newStats, players: newPlayers, trainings: newTrainings, teams: newTeams, coaches: newCoaches, matches: newMatches });
     setSkeletonLoading(false);
+    setUsingDemoData(false);
   }, []);
 
   useEffect(() => {
     fetchAllData();
-    // Auto-refresh cada 30 segundos
     autoRefreshRef.current = setInterval(() => fetchAllData(true), 30000);
     return () => clearInterval(autoRefreshRef.current);
   }, [fetchAllData]);
 
-  // CRUD EQUIPOS
-  const handleSaveTeam = async (e) => {
-    e.preventDefault();
-    if (!teamForm.name) return showToast('El nombre del equipo es obligatorio', 'error');
-    const method = teamModal.editId ? 'PUT' : 'POST';
-    const url = teamModal.editId ? `/api/teams/${teamModal.editId}` : `/api/teams`;
-
+  // ── CRUD: Players ──────────────────────────────────────────────────────────
+  const handleSavePlayer = async (form, editId) => {
+    setLoading(true);
+    const method = editId ? 'PUT' : 'POST';
+    const url = editId ? `/api/players/${editId}` : `/api/players`;
     try {
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(teamForm)
+        body: JSON.stringify(form)
       });
       if (res.ok) {
-        showToast(teamModal.editId ? 'Equipo actualizado' : 'Equipo creado');
-        setTeamModal({ isOpen: false, editId: null });
-        fetchAllData();
+        showToast(editId ? '✅ Jugador actualizado' : '✅ Jugador registrado');
+        fetchAllData(true);
+      } else {
+        showToast('Error al guardar jugador', 'error');
       }
     } catch {
       showToast('Error de conexión', 'error');
     }
-  };
-
-  const handleDeleteTeam = async (id) => {
-    if (!window.confirm('¿Seguro de eliminar este equipo?')) return;
-    try {
-      const res = await fetch(`/api/teams/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        showToast('Equipo eliminado');
-        fetchAllData();
-      }
-    } catch {}
-  };
-
-  // CRUD JUGADORES
-  const handleSavePlayer = async (e) => {
-    e.preventDefault();
-    if (!playerForm.name || !playerForm.category) return showToast('Nombre y Categoría obligatorios', 'error');
-    const method = playerModal.editId ? 'PUT' : 'POST';
-    const url = playerModal.editId ? `/api/players/${playerModal.editId}` : `/api/players`;
-
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(playerForm)
-      });
-      if (res.ok) {
-        showToast(playerModal.editId ? 'Jugador actualizado' : 'Jugador registrado');
-        setPlayerModal({ isOpen: false, editId: null });
-        fetchAllData();
-      }
-    } catch {}
+    setLoading(false);
   };
 
   const handleDeletePlayer = async (id) => {
-    if (!window.confirm('¿Eliminar jugador de los planteles?')) return;
+    if (!window.confirm('¿Eliminar este jugador del plantel?')) return;
     try {
-      const res = await fetch(`/api/players/${id}`, { method: 'DELETE' });
+      const res = await apiFetch(`/api/players/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Jugador eliminado');
-        fetchAllData();
+        fetchAllData(true);
       }
     } catch {}
   };
 
-  const handlePrintPlayerFicha = (player) => {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-
-    const birthDateFormatted = player.birthDate ? new Date(player.birthDate).toLocaleDateString('es-AR') : 'No especificada';
-    const photoHtml = player.photoUrl 
-      ? `<img src="${player.photoUrl}" style="width: 140px; height: 140px; border-radius: 12px; object-fit: cover; border: 3px solid #cc0000;" />`
-      : `<div style="width: 140px; height: 140px; border-radius: 12px; background: #e5e7eb; display: flex; align-items: center; justify-content: center; border: 3px solid #ccc; color: #666; font-size: 11px; font-weight: bold; text-align: center; line-height: 140px;">SIN FOTO</div>`;
-
-    const htmlContent = `
-      <html>
-        <head>
-          <title>Ficha Profesional - ${player.name} ${player.lastName}</title>
-          <style>
-            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; margin: 30px; line-height: 1.4; }
-            .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #cc0000; padding-bottom: 15px; margin-bottom: 25px; }
-            .logo-area { display: flex; align-items: center; gap: 12px; }
-            .logo-text { font-size: 20px; font-weight: 900; color: #000; letter-spacing: -0.5px; }
-            .logo-subtext { font-size: 9px; color: #cc0000; font-weight: 700; text-transform: uppercase; tracking-wider: 1px; }
-            .title-area { text-align: right; }
-            .title-area h1 { margin: 0; font-size: 22px; font-weight: 900; text-transform: uppercase; color: #000; }
-            .title-area p { margin: 3px 0 0 0; font-size: 10px; color: #666; font-weight: bold; }
-            .profile-card { display: flex; gap: 25px; background: #fafafa; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; margin-bottom: 25px; }
-            .profile-info { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px; }
-            .info-group { margin-bottom: 4px; }
-            .info-label { font-size: 9px; color: #666; font-weight: bold; text-transform: uppercase; }
-            .info-value { font-size: 13px; font-weight: 700; color: #111; margin-top: 1px; }
-            .section-title { font-size: 12px; font-weight: 900; text-transform: uppercase; color: #cc0000; border-bottom: 2px solid #eaeaea; padding-bottom: 4px; margin-bottom: 12px; margin-top: 25px; }
-            .grid-3 { display: grid; grid-template-cols: 1fr 1fr 1fr; gap: 15px; }
-            .observations { background: #fef2f2; border: 1px solid #fee2e2; border-radius: 12px; padding: 12px; font-size: 11px; color: #7f1d1d; font-style: italic; }
-            .footer { margin-top: 50px; font-size: 9px; color: #999; text-align: center; border-top: 1px solid #eee; padding-top: 10px; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <div class="logo-area">
-              <div style="font-size: 28px;">⚽</div>
-              <div>
-                <div class="logo-text">Jorge Newbery</div>
-                <div class="logo-subtext">ERP Gestión Deportiva</div>
-              </div>
-            </div>
-            <div class="title-area">
-              <h1>Ficha de Deportista</h1>
-              <p>ID Registro: JN-2026-${player.id || 'NEW'}</p>
-            </div>
-          </div>
-
-          <div class="profile-card">
-            <div>${photoHtml}</div>
-            <div class="profile-info">
-              <div class="info-group">
-                <div class="info-label">Nombre Completo</div>
-                <div class="info-value" style="font-size: 16px; color: #000;">${player.name} ${player.lastName}</div>
-              </div>
-              <div class="info-group">
-                <div class="info-label">DNI / Identificación</div>
-                <div class="info-value">${player.dni || 'No especificado'}</div>
-              </div>
-              <div class="info-group">
-                <div class="info-label">Fecha de Nacimiento</div>
-                <div class="info-value">${birthDateFormatted}</div>
-              </div>
-              <div class="info-group">
-                <div class="info-label">Edad del Deportista</div>
-                <div class="info-value">${player.age ? player.age + ' años' : 'No especificada'}</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="section-title">Datos Deportivos y Plantel</div>
-          <div class="grid-3" style="font-size: 12px; margin-bottom: 25px;">
-            <div class="info-group">
-              <div class="info-label">Equipo / Disciplina</div>
-              <div class="info-value">${player.team || 'No asignado'}</div>
-            </div>
-            <div class="info-group">
-              <div class="info-label">Categoría Federada</div>
-              <div class="info-value">${player.category || 'No asignada'}</div>
-            </div>
-            <div class="info-group">
-              <div class="info-label">Posición en Campo</div>
-              <div class="info-value">${player.position || 'Ala'}</div>
-            </div>
-            <div class="info-group">
-              <div class="info-label">Número de Camiseta</div>
-              <div class="info-value">#${player.dorsal || '0'}</div>
-            </div>
-            <div class="info-group">
-              <div class="info-label">Pierna Hábil</div>
-              <div class="info-value">${player.dominantFoot || 'DERECHA'}</div>
-            </div>
-            <div class="info-group">
-              <div class="info-label">Estado de Ficha</div>
-              <div class="info-value" style="color: ${player.playerStatus === 'ACTIVE' ? 'green' : 'red'};">${player.playerStatus === 'ACTIVE' ? 'ACTIVO (Apto para competir)' : player.playerStatus === 'INJURED' ? 'LESIONADO (Baja médica)' : 'SUSPENDIDO (Sanción disciplinaria)'}</div>
-            </div>
-          </div>
-
-          <div class="section-title">Datos Fisiológicos y Médicos</div>
-          <div class="grid-3" style="font-size: 12px; margin-bottom: 25px;">
-            <div class="info-group">
-              <div class="info-label">Estatura</div>
-              <div class="info-value">${player.height ? player.height + ' m' : 'No especificada'}</div>
-            </div>
-            <div class="info-group">
-              <div class="info-label">Peso Corporal</div>
-              <div class="info-value">${player.weight ? player.weight + ' kg' : 'No especificado'}</div>
-            </div>
-            <div class="info-group">
-              <div class="info-label">Certificación Aptitud Médica</div>
-              <div class="info-value" style="color: green;">APTO FÍSICO AL DÍA ✅</div>
-            </div>
-          </div>
-
-          <div class="section-title">Datos de Contacto</div>
-          <div class="grid-3" style="font-size: 12px; margin-bottom: 25px;">
-            <div class="info-group">
-              <div class="info-label">Teléfono de Contacto</div>
-              <div class="info-value">${player.phone || 'No especificado'}</div>
-            </div>
-            <div class="info-group">
-              <div class="info-label">Correo Electrónico</div>
-              <div class="info-value" style="text-transform: lowercase;">${player.email || 'No especificado'}</div>
-            </div>
-            <div class="info-group">
-              <div class="info-label">Dirección Residencial</div>
-              <div class="info-value">${player.address || 'No especificada'}</div>
-            </div>
-          </div>
-
-          ${player.observations ? `
-            <div class="section-title">Observaciones Técnicas / Médicas</div>
-            <div class="observations">${player.observations}</div>
-          ` : ''}
-
-          <div class="footer">
-            Jorge Newbery Digital 2.5 - Documento oficial del club para control de planteles de Primera, Reserva, Inferiores y Escuelita.
-          </div>
-
-          <script>
-            window.onload = function() {
-              window.print();
-            };
-          </script>
-        </body>
-      </html>
-    `;
-
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-  };
-
-  // CRUD ENTRENADORES Y CUERPO TECNICO
-  const handleSaveCoach = async (e) => {
-    e.preventDefault();
-    if (!coachForm.name || !coachForm.role) return showToast('Nombre y Cargo obligatorios', 'error');
-    const method = coachModal.editId ? 'PUT' : 'POST';
-    const url = coachModal.editId ? `/api/gestion-deportiva/coaches/${coachModal.editId}` : `/api/gestion-deportiva/coaches`;
-
+  // ── CRUD: Coaches ──────────────────────────────────────────────────────────
+  const handleSaveCoach = async (form, editId) => {
+    setLoading(true);
+    const method = editId ? 'PUT' : 'POST';
+    const url = editId ? `/api/gestion-deportiva/coaches/${editId}` : `/api/gestion-deportiva/coaches`;
     try {
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(coachForm)
+        body: JSON.stringify(form)
       });
       if (res.ok) {
-        showToast(coachModal.editId ? 'Registro de personal actualizado' : 'Personal registrado');
-        setCoachModal({ isOpen: false, editId: null });
-        fetchAllData();
+        showToast(editId ? '✅ Miembro actualizado' : '✅ Miembro registrado');
+        fetchAllData(true);
+      } else {
+        showToast('Error al guardar', 'error');
       }
-    } catch {}
+    } catch {
+      showToast('Error de conexión', 'error');
+    }
+    setLoading(false);
   };
 
   const handleDeleteCoach = async (id) => {
-    if (!window.confirm('¿Eliminar de la plantilla técnica?')) return;
+    if (!window.confirm('¿Eliminar este miembro del cuerpo técnico?')) return;
     try {
-      const res = await fetch(`/api/gestion-deportiva/coaches/${id}`, { method: 'DELETE' });
+      const res = await apiFetch(`/api/gestion-deportiva/coaches/${id}`, { method: 'DELETE' });
       if (res.ok) {
-        showToast('Personal técnico eliminado');
-        fetchAllData();
+        showToast('Miembro eliminado');
+        fetchAllData(true);
       }
     } catch {}
   };
 
-  // CRUD CATEGORÍAS
-  const handleSaveCategory = async (e) => {
-    e.preventDefault();
-    if (!categoryForm.name || categoryForm.price === undefined) return showToast('Nombre y precio requeridos', 'error');
-    const method = categoryModal.editId ? 'PUT' : 'POST';
-    const url = categoryModal.editId ? `/api/categories/${categoryModal.editId}` : `/api/categories`;
-
+  // ── CRUD: Matches ──────────────────────────────────────────────────────────
+  const handleSaveMatch = async (form, editId) => {
+    setLoading(true);
+    const method = editId ? 'PUT' : 'POST';
+    const url = editId ? `/api/matches/${editId}` : `/api/matches`;
     try {
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(categoryForm)
+        body: JSON.stringify(form)
       });
       if (res.ok) {
-        showToast(categoryModal.editId ? 'Categoría configurada' : 'Categoría creada');
-        setCategoryModal({ isOpen: false, editId: null });
-        fetchAllData();
+        showToast(editId ? '✅ Partido actualizado' : '✅ Partido registrado');
+        fetchAllData(true);
+      } else {
+        showToast('Error al guardar', 'error');
       }
-    } catch {}
-  };
-
-  const handleDeleteCategory = async (id) => {
-    if (!window.confirm('¿Eliminar esta categoría?')) return;
-    try {
-      const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        showToast('Categoría eliminada');
-        fetchAllData();
-      }
-    } catch {}
-  };
-
-  // CRUD PARTIDOS
-  const handleSaveMatch = async (e) => {
-    e.preventDefault();
-    if (!matchForm.opponent || !matchForm.date || !matchForm.timeSlot) return showToast('Oponente, fecha y hora requeridos', 'error');
-    const method = matchModal.editId ? 'PUT' : 'POST';
-    const url = matchModal.editId ? `/api/matches/${matchModal.editId}` : `/api/matches`;
-
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(matchForm)
-      });
-      if (res.ok) {
-        showToast(matchModal.editId ? 'Partido modificado' : 'Partido agendado');
-        setMatchModal({ isOpen: false, editId: null });
-        fetchAllData();
-      }
-    } catch {}
+    } catch {
+      showToast('Error de conexión', 'error');
+    }
+    setLoading(false);
   };
 
   const handleDeleteMatch = async (id) => {
-    if (!window.confirm('¿Seguro de eliminar este partido?')) return;
+    if (!window.confirm('¿Eliminar este partido?')) return;
     try {
-      const res = await fetch(`/api/matches/${id}`, { method: 'DELETE' });
+      const res = await apiFetch(`/api/matches/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Partido eliminado');
-        fetchAllData();
+        fetchAllData(true);
       }
     } catch {}
   };
 
-  // CRUD ENTRENAMIENTOS
-  const handleSaveTraining = async (e) => {
-    e.preventDefault();
-    const method = trainingModal.editId ? 'PUT' : 'POST';
-    const url = trainingModal.editId ? `/api/gestion-deportiva/trainings/${trainingModal.editId}` : `/api/gestion-deportiva/trainings`;
-
+  // ── CRUD: Trainings ────────────────────────────────────────────────────────
+  const handleSaveTraining = async (form, editId) => {
+    setLoading(true);
+    const method = editId ? 'PUT' : 'POST';
+    const url = editId ? `/api/gestion-deportiva/trainings/${editId}` : `/api/gestion-deportiva/trainings`;
     try {
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(trainingForm)
+        body: JSON.stringify(form)
       });
       if (res.ok) {
-        showToast(trainingModal.editId ? 'Entrenamiento modificado' : 'Entrenamiento programado');
-        setTrainingModal({ isOpen: false, editId: null });
-        fetchAllData();
+        showToast(editId ? '✅ Entrenamiento actualizado' : '✅ Entrenamiento registrado');
+        fetchAllData(true);
+      } else {
+        showToast('Error al guardar', 'error');
       }
-    } catch {}
+    } catch {
+      showToast('Error de conexión', 'error');
+    }
+    setLoading(false);
   };
 
   const handleDeleteTraining = async (id) => {
-    if (!window.confirm('¿Cancelar este entrenamiento?')) return;
+    if (!window.confirm('¿Eliminar este entrenamiento?')) return;
     try {
-      const res = await fetch(`/api/gestion-deportiva/trainings/${id}`, { method: 'DELETE' });
+      const res = await apiFetch(`/api/gestion-deportiva/trainings/${id}`, { method: 'DELETE' });
       if (res.ok) {
-        showToast('Entrenamiento cancelado');
-        fetchAllData();
+        showToast('Entrenamiento eliminado');
+        fetchAllData(true);
       }
     } catch {}
   };
 
-  // CRUD DOCUMENTOS
-  const handleSaveDoc = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch(`/api/gestion-deportiva/documents`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(docForm)
-      });
-      if (res.ok) {
-        showToast('Documentación registrada');
-        setDocModal({ isOpen: false });
-        fetchAllData();
-      }
-    } catch {}
+  // Navigate to plantel with category filter
+  const handleViewPlantel = (category) => {
+    setFilterCategory(category);
+    setActiveTab('planteles');
   };
 
-  const handleDeleteDoc = async (id) => {
-    if (!window.confirm('¿Eliminar este archivo?')) return;
-    try {
-      const res = await fetch(`/api/gestion-deportiva/documents/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        showToast('Documento eliminado');
-        fetchAllData();
-      }
-    } catch {}
+  const handleNavigate = (tab) => {
+    setActiveTab(tab);
   };
 
-  // ASIGNAR JUGADOR A EQUIPO/CATEGORIA
-  const handleAssignRoster = async (e) => {
-    e.preventDefault();
-    const targetTeam = e.target.team.value;
-    const targetCategory = e.target.category.value;
-    const targetDorsal = e.target.dorsal.value;
-
-    try {
-      const res = await fetch(`/api/players/${assignModal.player.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...assignModal.player,
-          team: targetTeam,
-          category: targetCategory,
-          dorsal: parseInt(targetDorsal) || 0
-        })
-      });
-      if (res.ok) {
-        showToast('Jugador asignado exitosamente al plantel');
-        setAssignModal({ isOpen: false, player: null });
-        fetchAllData();
-      }
-    } catch {
-      showToast('Error al asignar jugador', 'error');
-    }
-  };
-
-  // CALENDAR HELPER
-  const getDaysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
-  const getFirstDayOfMonth = (month, year) => new Date(year, month, 1).getDay();
-
-  const getCalendarEvents = (day) => {
-    const formattedDay = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const dayTrainings = trainings.filter(t => t.date.startsWith(formattedDay));
-    const dayMatches = matches.filter(m => m.date.startsWith(formattedDay));
-    return { trainings: dayTrainings, matches: dayMatches };
-  };
-
-  const prevMonth = () => {
-    if (currentMonth === 0) {
-      setCurrentMonth(11);
-      setCurrentYear(currentYear - 1);
-    } else {
-      setCurrentMonth(currentMonth - 1);
-    }
-  };
-
-  const nextMonth = () => {
-    if (currentMonth === 11) {
-      setCurrentMonth(0);
-      setCurrentYear(currentYear + 1);
-    } else {
-      setCurrentMonth(currentMonth + 1);
-    }
-  };
-
-  const monthNames = [
-    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-  ];
-
-  // FILTRAR JUGADORES POR EQUIPO
-  const filteredPlayers = players.filter(p => {
-    const matchesSearch = `${p.name} ${p.lastName}`.toLowerCase().includes(searchPlayer.toLowerCase());
-    const matchesTeam = filterTeam === 'ALL' || p.team === filterTeam;
-    return matchesSearch && matchesTeam;
-  });
-
-  // Skeleton component
-  const Skeleton = ({ className = '' }) => (
-    <div className={`bg-gray-200 animate-pulse rounded-lg ${className}`} />
-  );
-
-  const StatusDot = ({ status }) => {
-    if (status === null) return <Circle size={8} className="text-gray-300 fill-gray-300" />;
-    return status
-      ? <Circle size={8} className="text-green-500 fill-green-500" />
-      : <Circle size={8} className="text-red-500 fill-red-500 animate-pulse" />;
-  };
+  const currentNav = NAV_ITEMS.find(n => n.key === activeTab);
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen text-jn-black">
-      {/* TOAST mejorado con soporte de tipo 'warn' */}
-      {toast && (
-        <div className={`fixed top-4 right-4 z-50 p-4 rounded-xl flex items-center gap-2 shadow-2xl transition-all duration-300 text-white max-w-sm ${
-          toast.type === 'success' ? 'bg-green-600' :
-          toast.type === 'warn'    ? 'bg-amber-500' :
-                                     'bg-red-600'
-        }`}>
-          {toast.type === 'success' ? <Check size={18} /> : toast.type === 'warn' ? <AlertCircle size={18} /> : <WifiOff size={18} />}
-          <span className="text-sm font-bold">{toast.message}</span>
+    <div className="flex h-full -m-6">
+      {/* Vertical Tab Nav */}
+      <aside className="w-52 flex-shrink-0 bg-gray-950 flex flex-col py-4 px-2 gap-1">
+        <div className="px-3 py-2 mb-2">
+          <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Gestión Deportiva</p>
+          <p className="text-xs font-black text-white mt-0.5">Futsal AFA</p>
         </div>
-      )}
+        {NAV_ITEMS.map(item => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.key;
+          return (
+            <button
+              key={item.key}
+              onClick={() => setActiveTab(item.key)}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all text-left w-full ${isActive ? 'bg-jn-red text-white shadow-lg shadow-red-900/50' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+            >
+              <Icon size={16} className={isActive ? 'text-white' : 'text-gray-500'} />
+              {item.label}
+            </button>
+          );
+        })}
 
-      {/* PANEL DE ESTADO DEL SISTEMA */}
-      <div className="mb-4 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 justify-between">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-            {/* API */}
-            <div className="flex items-center gap-2 text-xs font-bold">
-              <StatusDot status={apiStatus.api} />
-              <span className={apiStatus.api === null ? 'text-gray-400' : apiStatus.api ? 'text-green-700' : 'text-red-600'}>
-                {apiStatus.api === null ? '⏳ API...' : apiStatus.api ? '🟢 API Online' : '🔴 API Offline'}
-              </span>
-            </div>
-            {/* Base de Datos */}
-            <div className="flex items-center gap-2 text-xs font-bold">
-              <StatusDot status={apiStatus.db} />
-              <span className={apiStatus.db === null ? 'text-gray-400' : apiStatus.db ? 'text-green-700' : 'text-red-600'}>
-                {apiStatus.db === null ? '⏳ BD...' : apiStatus.db ? '🟢 Base de Datos' : '🔴 BD Offline'}
-              </span>
-            </div>
-            {/* Servidor */}
-            <div className="flex items-center gap-2 text-xs font-bold">
-              <StatusDot status={apiStatus.server} />
-              <span className={apiStatus.server === null ? 'text-gray-400' : apiStatus.server ? 'text-green-700' : 'text-red-600'}>
-                {apiStatus.server === null ? '⏳ Servidor...' : apiStatus.server ? '🟢 Servidor' : '🔴 Servidor Caído'}
-              </span>
-            </div>
-            {/* Sincronización */}
-            <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
-              <RefreshCw size={11} className={syncPulse ? 'animate-spin text-blue-500' : ''} />
-              {lastSync
-                ? <span>Sync: {lastSync.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
-                : <span className="text-gray-400">Sin sincronizar</span>
-              }
-            </div>
-            {/* Tiempo de respuesta */}
-            {responseTime !== null && (
-              <div className="flex items-center gap-1 text-xs font-bold">
-                <Zap size={11} className={responseTime < 300 ? 'text-green-500' : responseTime < 800 ? 'text-amber-500' : 'text-red-500'} />
-                <span className={responseTime < 300 ? 'text-green-600' : responseTime < 800 ? 'text-amber-600' : 'text-red-600'}>
-                  {responseTime}ms
-                </span>
-              </div>
-            )}
-          </div>
+        {/* API Status */}
+        <div className="mt-auto px-3 pt-4 border-t border-white/10">
           <div className="flex items-center gap-2">
-            {usingDemoData && (
-              <span className="text-[9px] font-black uppercase px-2 py-1 bg-amber-100 text-amber-700 rounded-full border border-amber-200 tracking-wider">
-                📊 Modo Demo
-              </span>
+            {apiStatus.api ? (
+              <><div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" /><span className="text-[9px] font-bold text-green-400">API Conectada</span></>
+            ) : (
+              <><div className="w-2 h-2 rounded-full bg-red-400" /><span className="text-[9px] font-bold text-red-400">API Offline</span></>
             )}
-            <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider">
-              Auto-refresh 30s
-            </span>
           </div>
+          <button onClick={() => fetchAllData()} className="mt-2 flex items-center gap-1.5 text-[9px] font-bold text-gray-500 hover:text-white transition-colors">
+            <RefreshCw size={10} className={skeletonLoading ? 'animate-spin' : ''} />
+            Actualizar datos
+          </button>
         </div>
-        {/* Endpoints con error */}
-        {failedEndpoints.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-red-100">
-            <p className="text-[10px] font-black text-red-600 uppercase tracking-wider mb-1">⚠️ Endpoints con error:</p>
-            <div className="flex flex-wrap gap-1">
-              {failedEndpoints.map((ep, i) => (
-                <span key={i} className="text-[9px] bg-red-50 text-red-700 px-2 py-0.5 rounded border border-red-100 font-bold">
-                  {ep}
-                </span>
-              ))}
-            </div>
-          </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+        {activeTab === 'dashboard' && (
+          <DashboardTab
+            stats={stats}
+            players={players}
+            teams={teams}
+            coaches={coaches}
+            matches={matches}
+            trainings={trainings}
+            onRefresh={() => fetchAllData()}
+            loading={loading}
+            skeletonLoading={skeletonLoading}
+            usingDemoData={usingDemoData}
+            onNavigate={handleNavigate}
+          />
+        )}
+
+        {activeTab === 'categorias' && (
+          <CategoriasTab
+            teams={teams}
+            players={players}
+            onViewPlantel={handleViewPlantel}
+            loading={loading}
+          />
+        )}
+
+        {activeTab === 'planteles' && (
+          <PlantelTab
+            players={players}
+            teams={teams}
+            onSavePlayer={handleSavePlayer}
+            onDeletePlayer={handleDeletePlayer}
+            loading={loading}
+            filterCategory={filterCategory}
+            setFilterCategory={setFilterCategory}
+          />
+        )}
+
+        {activeTab === 'semillero' && (
+          <SemilleroTab
+            players={players}
+            teams={teams}
+            trainings={trainings}
+            matches={matches}
+            onViewPlantel={handleViewPlantel}
+          />
+        )}
+
+        {activeTab === 'matches' && (
+          <MatchesTab
+            matches={matches}
+            onSaveMatch={handleSaveMatch}
+            onDeleteMatch={handleDeleteMatch}
+            loading={loading}
+          />
+        )}
+
+        {activeTab === 'trainings' && (
+          <TrainingsTab
+            trainings={trainings}
+            onSaveTraining={handleSaveTraining}
+            onDeleteTraining={handleDeleteTraining}
+            loading={loading}
+          />
+        )}
+
+        {activeTab === 'coaches' && (
+          <CoachesTab
+            coaches={coaches}
+            onSaveCoach={handleSaveCoach}
+            onDeleteCoach={handleDeleteCoach}
+            loading={loading}
+          />
+        )}
+
+        {activeTab === 'galeria' && (
+          <GaleriaTab />
+        )}
+
+        {activeTab === 'calendario' && (
+          <CalendarioTab
+            trainings={trainings}
+            matches={matches}
+            onRefresh={() => fetchAllData(true)}
+          />
+        )}
+
+        {activeTab === 'reportes' && (
+          <ReportesTab
+            players={players}
+            matches={matches}
+            trainings={trainings}
+            coaches={coaches}
+          />
         )}
       </div>
 
-      {/* HEADER */}
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <span className="text-xs font-black text-jn-red uppercase tracking-widest bg-red-100 px-3 py-1 rounded-full border border-jn-red/20">Centro Deportivo</span>
-          <h1 className="text-3xl font-black uppercase mt-2">🏆 Centro de Gestión Deportiva</h1>
-          <p className="text-gray-500 text-sm">Control profesional y unificado de todas las disciplinas, categorías, planteles y agendas.</p>
-        </div>
-        <button
-          onClick={() => fetchAllData(false)}
-          className="bg-white hover:bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl border flex items-center gap-2 font-bold text-xs uppercase self-start shadow-sm"
-        >
-          <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Actualizar
-        </button>
-      </div>
-
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* LOCAL SIDEBAR NAVIGATION */}
-        <div className="lg:w-64 bg-jn-black text-white p-5 rounded-2xl flex flex-col gap-1 shadow-xl h-fit border border-white/5">
-          <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest px-3 mb-3">Módulos de Gestión</span>
-          
-          {[
-            { id: 'dashboard', label: '📊 Dashboard', icon: <Clipboard size={16} /> },
-            { id: 'equipos', label: '🛡️ Equipos', icon: <Shield size={16} /> },
-            { id: 'categorias', label: '🏷️ Categorías', icon: <Star size={16} /> },
-            { id: 'planteles', label: '📋 Planteles', icon: <UserCheck size={16} /> },
-            { id: 'jugadores', label: '🏃 Jugadores', icon: <Users size={16} /> },
-            { id: 'entrenadores', label: '👔 Entrenadores', icon: <Award size={16} /> },
-            { id: 'cuerpo-tecnico', label: '💼 Cuerpo Técnico', icon: <Users size={16} /> },
-            { id: 'calendario', label: '📅 Calendario', icon: <Calendar size={16} /> },
-            { id: 'entrenamientos', label: '⏱️ Entrenamientos', icon: <Clock size={16} /> },
-            { id: 'partidos', label: '⚽ Partidos AFA', icon: <Trophy size={16} /> },
-            { id: 'reportes', label: '📈 Reportes & Stats', icon: <BarChart2 size={16} /> },
-            { id: 'documentacion', label: '📁 Documentación', icon: <FileText size={16} /> }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wider text-left transition-all ${
-                activeTab === tab.id
-                  ? 'bg-jn-red text-white shadow-md shadow-jn-red/30 translate-x-1'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* CONTENT PANEL */}
-        <div className="flex-1 min-w-0">
-          
-          {/* TAB 1: DASHBOARD */}
-          {activeTab === 'dashboard' && (
-            <div className="space-y-6">
-              {/* KPIs con skeleton */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {skeletonLoading ? (
-                  Array.from({ length: 10 }).map((_, i) => (
-                    <div key={i} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-2">
-                      <Skeleton className="h-2.5 w-24" />
-                      <Skeleton className="h-7 w-12" />
-                    </div>
-                  ))
-                ) : [
-                  { title: 'Equipos Activos', val: stats?.totalTeams, color: 'text-blue-600', bg: 'bg-blue-50' },
-                  { title: 'Categorías', val: stats?.totalCategories, color: 'text-purple-600', bg: 'bg-purple-50' },
-                  { title: 'Jugadores Fichados', val: stats?.totalPlayers, color: 'text-jn-red', bg: 'bg-red-50' },
-                  { title: 'Entrenadores', val: stats?.totalCoaches, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-                  { title: 'Ayudantes de Campo', val: stats?.totalAssistants, color: 'text-amber-600', bg: 'bg-amber-50' },
-                  { title: 'Preparadores Físicos', val: stats?.totalPFs, color: 'text-cyan-600', bg: 'bg-cyan-50' },
-                  { title: 'Entrenamientos Hoy', val: stats?.trainingsToday, color: 'text-pink-600', bg: 'bg-pink-50' },
-                  { title: 'Lesionados', val: stats?.injuredPlayers, color: 'text-orange-600', bg: 'bg-orange-50' },
-                  { title: 'Suspendidos', val: stats?.suspendedPlayers, color: 'text-red-700', bg: 'bg-red-100' },
-                  { title: 'Noticias Publicadas', val: stats?.publishedNews, color: 'text-indigo-600', bg: 'bg-indigo-50' }
-                ].map((kpi, idx) => (
-                  <div key={idx} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-1 transition-all hover:shadow-md">
-                    <span className="text-gray-400 text-[10px] font-black uppercase tracking-wider">{kpi.title}</span>
-                    <span className={`text-2xl font-black ${kpi.color}`}>{kpi.val ?? 0}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* GRIDS RECIENTES */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="bg-white p-5 border border-gray-200 rounded-2xl lg:col-span-2">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">Agenda de Próximos Partidos</h3>
-                  <div className="divide-y divide-gray-150">
-                    {(stats?.upcomingMatches || []).length === 0 ? (
-                      <p className="text-xs text-gray-400 py-4">Sin partidos pendientes.</p>
-                    ) : stats.upcomingMatches.map(m => (
-                      <div key={m.id} className="py-3 flex items-center justify-between gap-4">
-                        <div>
-                          <p className="font-bold text-sm">VS {m.opponent}</p>
-                          <span className="text-[10px] text-gray-500 uppercase font-black">{m.category} · {m.competition}</span>
-                        </div>
-                        <span className="text-xs font-bold text-gray-500">{new Date(m.date).toLocaleDateString('es-AR')}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-white p-5 border border-gray-200 rounded-2xl">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-1.5">
-                    <Heart size={14} className="text-red-500" /> Cumpleaños del Mes
-                  </h3>
-                  <div className="space-y-3">
-                    {(stats?.birthdays || []).length === 0 ? (
-                      <p className="text-xs text-gray-400">Sin cumpleaños este mes.</p>
-                    ) : stats.birthdays.map((b, i) => (
-                      <div key={i} className="flex items-center justify-between text-xs p-2.5 border border-gray-100 rounded-xl bg-gray-50/50">
-                        <div>
-                          <p className="font-bold text-jn-black">{b.name}</p>
-                          <span className="text-[9px] text-gray-500 font-bold uppercase">{b.category}</span>
-                        </div>
-                        <span className="text-jn-red font-black">
-                          {new Date(b.birthDate).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: EQUIPOS */}
-          {activeTab === 'equipos' && (
-            <div className="space-y-6">
-              <div className="flex justify-end">
-                <button
-                  onClick={() => {
-                    setTeamForm({ name: '', category: 'Primera Masculina', season: '2026', imageUrl: '', description: '', coach: '', assistantCoach: '', preparadorFisico: '', status: 'ACTIVE' });
-                    setTeamModal({ isOpen: true, editId: null });
-                  }}
-                  className="bg-jn-red hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2"
-                >
-                  <Plus size={16} /> Crear Equipo
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {teams.map(team => (
-                  <div key={team.id} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow relative">
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-start">
-                        {team.imageUrl ? (
-                          <img src={team.imageUrl} alt="" className="w-12 h-12 object-contain rounded border bg-gray-50" />
-                        ) : (
-                          <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center text-gray-400 font-bold">🛡️</div>
-                        )}
-                        <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded ${team.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                          {team.status}
-                        </span>
-                      </div>
-                      <div>
-                        <h4 className="font-black text-lg">{team.name}</h4>
-                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">{team.category} · TEMP {team.season}</p>
-                      </div>
-                      {team.description && <p className="text-xs text-gray-500 leading-relaxed">{team.description}</p>}
-                      <div className="border-t pt-3 mt-3 space-y-1 text-xs text-gray-500 font-bold">
-                        <p><span className="text-gray-400">DT:</span> {team.coach || 'No asignado'}</p>
-                        <span className="block"><span className="text-gray-400">Ayudante:</span> {team.assistantCoach || 'No asignado'}</span>
-                        <span className="block"><span className="text-gray-400">PF:</span> {team.preparadorFisico || 'No asignado'}</span>
-                      </div>
-                    </div>
-                    <div className="flex gap-2 justify-end mt-5 border-t pt-3 bg-gray-50/50 -mx-5 -mb-5 p-3 rounded-b-2xl">
-                      <button
-                        onClick={() => {
-                          setTeamForm(team);
-                          setTeamModal({ isOpen: true, editId: team.id });
-                        }}
-                        className="p-1.5 border border-gray-200 text-gray-600 hover:bg-gray-100 rounded-lg bg-white"
-                      >
-                        <Edit size={12} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteTeam(team.id)}
-                        className="p-1.5 border border-red-100 text-red-600 hover:bg-red-50 rounded-lg bg-white"
-                      >
-                        <Trash size={12} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: CATEGORIAS */}
-          {activeTab === 'categorias' && (
-            <div className="space-y-6">
-              <div className="flex justify-end">
-                <button
-                  onClick={() => {
-                    setCategoryForm({ name: '', type: 'DISCIPLINA', price: 0, description: '' });
-                    setCategoryModal({ isOpen: true, editId: null });
-                  }}
-                  className="bg-jn-red hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2"
-                >
-                  <Plus size={16} /> Nueva Categoría
-                </button>
-              </div>
-
-              <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-                <table className="w-full text-left border-collapse text-sm">
-                  <thead>
-                    <tr className="bg-gray-50 border-b border-gray-100 text-xs font-black text-gray-400 uppercase tracking-wider">
-                      <th className="p-4">Nombre</th>
-                      <th className="p-4">Tipo</th>
-                      <th className="p-4">Arancel Social</th>
-                      <th className="p-4">Descripción</th>
-                      <th className="p-4 text-right">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {categories.map(cat => (
-                      <tr key={cat.id} className="hover:bg-gray-50/50">
-                        <td className="p-4 font-bold">{cat.name}</td>
-                        <td className="p-4"><span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-black uppercase">{cat.type}</span></td>
-                        <td className="p-4 font-bold text-jn-red">${cat.price}</td>
-                        <td className="p-4 text-gray-500 text-xs">{cat.description}</td>
-                        <td className="p-4 text-right flex gap-2 justify-end">
-                          <button
-                            onClick={() => {
-                              setCategoryForm(cat);
-                              setCategoryModal({ isOpen: true, editId: cat.id });
-                            }}
-                            className="p-1.5 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg bg-white"
-                          >
-                            <Edit size={12} />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteCategory(cat.id)}
-                            className="p-1.5 border border-red-100 text-red-600 hover:bg-red-50 rounded-lg bg-white"
-                          >
-                            <Trash size={12} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 4: PLANTELES */}
-          {activeTab === 'planteles' && (
-            <div className="space-y-6">
-              <div className="bg-white p-4 border border-gray-200 rounded-2xl flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <select
-                    value={filterTeam}
-                    onChange={e => setFilterTeam(e.target.value)}
-                    className="border border-gray-300 rounded-lg p-2.5 text-xs font-bold bg-white focus:ring-2 focus:ring-red-500 focus:outline-none"
-                  >
-                    <option value="ALL">TODOS LOS EQUIPOS / PLANTELES</option>
-                    {teams.map(team => (
-                      <option key={team.id} value={team.name}>{team.name.toUpperCase()}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="relative w-full md:w-64">
-                  <Search size={16} className="absolute left-3 top-2.5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={searchPlayer}
-                    onChange={e => setSearchPlayer(e.target.value)}
-                    placeholder="Buscar jugador..."
-                    className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-red-500 focus:outline-none bg-white"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {filteredPlayers.map(p => (
-                  <div key={p.id} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
-                    <div className="space-y-4">
-                      <div className="flex gap-4">
-                        {p.photoUrl ? (
-                          <img src={p.photoUrl} alt="" className="w-16 h-16 rounded-2xl object-cover border" />
-                        ) : (
-                          <div className="w-16 h-16 bg-gray-50 rounded-2xl border flex items-center justify-center text-gray-400 font-bold"><Users size={20} /></div>
-                        )}
-                        <div className="space-y-1">
-                          <span className="text-xs font-black text-jn-red bg-red-50 px-2 py-0.5 rounded">#{p.dorsal}</span>
-                          <h4 className="font-black text-base leading-tight mt-1">{p.name} {p.lastName}</h4>
-                          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">{p.position}</p>
-                        </div>
-                      </div>
-
-                      <div className="border-t pt-3 text-xs font-bold text-gray-500 space-y-1">
-                        <p><span className="text-gray-400">Equipo:</span> <b className="text-jn-black">{p.team || 'No asignado'}</b></p>
-                        <p><span className="text-gray-400">Categoría:</span> <b className="text-jn-black">{p.category || 'No asignado'}</b></p>
-                        <p><span className="text-gray-400">Estado:</span> <span className={`text-[9px] uppercase px-2 py-0.5 rounded font-black ${p.playerStatus === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>{p.playerStatus}</span></p>
-                      </div>
-
-                      <div className="bg-gray-50 p-2.5 rounded-xl text-[10px] font-black uppercase text-gray-500 grid grid-cols-3 text-center gap-2">
-                        <div>
-                          <p className="text-xs text-jn-black font-bold">{p.matchesPlayed}</p>
-                          <span>Partidos</span>
-                        </div>
-                        <div>
-                          <p className="text-xs text-jn-black font-bold">{p.goals}</p>
-                          <span>Goles</span>
-                        </div>
-                        <div>
-                          <p className="text-xs text-jn-black font-bold">{p.assists}</p>
-                          <span>Asistencias</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => setAssignModal({ isOpen: true, player: p })}
-                      className="w-full mt-4 bg-jn-black hover:bg-jn-red text-white py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-colors"
-                    >
-                      🔄 Asignar Plantel
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 5: JUGADORES */}
-          {activeTab === 'jugadores' && (
-            <div className="space-y-6">
-              <div className="flex justify-between items-center flex-wrap gap-4">
-                <div className="relative w-full md:w-64">
-                  <Search size={16} className="absolute left-3 top-2.5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={searchPlayer}
-                    onChange={e => setSearchPlayer(e.target.value)}
-                    placeholder="Buscar por jugador..."
-                    className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-red-500 focus:outline-none bg-white"
-                  />
-                </div>
-                <button
-                  onClick={() => {
-                    setPlayerForm({ name: '', lastName: '', age: '', dorsal: 0, category: 'Primera Masculina', position: 'Ala', team: 'Futsal AFA', achievements: '', matchesPlayed: 0, goals: 0, assists: 0, yellowCards: 0, redCards: 0, cleanSheets: 0, playerStatus: 'ACTIVE', description: '', birthDate: '', photoUrl: '', phone: '', email: '', address: '', dni: '', dominantFoot: 'DERECHA', height: '', weight: '', observations: '' });
-                    setPlayerModal({ isOpen: true, editId: null });
-                  }}
-                  className="bg-jn-red hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 self-start"
-                >
-                  <Plus size={16} /> Fichar Jugador
-                </button>
-              </div>
-
-              <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-                <table className="w-full text-left border-collapse text-sm">
-                  <thead>
-                    <tr className="bg-gray-50 border-b border-gray-100 text-xs font-black text-gray-400 uppercase tracking-wider">
-                      <th className="p-4">Dorsal</th>
-                      <th className="p-4">Nombre</th>
-                      <th className="p-4">Categoría / Posición</th>
-                      <th className="p-4">Estadísticas</th>
-                      <th className="p-4">Tarjetas (A/R)</th>
-                      <th className="p-4">Estado</th>
-                      <th className="p-4 text-right">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 font-bold">
-                    {players.filter(p => `${p.name} ${p.lastName}`.toLowerCase().includes(searchPlayer.toLowerCase())).map(p => (
-                      <tr key={p.id} className="hover:bg-gray-50/50">
-                        <td className="p-4 font-black text-jn-red">#{p.dorsal}</td>
-                        <td className="p-4">
-                          <div className="flex items-center gap-2.5">
-                            {p.photoUrl ? (
-                              <img src={p.photoUrl} alt="" className="w-8 h-8 rounded-full object-cover border" />
-                            ) : (
-                              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-400"><Users size={12} /></div>
-                            )}
-                            <div>
-                              <p className="font-bold">{p.name} {p.lastName}</p>
-                              <span className="text-[9px] text-gray-400 uppercase font-black">{p.team}</span>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="p-4">
-                          <span className="text-xs">{p.category}</span>
-                          <span className="block text-[9px] text-gray-400 uppercase font-black">{p.position}</span>
-                        </td>
-                        <td className="p-4 text-xs text-gray-500">
-                          {p.matchesPlayed} PJ / {p.goals} G / {p.assists} A
-                        </td>
-                        <td className="p-4 text-xs text-gray-500">
-                          🟨 {p.yellowCards} / 🟥 {p.redCards}
-                        </td>
-                        <td className="p-4">
-                          <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded ${
-                            p.playerStatus === 'ACTIVE' ? 'bg-green-100 text-green-700' :
-                            p.playerStatus === 'INJURED' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'
-                          }`}>
-                            {p.playerStatus}
-                          </span>
-                        </td>
-                        <td className="p-4 text-right flex gap-2 justify-end">
-                          <button
-                            onClick={() => {
-                              setPlayerForm({
-                                ...p,
-                                birthDate: p.birthDate ? p.birthDate.split('T')[0] : ''
-                              });
-                              setPlayerModal({ isOpen: true, editId: p.id });
-                            }}
-                            className="p-1.5 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg bg-white"
-                          >
-                            <Edit size={12} />
-                          </button>
-                          <button
-                            onClick={() => handleDeletePlayer(p.id)}
-                            className="p-1.5 border border-red-100 text-red-600 hover:bg-red-50 rounded-lg bg-white"
-                          >
-                            <Trash size={12} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 6 & 7: ENTRENADORES Y CUERPO TECNICO */}
-          {(activeTab === 'entrenadores' || activeTab === 'cuerpo-tecnico') && (
-            <div className="space-y-6">
-              <div className="flex justify-end">
-                <button
-                  onClick={() => {
-                    setCoachForm({ photoUrl: '', name: '', role: activeTab === 'entrenadores' ? 'ENTRENADOR' : 'AYUDANTE', categories: '', license: '', phone: '', email: '', biography: '' });
-                    setCoachModal({ isOpen: true, editId: null });
-                  }}
-                  className="bg-jn-red hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2"
-                >
-                  <Plus size={16} /> Nuevo Registro
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {coaches.filter(c => activeTab === 'entrenadores' ? c.role === 'ENTRENADOR' : (c.role === 'AYUDANTE' || c.role === 'PF')).map(c => (
-                  <div key={c.id} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
-                    <div className="space-y-3">
-                      <div className="flex gap-4">
-                        {c.photoUrl ? (
-                          <img src={c.photoUrl} alt="" className="w-16 h-16 rounded-full object-cover border" />
-                        ) : (
-                          <div className="w-16 h-16 bg-gray-50 rounded-full border flex items-center justify-center text-gray-400 font-bold"><Users size={20} /></div>
-                        )}
-                        <div>
-                          <span className="text-[9px] bg-red-100 text-jn-red px-2 py-0.5 rounded font-black uppercase">{c.role}</span>
-                          <h4 className="font-black text-base mt-1.5 leading-tight">{c.name}</h4>
-                          {c.license && <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Licencia: {c.license}</p>}
-                        </div>
-                      </div>
-
-                      <div className="text-xs text-gray-500 font-bold space-y-1.5 border-t pt-3">
-                        <p><span className="text-gray-400">Email:</span> {c.email || 'No especificado'}</p>
-                        <p><span className="text-gray-400">Tel:</span> {c.phone || 'No especificado'}</p>
-                        <p><span className="text-gray-400">Categorías:</span> {c.categories || 'Ninguna'}</p>
-                        {c.biography && <p className="text-[11px] text-gray-400 font-light mt-2 italic leading-relaxed font-serif">"{c.biography}"</p>}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 justify-end mt-5 border-t pt-3 bg-gray-50/50 -mx-5 -mb-5 p-3 rounded-b-2xl font-bold">
-                      <button
-                        onClick={() => {
-                          setCoachForm(c);
-                          setCoachModal({ isOpen: true, editId: c.id });
-                        }}
-                        className="p-1.5 border border-gray-200 text-gray-600 hover:bg-gray-100 rounded-lg bg-white"
-                      >
-                        <Edit size={12} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteCoach(c.id)}
-                        className="p-1.5 border border-red-100 text-red-600 hover:bg-red-50 rounded-lg bg-white"
-                      >
-                        <Trash size={12} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 8: CALENDARIO */}
-          {activeTab === 'calendario' && (
-            <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="font-black text-lg uppercase">{monthNames[currentMonth]} {currentYear}</h3>
-                <div className="flex gap-2">
-                  <button onClick={prevMonth} className="p-2 border rounded-xl hover:bg-gray-50 font-bold">◀</button>
-                  <button onClick={nextMonth} className="p-2 border rounded-xl hover:bg-gray-50 font-bold">▶</button>
-                </div>
-              </div>
-
-              {/* CALENDAR GRID */}
-              <div className="grid grid-cols-7 gap-2 text-center text-xs font-black text-gray-400 uppercase tracking-widest border-b pb-2">
-                <div>Dom</div><div>Lun</div><div>Mar</div><div>Mie</div><div>Jue</div><div>Vie</div><div>Sab</div>
-              </div>
-
-              <div className="grid grid-cols-7 gap-2">
-                {Array.from({ length: getFirstDayOfMonth(currentMonth, currentYear) }).map((_, i) => (
-                  <div key={`empty-${i}`} className="aspect-square bg-gray-50/50 rounded-xl border border-dashed border-gray-100" />
-                ))}
-                {Array.from({ length: getDaysInMonth(currentMonth, currentYear) }).map((_, i) => {
-                  const day = i + 1;
-                  const { trainings: dayTrainings, matches: dayMatches } = getCalendarEvents(day);
-                  const hasEvents = dayTrainings.length > 0 || dayMatches.length > 0;
-
-                  return (
-                    <div key={`day-${day}`} className={`aspect-square p-2 rounded-xl border flex flex-col justify-between transition-all ${
-                      hasEvents ? 'bg-red-50/20 border-jn-red/20 hover:bg-red-50/40' : 'bg-white border-gray-100 hover:bg-gray-50'
-                    }`}>
-                      <span className={`text-xs font-black ${hasEvents ? 'text-jn-red' : 'text-gray-400'}`}>{day}</span>
-                      
-                      <div className="space-y-1">
-                        {dayTrainings.map(t => (
-                          <span key={t.id} className="block text-[8px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded font-black truncate" title={`Entrenamiento ${t.category}`}>
-                            ⏱️ {t.category}
-                          </span>
-                        ))}
-                        {dayMatches.map(m => (
-                          <span key={m.id} className="block text-[8px] bg-jn-red text-white px-1 py-0.5 rounded font-black truncate" title={`VS ${m.opponent}`}>
-                            ⚽ VS {m.opponent}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 9: ENTRENAMIENTOS */}
-          {activeTab === 'entrenamientos' && (
-            <div className="space-y-6">
-              <div className="flex justify-end">
-                <button
-                  onClick={() => {
-                    setTrainingForm({ date: '', timeSlot: '', category: 'Primera Masculina', team: '', coach: '', court: 'Cancha Parquet', objective: '', notes: '', status: 'SCHEDULED' });
-                    setTrainingModal({ isOpen: true, editId: null });
-                  }}
-                  className="bg-jn-red hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2"
-                >
-                  <Plus size={16} /> Programar Entrenamiento
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {trainings.map(t => (
-                  <div key={t.id} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-3 relative flex flex-col justify-between hover:shadow-md transition-shadow">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] bg-red-100 text-jn-red px-2 py-0.5 rounded font-black uppercase tracking-wider">{t.category}</span>
-                        <span className={`w-2 h-2 rounded-full ${t.status === 'SCHEDULED' ? 'bg-yellow-500 animate-pulse' : t.status === 'COMPLETED' ? 'bg-green-500' : 'bg-red-500'}`} />
-                      </div>
-                      <h4 className="font-bold text-sm">Entrenamiento {t.team ? `(${t.team})` : ''}</h4>
-                      <div className="text-xs text-gray-500 space-y-1.5 font-bold">
-                        <p className="flex items-center gap-1.5 text-gray-700"><Calendar size={12} /> {new Date(t.date).toLocaleDateString('es-AR')}</p>
-                        <p className="flex items-center gap-1.5"><Clock size={12} /> {t.timeSlot} hs</p>
-                        <p className="flex items-center gap-1.5"><Shield size={12} /> {t.court}</p>
-                        <p className="text-[10px] text-gray-400 mt-1 uppercase">Entrenador: {t.coach}</p>
-                        {t.objective && <p className="text-[10px] text-jn-red uppercase mt-1">Objetivo: {t.objective}</p>}
-                      </div>
-                      {t.notes && <p className="text-xs text-gray-400 bg-gray-50 p-2.5 rounded-xl leading-relaxed">{t.notes}</p>}
-                    </div>
-
-                    <div className="flex gap-2 justify-end border-t border-gray-100 pt-3">
-                      <button
-                        onClick={() => {
-                          setTrainingForm({ ...t, date: t.date.split('T')[0] });
-                          setTrainingModal({ isOpen: true, editId: t.id });
-                        }}
-                        className="p-1.5 border border-gray-200 text-gray-600 hover:bg-gray-100 rounded-lg bg-white"
-                      >
-                        <Edit size={12} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteTraining(t.id)}
-                        className="p-1.5 border border-red-100 text-red-600 hover:bg-red-50 rounded-lg bg-white"
-                      >
-                        <Trash size={12} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 10: PARTIDOS */}
-          {activeTab === 'partidos' && (
-            <div className="space-y-6">
-              <div className="flex justify-end">
-                <button
-                  onClick={() => {
-                    setMatchForm({ category: 'Primera Masculina', opponent: '', homeTeam: 'Jorge Newbery', awayTeam: '', referee: '', attendance: 0, date: '', timeSlot: '', ourScore: 0, opponentScore: 0, status: 'UPCOMING', competition: 'AFA Primera', venue: 'Cancha Jorge Newbery', season: '2026', isFeatured: false });
-                    setMatchModal({ isOpen: true, editId: null });
-                  }}
-                  className="bg-jn-red hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2"
-                >
-                  <Plus size={16} /> Agendar Partido
-                </button>
-              </div>
-
-              <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-                <table className="w-full text-left border-collapse text-sm">
-                  <thead>
-                    <tr className="bg-gray-50 border-b border-gray-100 text-xs font-black text-gray-400 uppercase tracking-wider">
-                      <th className="p-4">Fecha / Hora</th>
-                      <th className="p-4">Rival</th>
-                      <th className="p-4">Competencia / Categoría</th>
-                      <th className="p-4 text-center">Score</th>
-                      <th className="p-4">Estado</th>
-                      <th className="p-4 text-right">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 font-bold">
-                    {matches.map(m => (
-                      <tr key={m.id} className="hover:bg-gray-50/50">
-                        <td className="p-4 text-xs font-semibold">
-                          <span>{new Date(m.date).toLocaleDateString('es-AR')}</span>
-                          <span className="block text-[10px] text-gray-400">{m.timeSlot} hs</span>
-                        </td>
-                        <td className="p-4">VS {m.opponent.toUpperCase()}</td>
-                        <td className="p-4">
-                          <span className="text-xs">{m.category}</span>
-                          <span className="block text-[9px] text-gray-400 uppercase font-black">{m.competition}</span>
-                        </td>
-                        <td className="p-4 text-center text-base font-black">
-                          {m.status === 'UPCOMING' ? (
-                            <span className="text-gray-400 text-xs uppercase font-bold">Sin Jugar</span>
-                          ) : (
-                            <span className="text-jn-red">{m.ourScore} - {m.opponentScore}</span>
-                          )}
-                        </td>
-                        <td className="p-4">
-                          <span className={`text-[8px] font-black uppercase px-2.5 py-0.5 rounded ${
-                            m.status === 'LIVE' ? 'bg-red-500 text-white animate-pulse' :
-                            m.status === 'FINISHED' ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-700'
-                          }`}>
-                            {m.status}
-                          </span>
-                        </td>
-                        <td className="p-4 text-right flex gap-2 justify-end">
-                          <button
-                            onClick={() => {
-                              setMatchForm({ ...m, date: m.date.split('T')[0] });
-                              setMatchModal({ isOpen: true, editId: m.id });
-                            }}
-                            className="p-1.5 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg bg-white"
-                          >
-                            <Edit size={12} />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteMatch(m.id)}
-                            className="p-1.5 border border-red-100 text-red-600 hover:bg-red-50 rounded-lg bg-white"
-                          >
-                            <Trash size={12} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 11: REPORTES & STATS */}
-          {activeTab === 'reportes' && (
-            <div className="space-y-6 bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
-              <h3 className="text-xs font-black uppercase tracking-widest text-gray-400">Filtro de Reportes Deportivos</h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">Tipo de Reporte</label>
-                  <select
-                    value={reportFilter.type}
-                    onChange={e => setReportFilter(prev => ({ ...prev, type: e.target.value, id: '' }))}
-                    className="w-full border border-gray-300 rounded-lg p-2.5 text-xs font-bold bg-white font-bold"
-                  >
-                    <option value="team">Por Equipo</option>
-                    <option value="player">Por Jugador</option>
-                    <option value="category">Por Categoría</option>
-                  </select>
-                </div>
-
-                {reportFilter.type === 'team' && (
-                  <div>
-                    <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">Seleccionar Equipo</label>
-                    <select
-                      value={reportFilter.id}
-                      onChange={e => setReportFilter(prev => ({ ...prev, id: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg p-2.5 text-xs font-bold bg-white"
-                    >
-                      <option value="">Seleccionar...</option>
-                      {teams.map(t => (
-                        <option key={t.id} value={t.name}>{t.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                {reportFilter.type === 'player' && (
-                  <div>
-                    <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">Seleccionar Jugador</label>
-                    <select
-                      value={reportFilter.id}
-                      onChange={e => setReportFilter(prev => ({ ...prev, id: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg p-2.5 text-xs font-bold bg-white"
-                    >
-                      <option value="">Seleccionar...</option>
-                      {players.map(p => (
-                        <option key={p.id} value={p.id}>{p.name} {p.lastName}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                {reportFilter.type === 'category' && (
-                  <div>
-                    <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">Seleccionar Categoría</label>
-                    <select
-                      value={reportFilter.category}
-                      onChange={e => setReportFilter(prev => ({ ...prev, category: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg p-2.5 text-xs font-bold bg-white"
-                    >
-                      <option value="">Seleccionar...</option>
-                      {Array.from(new Set(players.map(p => p.category))).map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                <div>
-                  <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">Temporada</label>
-                  <select
-                    value={reportFilter.season}
-                    onChange={e => setReportFilter(prev => ({ ...prev, season: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg p-2.5 text-xs font-bold bg-white"
-                  >
-                    <option value="2026">Temporada 2026</option>
-                    <option value="2025">Temporada 2025</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* REPORT PREVIEW */}
-              <div className="border border-dashed p-6 rounded-2xl space-y-4">
-                <h4 className="font-black text-sm uppercase text-gray-400">Vista Previa del Reporte de Rendimiento</h4>
-                
-                {reportFilter.type === 'team' && reportFilter.id && (
-                  <div className="space-y-4">
-                    <p className="font-black text-lg">Rendimiento Técnico - Equipo: {reportFilter.id}</p>
-                    <div className="grid grid-cols-4 gap-4 text-center">
-                      <div className="bg-gray-50 p-4 rounded-xl">
-                        <span className="text-2xl font-black text-jn-red">{players.filter(p => p.team === reportFilter.id).length}</span>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Jugadores Activos</p>
-                      </div>
-                      <div className="bg-gray-50 p-4 rounded-xl">
-                        <span className="text-2xl font-black text-jn-red">{players.filter(p => p.team === reportFilter.id).reduce((acc, p) => acc + p.goals, 0)}</span>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Goles Totales</p>
-                      </div>
-                      <div className="bg-gray-50 p-4 rounded-xl">
-                        <span className="text-2xl font-black text-jn-red">{players.filter(p => p.team === reportFilter.id).reduce((acc, p) => acc + p.yellowCards, 0)}</span>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Amarillas</p>
-                      </div>
-                      <div className="bg-gray-50 p-4 rounded-xl">
-                        <span className="text-2xl font-black text-jn-red">{players.filter(p => p.team === reportFilter.id).reduce((acc, p) => acc + p.redCards, 0)}</span>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Rojas</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {reportFilter.type === 'player' && reportFilter.id && (
-                  <div className="space-y-4">
-                    {(() => {
-                      const p = players.find(x => x.id === parseInt(reportFilter.id));
-                      if (!p) return <p className="text-xs text-gray-400">Jugador no encontrado.</p>;
-                      return (
-                        <>
-                          <p className="font-black text-lg">Perfil e Historial: {p.name} {p.lastName}</p>
-                          <div className="grid grid-cols-3 gap-4 text-center">
-                            <div className="bg-gray-50 p-4 rounded-xl">
-                              <span className="text-2xl font-black text-jn-red">{p.goals}</span>
-                              <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Goles anotados</p>
-                            </div>
-                            <div className="bg-gray-50 p-4 rounded-xl">
-                              <span className="text-2xl font-black text-jn-red">{p.assists}</span>
-                              <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Asistencias</p>
-                            </div>
-                            <div className="bg-gray-50 p-4 rounded-xl">
-                              <span className="text-2xl font-black text-jn-red">{p.cleanSheets}</span>
-                              <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Vallas Invictas</p>
-                            </div>
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </div>
-                )}
-
-                {!reportFilter.id && (
-                  <p className="text-xs text-gray-400">Seleccioná un elemento para ver la vista previa del reporte.</p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 12: DOCUMENTACION */}
-          {activeTab === 'documentacion' && (
-            <div className="space-y-6">
-              <div className="flex justify-end">
-                <button
-                  onClick={() => {
-                    setDocForm({ title: '', url: '', category: 'Reglamento', description: '' });
-                    setDocModal({ isOpen: true });
-                  }}
-                  className="bg-jn-red hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2"
-                >
-                  <Plus size={16} /> Subir Documento
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {documents.map(d => (
-                  <div key={d.id} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow relative">
-                    <FileText size={32} className="text-jn-red flex-shrink-0 mt-1" />
-                    <div className="space-y-1.5 flex-1 pr-6 font-bold">
-                      <span className="text-[8px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-black uppercase tracking-wider">{d.category}</span>
-                      <h4 className="font-bold text-sm leading-snug">{d.title}</h4>
-                      {d.description && <p className="text-xs text-gray-400 leading-relaxed font-medium">{d.description}</p>}
-                      <a href={d.url} target="_blank" rel="noopener noreferrer" className="inline-block text-xs font-black text-jn-red hover:underline uppercase tracking-wide">Descargar archivo</a>
-                    </div>
-                    <button
-                      onClick={() => handleDeleteDoc(d.id)}
-                      className="absolute top-4 right-4 p-1.5 border border-red-100 text-red-600 hover:bg-red-50 rounded-lg bg-white"
-                    >
-                      <Trash size={12} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-        </div>
-      </div>
-
-      {/* MODAL EQUIPOS */}
-      {teamModal.isOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 space-y-4">
-            <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-              <h3 className="font-black text-lg uppercase">{teamModal.editId ? 'Editar Equipo' : 'Nuevo Equipo'}</h3>
-              <button onClick={() => setTeamModal({ isOpen: false, editId: null })} className="text-gray-400 hover:text-black">
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveTeam} className="space-y-3 text-xs font-bold text-gray-600 uppercase">
-              <div>
-                <label className="mb-1 block">Nombre del Equipo *</label>
-                <input
-                  type="text" required
-                  value={teamForm.name}
-                  onChange={e => setTeamForm(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block">Categoría *</label>
-                  <input
-                    type="text" required
-                    value={teamForm.category}
-                    onChange={e => setTeamForm(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">Temporada</label>
-                  <input
-                    type="text"
-                    value={teamForm.season}
-                    onChange={e => setTeamForm(prev => ({ ...prev, season: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="mb-1 block">Entrenador (DT)</label>
-                  <input
-                    type="text"
-                    value={teamForm.coach}
-                    onChange={e => setTeamForm(prev => ({ ...prev, coach: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">Ayudante</label>
-                  <input
-                    type="text"
-                    value={teamForm.assistantCoach}
-                    onChange={e => setTeamForm(prev => ({ ...prev, assistantCoach: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">PF</label>
-                  <input
-                    type="text"
-                    value={teamForm.preparadorFisico}
-                    onChange={e => setTeamForm(prev => ({ ...prev, preparadorFisico: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1 block">Escudo / Imagen de Equipo</label>
-                <MediaUploadUniversal
-                  value={teamForm.imageUrl}
-                  onChange={url => setTeamForm(prev => ({ ...prev, imageUrl: url }))}
-                  category="multimedia"
-                  allowedTypes={['image']}
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block">Estado</label>
-                <select
-                  value={teamForm.status}
-                  onChange={e => setTeamForm(prev => ({ ...prev, status: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none bg-white"
-                >
-                  <option value="ACTIVE">ACTIVO</option>
-                  <option value="INACTIVE">INACTIVO</option>
-                </select>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-jn-red hover:bg-red-700 text-white font-black uppercase tracking-wider py-3.5 rounded-xl text-xs transition-colors mt-2"
-              >
-                {teamModal.editId ? 'Guardar Cambios' : 'Confirmar Creación'}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL PLANTELES / FICHA JUGADOR */}
-      {playerModal.isOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 space-y-4">
-            <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-              <h3 className="font-black text-lg uppercase">{playerModal.editId ? 'Editar Ficha Jugador' : 'Registrar Jugador'}</h3>
-              <button onClick={() => setPlayerModal({ isOpen: false, editId: null })} className="text-gray-400 hover:text-black">
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSavePlayer} className="space-y-2.5 text-[10px] font-black text-gray-500 uppercase">
-              {/* Nombre y Apellido */}
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="mb-0.5 block">Nombre *</label>
-                  <input
-                    type="text" required
-                    value={playerForm.name}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="mb-0.5 block">Apellido *</label>
-                  <input
-                    type="text" required
-                    value={playerForm.lastName}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, lastName: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* DNI y Fecha Nacimiento */}
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="mb-0.5 block">DNI *</label>
-                  <input
-                    type="text" required
-                    value={playerForm.dni || ''}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, dni: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-mono focus:ring-1 focus:ring-red-500 focus:outline-none"
-                    placeholder="Solo Nros"
-                  />
-                </div>
-                <div>
-                  <label className="mb-0.5 block">F. Nacimiento</label>
-                  <input
-                    type="date"
-                    value={playerForm.birthDate}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, birthDate: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Teléfono y Email */}
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="mb-0.5 block">Teléfono</label>
-                  <input
-                    type="text"
-                    value={playerForm.phone || ''}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, phone: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-mono focus:ring-1 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="mb-0.5 block">Email</label>
-                  <input
-                    type="email"
-                    value={playerForm.email || ''}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs lowercase font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Dirección */}
-              <div>
-                <label className="mb-0.5 block">Dirección</label>
-                <input
-                  type="text"
-                  value={playerForm.address || ''}
-                  onChange={e => setPlayerForm(prev => ({ ...prev, address: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none"
-                />
-              </div>
-
-              {/* Altura, Peso y Pierna Hábil */}
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <label className="mb-0.5 block">Altura (m)</label>
-                  <input
-                    type="number" step="0.01" min="0"
-                    placeholder="Ej 1.75"
-                    value={playerForm.height || ''}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, height: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-red-500"
-                  />
-                </div>
-                <div>
-                  <label className="mb-0.5 block">Peso (kg)</label>
-                  <input
-                    type="number" step="0.1" min="0"
-                    placeholder="Ej 70"
-                    value={playerForm.weight || ''}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, weight: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-red-500"
-                  />
-                </div>
-                <div>
-                  <label className="mb-0.5 block">Pierna Hábil</label>
-                  <select
-                    value={playerForm.dominantFoot || 'DERECHA'}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, dominantFoot: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-semibold bg-white focus:ring-1 focus:ring-red-500"
-                  >
-                    <option value="DERECHA">DERECHA</option>
-                    <option value="IZQUIERDA">IZQUIERDA</option>
-                    <option value="AMBAS">AMBAS</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Categoría y Equipo */}
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="mb-0.5 block">Categoría *</label>
-                  <input
-                    type="text" required
-                    value={playerForm.category}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="mb-0.5 block">Equipo *</label>
-                  <input
-                    type="text" required
-                    value={playerForm.team}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, team: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Dorsal, Edad y Posición */}
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <label className="mb-0.5 block">Dorsal (#)</label>
-                  <input
-                    type="number"
-                    value={playerForm.dorsal}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, dorsal: parseInt(e.target.value) || 0 }))}
-                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="mb-0.5 block">Edad *</label>
-                  <input
-                    type="number" required
-                    value={playerForm.age}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, age: parseInt(e.target.value) || '' }))}
-                    className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="mb-0.5 block">Posición *</label>
-                  <select
-                    value={playerForm.position}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, position: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-semibold bg-white focus:ring-1 focus:ring-red-500 focus:outline-none"
-                  >
-                    <option value="Arquero">Arquero</option>
-                    <option value="Cierre">Cierre</option>
-                    <option value="Ala">Ala</option>
-                    <option value="Pivot">Pivot</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Estado Físico y Estadísticas */}
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="mb-0.5 block">Estado Físico / Sanción</label>
-                  <select
-                    value={playerForm.playerStatus}
-                    onChange={e => setPlayerForm(prev => ({ ...prev, playerStatus: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-semibold bg-white focus:ring-1 focus:ring-red-500"
-                  >
-                    <option value="ACTIVE">ACTIVO</option>
-                    <option value="INJURED">LESIONADO</option>
-                    <option value="SUSPENDED">SUSPENDIDO</option>
-                  </select>
-                </div>
-                <div className="grid grid-cols-3 gap-1.5">
-                  <div>
-                    <label className="mb-0.5 block text-[8px]">PJ</label>
-                    <input
-                      type="number"
-                      value={playerForm.matchesPlayed}
-                      onChange={e => setPlayerForm(prev => ({ ...prev, matchesPlayed: parseInt(e.target.value) || 0 }))}
-                      className="w-full border border-gray-300 rounded-lg p-1 text-xs"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-0.5 block text-[8px]">Goles</label>
-                    <input
-                      type="number"
-                      value={playerForm.goals}
-                      onChange={e => setPlayerForm(prev => ({ ...prev, goals: parseInt(e.target.value) || 0 }))}
-                      className="w-full border border-gray-300 rounded-lg p-1 text-xs"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-0.5 block text-[8px]">Asist</label>
-                    <input
-                      type="number"
-                      value={playerForm.assists}
-                      onChange={e => setPlayerForm(prev => ({ ...prev, assists: parseInt(e.target.value) || 0 }))}
-                      className="w-full border border-gray-300 rounded-lg p-1 text-xs"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Observaciones */}
-              <div>
-                <label className="mb-0.5 block">Observaciones</label>
-                <textarea
-                  value={playerForm.observations || ''}
-                  onChange={e => setPlayerForm(prev => ({ ...prev, observations: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-2.5 py-1 text-xs h-9 resize-none font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none"
-                />
-              </div>
-
-              {/* Foto de Perfil */}
-              <div>
-                <label className="mb-0.5 block">Foto de Perfil</label>
-                <MediaUploadUniversal
-                  value={playerForm.photoUrl}
-                  onChange={url => setPlayerForm(prev => ({ ...prev, photoUrl: url }))}
-                  category="multimedia"
-                  allowedTypes={['image']}
-                  compact={true}
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-jn-red hover:bg-red-700 text-white font-black uppercase tracking-wider py-3 rounded-xl text-xs transition-colors mt-2"
-              >
-                {playerModal.editId ? 'Guardar Cambios' : 'Confirmar Registro'}
-              </button>
-
-              {playerModal.editId && (
-                <button
-                  type="button"
-                  onClick={() => handlePrintPlayerFicha(playerForm)}
-                  className="w-full bg-black hover:bg-zinc-800 text-white font-black uppercase tracking-wider py-3 rounded-xl text-xs transition-colors mt-2 flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <Printer size={14} /> Imprimir Ficha / PDF
-                </button>
-              )}
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL ASIGNAR PLANTEL */}
-      {assignModal.isOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full shadow-2xl p-6 space-y-4">
-            <div className="flex justify-between items-center border-b pb-2">
-              <h3 className="font-black text-sm uppercase">Asignar Roster: {assignModal.player?.name}</h3>
-              <button onClick={() => setAssignModal({ isOpen: false, player: null })} className="text-gray-400 hover:text-black">
-                <X size={18} />
-              </button>
-            </div>
-
-            <form onSubmit={handleAssignRoster} className="space-y-4 text-xs font-bold text-gray-600 uppercase">
-              <div>
-                <label className="mb-1 block">Seleccionar Equipo</label>
-                <select
-                  name="team"
-                  defaultValue={assignModal.player?.team || ''}
-                  className="w-full border border-gray-300 rounded-lg p-2 bg-white"
-                >
-                  <option value="">Ninguno</option>
-                  {teams.map(t => (
-                    <option key={t.id} value={t.name}>{t.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="mb-1 block">Categoría Deportiva</label>
-                <input
-                  type="text"
-                  name="category"
-                  defaultValue={assignModal.player?.category || ''}
-                  className="w-full border border-gray-300 rounded-lg p-2"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block">Dorsal (#)</label>
-                <input
-                  type="number"
-                  name="dorsal"
-                  defaultValue={assignModal.player?.dorsal || 0}
-                  className="w-full border border-gray-300 rounded-lg p-2"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-jn-red hover:bg-red-700 text-white py-3 rounded-xl font-black uppercase tracking-wider text-xs"
-              >
-                Confirmar Asignación
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL ENTRENADORES */}
-      {coachModal.isOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 space-y-4">
-            <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-              <h3 className="font-black text-lg uppercase">{coachModal.editId ? 'Editar Personal' : 'Registrar Personal Técnico'}</h3>
-              <button onClick={() => setCoachModal({ isOpen: false, editId: null })} className="text-gray-400 hover:text-black">
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveCoach} className="space-y-3 text-xs font-bold text-gray-600 uppercase">
-              <div>
-                <label className="mb-1 block">Nombre Completo *</label>
-                <input
-                  type="text" required
-                  value={coachForm.name}
-                  onChange={e => setCoachForm(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block">Cargo / Función</label>
-                  <select
-                    value={coachForm.role}
-                    onChange={e => setCoachForm(prev => ({ ...prev, role: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none bg-white"
-                  >
-                    <option value="ENTRENADOR">ENTRENADOR</option>
-                    <option value="AYUDANTE">AYUDANTE DE CAMPO</option>
-                    <option value="PF">PREPARADOR FÍSICO</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block">Licencia Habilitante</label>
-                  <input
-                    type="text"
-                    value={coachForm.license}
-                    onChange={e => setCoachForm(prev => ({ ...prev, license: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                    placeholder="ATFA Pro"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block">Teléfono de Contacto</label>
-                  <input
-                    type="text"
-                    value={coachForm.phone}
-                    onChange={e => setCoachForm(prev => ({ ...prev, phone: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">Email</label>
-                  <input
-                    type="email"
-                    value={coachForm.email}
-                    onChange={e => setCoachForm(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs lowercase"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1 block">Categorías a Cargo (separadas por comas)</label>
-                <input
-                  type="text"
-                  value={coachForm.categories}
-                  onChange={e => setCoachForm(prev => ({ ...prev, categories: e.target.value }))}
-                  placeholder="Primera, Tercera, Quinta"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block">Foto de Perfil</label>
-                <MediaUploadUniversal
-                  value={coachForm.photoUrl}
-                  onChange={url => setCoachForm(prev => ({ ...prev, photoUrl: url }))}
-                  category="multimedia"
-                  allowedTypes={['image']}
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block">Biografía / Notas</label>
-                <textarea
-                  value={coachForm.biography}
-                  onChange={e => setCoachForm(prev => ({ ...prev, biography: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs h-20"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-jn-red hover:bg-red-700 text-white font-black uppercase tracking-wider py-3.5 rounded-xl text-xs transition-colors mt-2"
-              >
-                Confirmar Registro
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL CATEGORIAS */}
-      {categoryModal.isOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full shadow-2xl p-6 space-y-4">
-            <div className="flex justify-between items-center border-b pb-2">
-              <h3 className="font-black text-sm uppercase">{categoryModal.editId ? 'Editar Categoría' : 'Nueva Categoría'}</h3>
-              <button onClick={() => setCategoryModal({ isOpen: false, editId: null })} className="text-gray-400 hover:text-black">
-                <X size={18} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveCategory} className="space-y-3 text-xs font-bold text-gray-600 uppercase">
-              <div>
-                <label className="mb-1 block">Nombre de Categoría *</label>
-                <input
-                  type="text" required
-                  value={categoryForm.name}
-                  onChange={e => setCategoryForm(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg p-2 text-xs"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block">Tipo</label>
-                  <select
-                    value={categoryForm.type}
-                    onChange={e => setCategoryForm(prev => ({ ...prev, type: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg p-2 bg-white"
-                  >
-                    <option value="SOCIO">SOCIO</option>
-                    <option value="DISCIPLINA">DISCIPLINA</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block">Arancel ($) *</label>
-                  <input
-                    type="number" required
-                    value={categoryForm.price}
-                    onChange={e => setCategoryForm(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
-                    className="w-full border border-gray-300 rounded-lg p-2 text-xs"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1 block">Descripción breve</label>
-                <textarea
-                  value={categoryForm.description}
-                  onChange={e => setCategoryForm(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg p-2 h-20 text-xs"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-jn-red hover:bg-red-700 text-white py-3 rounded-xl font-black uppercase tracking-wider text-xs"
-              >
-                Guardar Configuración
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL PARTIDOS */}
-      {matchModal.isOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 space-y-4">
-            <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-              <h3 className="font-black text-lg uppercase">{matchModal.editId ? 'Editar Partido' : 'Programar Partido'}</h3>
-              <button onClick={() => setMatchModal({ isOpen: false, editId: null })} className="text-gray-400 hover:text-black">
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveMatch} className="space-y-3 text-xs font-bold text-gray-600 uppercase">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block">Categoría *</label>
-                  <input
-                    type="text" required
-                    value={matchForm.category}
-                    onChange={e => setMatchForm(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">Rival / Oponente *</label>
-                  <input
-                    type="text" required
-                    value={matchForm.opponent}
-                    onChange={e => setMatchForm(prev => ({ ...prev, opponent: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block">Fecha del encuentro *</label>
-                  <input
-                    type="date" required
-                    value={matchForm.date}
-                    onChange={e => setMatchForm(prev => ({ ...prev, date: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">Horario *</label>
-                  <input
-                    type="text" required
-                    placeholder="20:00"
-                    value={matchForm.timeSlot}
-                    onChange={e => setMatchForm(prev => ({ ...prev, timeSlot: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block">Competencia</label>
-                  <input
-                    type="text"
-                    value={matchForm.competition}
-                    onChange={e => setMatchForm(prev => ({ ...prev, competition: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">Sede (Gimnasio)</label>
-                  <input
-                    type="text"
-                    value={matchForm.venue}
-                    onChange={e => setMatchForm(prev => ({ ...prev, venue: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="mb-1 block">Marcador (Newbery)</label>
-                  <input
-                    type="number"
-                    value={matchForm.ourScore}
-                    onChange={e => setMatchForm(prev => ({ ...prev, ourScore: parseInt(e.target.value) || 0 }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">Marcador (Rival)</label>
-                  <input
-                    type="number"
-                    value={matchForm.opponentScore}
-                    onChange={e => setMatchForm(prev => ({ ...prev, opponentScore: parseInt(e.target.value) || 0 }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">Estado</label>
-                  <select
-                    value={matchForm.status}
-                    onChange={e => setMatchForm(prev => ({ ...prev, status: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none bg-white"
-                  >
-                    <option value="UPCOMING">PROGRAMADO</option>
-                    <option value="LIVE">EN VIVO</option>
-                    <option value="FINISHED">FINALIZADO</option>
-                  </select>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-jn-red hover:bg-red-700 text-white font-black uppercase tracking-wider py-3.5 rounded-xl text-xs transition-colors mt-2"
-              >
-                Confirmar
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL ENTRENAMIENTOS */}
-      {trainingModal.isOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 space-y-4">
-            <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-              <h3 className="font-black text-lg uppercase">{trainingModal.editId ? 'Editar Entrenamiento' : 'Programar Entrenamiento'}</h3>
-              <button onClick={() => setTrainingModal({ isOpen: false, editId: null })} className="text-gray-400 hover:text-black">
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveTraining} className="space-y-3 text-xs font-bold text-gray-600 uppercase">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block">Fecha *</label>
-                  <input
-                    type="date" required
-                    value={trainingForm.date}
-                    onChange={e => setTrainingForm(prev => ({ ...prev, date: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">Horario *</label>
-                  <input
-                    type="text" required
-                    placeholder="20:00"
-                    value={trainingForm.timeSlot}
-                    onChange={e => setTrainingForm(prev => ({ ...prev, timeSlot: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block">Categoría *</label>
-                  <input
-                    type="text" required
-                    value={trainingForm.category}
-                    onChange={e => setTrainingForm(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block">Equipo Vinculado</label>
-                  <select
-                    value={trainingForm.team}
-                    onChange={e => setTrainingForm(prev => ({ ...prev, team: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs bg-white"
-                  >
-                    <option value="">Ninguno</option>
-                    {teams.map(t => (
-                      <option key={t.id} value={t.name}>{t.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1 block">Entrenador Responsable *</label>
-                <input
-                  type="text" required
-                  value={trainingForm.coach}
-                  onChange={e => setTrainingForm(prev => ({ ...prev, coach: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block">Objetivo Técnico</label>
-                <input
-                  type="text"
-                  value={trainingForm.objective}
-                  onChange={e => setTrainingForm(prev => ({ ...prev, objective: e.target.value }))}
-                  placeholder="Defensa 2-2, Salida Presión"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block">Cancha *</label>
-                  <select
-                    value={trainingForm.court}
-                    onChange={e => setTrainingForm(prev => ({ ...prev, court: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none bg-white"
-                  >
-                    <option value="Cancha Parquet">Cancha Parquet</option>
-                    <option value="Cancha Sintética">Cancha Sintética</option>
-                    <option value="Salón Multideporte">Salón Multideporte</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block">Estado</label>
-                  <select
-                    value={trainingForm.status}
-                    onChange={e => setTrainingForm(prev => ({ ...prev, status: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none bg-white"
-                  >
-                    <option value="SCHEDULED">AGENDADO</option>
-                    <option value="COMPLETED">REALIZADO</option>
-                    <option value="CANCELLED">SUSPENDIDO</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1 block">Observaciones adicionales</label>
-                <textarea
-                  value={trainingForm.notes}
-                  onChange={e => setTrainingForm(prev => ({ ...prev, notes: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs h-20"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-jn-red hover:bg-red-700 text-white font-black uppercase tracking-wider py-3.5 rounded-xl text-xs transition-colors mt-2"
-              >
-                Confirmar
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL DOCUMENTACION */}
-      {docModal.isOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 space-y-4">
-            <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-              <h3 className="font-black text-lg uppercase">Subir Documento Técnico</h3>
-              <button onClick={() => setDocModal({ isOpen: false })} className="text-gray-400 hover:text-black">
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveDoc} className="space-y-3 text-xs font-bold text-gray-600 uppercase">
-              <div>
-                <label className="mb-1 block">Título del Documento *</label>
-                <input
-                  type="text" required
-                  value={docForm.title}
-                  onChange={e => setDocForm(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block">Tipo de documento</label>
-                  <select
-                    value={docForm.category}
-                    onChange={e => setDocForm(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none bg-white"
-                  >
-                    <option value="Reglamento">Reglamento</option>
-                    <option value="Apto Médico">Apto Médico</option>
-                    <option value="Ficha Afiliación">Ficha Afiliación</option>
-                    <option value="Manual Táctico">Manual Táctico</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block">Documento del Club</label>
-                  <MediaUploadUniversal
-                    value={docForm.url}
-                    onChange={url => setDocForm(prev => ({ ...prev, url: url }))}
-                    category="documentos"
-                    allowedTypes={['document']}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1 block">Descripción breve</label>
-                <textarea
-                  value={docForm.description}
-                  onChange={e => setDocForm(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs h-20"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-jn-red hover:bg-red-700 text-white font-black uppercase tracking-wider py-3.5 rounded-xl text-xs transition-colors"
-              >
-                Subir Archivo
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+      <Toast toast={toast} />
     </div>
   );
 }

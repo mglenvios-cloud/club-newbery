@@ -1,10 +1,10 @@
-﻿"use client";
+"use client";
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { User, Lock, ArrowLeft, AlertCircle, ClubSquare } from 'lucide-react';
 import ClubShield from '@/components/ClubShield';
-import { API_URL } from '@/config';
+import { apiFetch } from '@/lib/apiClient';
 
 export default function SocioLogin() {
   const [email, setEmail] = useState('');
@@ -20,7 +20,7 @@ export default function SocioLogin() {
 
     try {
       let data;
-      const res = await fetch(`/api/auth/login`, {
+      const res = await apiFetch(`/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim(), password: password.trim() })

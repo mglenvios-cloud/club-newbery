@@ -5,44 +5,26 @@ import { DollarSign, Search, Plus, Calendar, FileText, ArrowUpRight, TrendingUp 
 import { apiFetch } from '@/lib/apiClient';
 import { API_URL } from '@/config';
 import { QRCodeSVG } from 'qrcode.react';
+import ReceiptPDF from '@/components/ReceiptPDF';
 
 const fetch = apiFetch;
 
 export default function AdminContabilidad() {
-  const [role, setRole] = useState(null);
-  useEffect(() => {
-    const getCookie = (name) => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop().split(';').shift();
-      return null;
-    };
-    setRole(getCookie("adminRole") || "ADMIN");
-  }, []);
+  const [role, setRole] = useState(() => {
+    if (typeof window === 'undefined') return "ADMIN";
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; adminRole=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return "ADMIN";
+  });
 
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  if (role === "COORDINADOR_FUTSAL") {
-    return (
-      <div className="bg-red-50 border border-red-200 p-8 rounded-2xl text-center max-w-xl mx-auto my-12 shadow-sm text-jn-black">
-        <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-black">!</div>
-        <h3 className="text-xl font-black uppercase text-red-700">Acceso Restringido</h3>
-        <p className="text-sm text-red-600 mt-2 font-medium">Se requieren permisos de Administrador General para ver y gestionar la contabilidad y pagos del club.</p>
-      </div>
-    );
-  }
-
   const [search, setSearch] = useState("");
   const [filterConcept, setFilterConcept] = useState("ALL");
   const [showModal, setShowModal] = useState(false);
   const [activeReceipt, setActiveReceipt] = useState(null);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
-
-  const handleShowReceipt = (transaction) => {
-    setActiveReceipt(transaction);
-    setShowReceiptModal(true);
-  };
 
   // Form State
   const [memberName, setMemberName] = useState("");
@@ -51,8 +33,9 @@ export default function AdminContabilidad() {
   const [details, setDetails] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = React.useCallback(async () => {
     try {
       setLoading(true);
       setErrorMsg("");
@@ -70,11 +53,36 @@ export default function AdminContabilidad() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchTransactions();
-  }, []);
+    const load = async () => {
+      await fetchTransactions();
+    };
+    load();
+  }, [fetchTransactions]);
+
+  if (role === "COORDINADOR_FUTSAL") {
+    return (
+      <div className="bg-red-50 border border-red-200 p-8 rounded-2xl text-center max-w-xl mx-auto my-12 shadow-sm text-jn-black">
+        <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-black">!</div>
+        <h3 className="text-xl font-black uppercase text-red-700">Acceso Restringido</h3>
+        <p className="text-sm text-red-600 mt-2 font-medium">Se requieren permisos de Administrador General para ver y gestionar la contabilidad y pagos del club.</p>
+      </div>
+    );
+  }
+
+  const handleShowReceipt = (transaction) => {
+    setActiveReceipt(transaction);
+    setShowReceiptModal(true);
+  };
+
+  const handlePrintReceipt = (receipt = activeReceipt) => {
+    if (!receipt) return;
+    const receiptId = receipt.numero || receipt.receiptNumber || receipt.id || 'REC-100001';
+    window.open(`/receipt/${receiptId}`, '_blank');
+  };
+
 
 
   const handlePostTransaction = async (e) => {
@@ -96,19 +104,27 @@ export default function AdminContabilidad() {
     };
 
     try {
+      setIsSubmitting(true);
       const res = await fetch('/api/transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
-      if (res.ok) {
-        setSuccessMsg("Pago registrado con éxito.");
+      if (res.ok || res.status === 201) {
+        const newTransaction = await res.json().catch(() => ({}));
+        setSuccessMsg("¡Pago registrado y guardado con éxito en el sistema!");
         setMemberName("");
         setAmount("");
         setDetails("");
         setShowModal(false);
-        fetchTransactions();
+        await fetchTransactions();
+
+        // Si se recibió la nueva transacción creada, abrir su recibo automáticamente
+        if (newTransaction && newTransaction.id) {
+          setActiveReceipt(newTransaction);
+          setShowReceiptModal(true);
+        }
       } else {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || "No se pudo registrar la transacción en el servidor.");
@@ -116,6 +132,8 @@ export default function AdminContabilidad() {
     } catch (e) {
       console.error("Error al registrar transacción:", e);
       setErrorMsg(e.message || "Error de red: No se pudo registrar la transacción.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -143,7 +161,56 @@ export default function AdminContabilidad() {
 
   return (
     <div className="space-y-8 animate-fade-in text-jn-black">
-      <div className="flex flex-wrap justify-between items-center gap-4">
+      {/* Reglas de Estilo para Impresión en 1 Sola Página */}
+      <style>{`
+        @media print {
+          @page {
+            size: A4 portrait;
+            margin: 10mm;
+          }
+          body {
+            background: white !important;
+            color: black !important;
+          }
+          /* Ocultar toda la interfaz del panel */
+          body > *:not(#printable-receipt-modal-wrapper) {
+            display: none !important;
+          }
+          .no-print, nav, header, sidebar, footer {
+            display: none !important;
+          }
+          #printable-receipt-modal-wrapper {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: white !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: block !important;
+            z-index: 999999 !important;
+          }
+          #printable-receipt-card {
+            box-shadow: none !important;
+            border: 2px solid #111 !important;
+            border-radius: 12px !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+        }
+      `}</style>
+
+      {successMsg && (
+        <div className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-xl font-bold text-sm flex justify-between items-center animate-fade-in no-print">
+          <span>✓ {successMsg}</span>
+          <button onClick={() => setSuccessMsg("")} className="text-green-600 hover:text-green-900 font-black">&times;</button>
+        </div>
+      )}
+
+      <div className="flex flex-wrap justify-between items-center gap-4 no-print">
         <div>
           <h2 className="text-3xl font-black tracking-tight">Contabilidad y Movimientos</h2>
           <p className="text-sm text-gray-500">Monitoreá la recaudación general de cuotas, aranceles y alquileres.</p>
@@ -158,15 +225,15 @@ export default function AdminContabilidad() {
       </div>
 
       {/* Indicadores Contables */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 no-print">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-150 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4 text-jn-red/10">
             <TrendingUp size={64} />
           </div>
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Caja Total (Junio)</p>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Caja Total</p>
           <h3 className="text-3xl font-black mt-2 text-jn-black">${totalIncome.toLocaleString('es-AR')}</h3>
           <p className="text-[10px] text-green-600 mt-2 font-bold flex items-center gap-1">
-            <ArrowUpRight size={12} /> +12.4% vs Mes Anterior
+            <ArrowUpRight size={12} /> Movimientos Registrados
           </p>
         </div>
 
@@ -190,7 +257,7 @@ export default function AdminContabilidad() {
       </div>
 
       {/* Gráfico y Sección Historial */}
-      <div className="grid lg:grid-cols-3 gap-8">
+      <div className="grid lg:grid-cols-3 gap-8 no-print">
         
         {/* Gráfico */}
         <div className="lg:col-span-1 bg-white p-6 rounded-2xl border border-gray-150 shadow-sm flex flex-col justify-between">
@@ -199,7 +266,7 @@ export default function AdminContabilidad() {
             <p className="text-xs text-gray-500 mb-6">Distribución por concepto contable.</p>
           </div>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={100}>
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} className="text-xs font-bold" />
@@ -292,7 +359,7 @@ export default function AdminContabilidad() {
                     filtered.map(tx => (
                       <tr key={tx.id} className="hover:bg-gray-50">
                         <td className="p-4 text-xs font-mono text-gray-500">
-                          {new Date(tx.date).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}hs
+                          {new Date(tx.date).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })}, {String(new Date(tx.date).getHours()).padStart(2, '0')}:{String(new Date(tx.date).getMinutes()).padStart(2, '0')} hs
                         </td>
                         <td className="p-4 font-bold">{tx.memberName}</td>
                         <td className="p-4">
@@ -330,7 +397,7 @@ export default function AdminContabilidad() {
 
       {/* Modal Cobro Manual */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 no-print">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-fade-in">
             <div className="p-5 bg-gradient-to-r from-jn-black to-jn-red text-white flex justify-between items-center">
               <h3 className="font-bold text-lg">Registrar Cobro en Ventanilla</h3>
@@ -396,14 +463,16 @@ export default function AdminContabilidad() {
                   type="button" 
                   onClick={() => setShowModal(false)}
                   className="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg font-bold"
+                  disabled={isSubmitting}
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit" 
-                  className="px-6 py-2 bg-jn-red text-white hover:bg-jn-darkred rounded-lg font-bold shadow-md shadow-jn-red/20"
+                  disabled={isSubmitting}
+                  className="px-6 py-2 bg-jn-red text-white hover:bg-jn-darkred rounded-lg font-bold shadow-md shadow-jn-red/20 disabled:opacity-50 flex items-center gap-2"
                 >
-                  Confirmar Cobro
+                  {isSubmitting ? 'Guardando...' : 'Confirmar Cobro'}
                 </button>
               </div>
             </form>
@@ -411,109 +480,12 @@ export default function AdminContabilidad() {
         </div>
       )}
 
-      {/* Modal Recibo Oficial con QR */}
-      {showReceiptModal && activeReceipt && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 print:p-0 print:static print:bg-white">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-fade-in print:shadow-none print:border-none print:w-full print:max-w-none text-jn-black">
-            {/* Header del Recibo */}
-            <div className="p-6 bg-jn-black text-white flex justify-between items-center print:bg-white print:text-black print:border-b-2 print:border-black print:pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center print:bg-black/5">
-                  <span className="font-black text-jn-red">JN</span>
-                </div>
-                <div>
-                  <h3 className="font-bold text-base leading-tight">Club Atlético Jorge Newbery</h3>
-                  <span className="text-[10px] text-gray-400 print:text-gray-600 font-bold uppercase tracking-wider">Comprobante de Pago Oficial</span>
-                </div>
-              </div>
-              <button 
-                onClick={() => setShowReceiptModal(false)} 
-                className="text-white hover:text-gray-300 print:hidden text-xl font-bold"
-              >
-                &times;
-              </button>
-            </div>
-
-            {/* Detalles del Pago */}
-            <div className="p-8 space-y-6 print:p-4">
-              <div className="flex justify-between items-start border-b border-gray-100 pb-4">
-                <div>
-                  <p className="text-xs text-gray-450 uppercase font-bold">Recibo de Caja</p>
-                  <p className="font-mono font-bold text-sm text-jn-black">N° REC-{100000 + activeReceipt.id}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-gray-450 uppercase font-bold">Fecha de Emisión</p>
-                  <p className="text-sm font-semibold">
-                    {new Date(activeReceipt.date).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}hs
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-gray-450 uppercase font-bold">Socio / Cliente</p>
-                  <p className="font-black text-base text-jn-black mt-0.5">{activeReceipt.memberName}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-450 uppercase font-bold">Concepto</p>
-                  <p className="font-semibold text-sm mt-0.5">
-                    {activeReceipt.concept === 'CUOTA_SOCIAL' ? 'Cuota Social' :
-                     activeReceipt.concept === 'ARANCEL_DISCIPLINA' ? 'Arancel Disciplina' : 'Alquiler Cancha'}
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-450 uppercase font-bold">Detalle del Pago</p>
-                <p className="text-sm text-gray-600 font-light mt-0.5">{activeReceipt.details || "Sin descripción de detalles."}</p>
-              </div>
-
-              {/* QR y Monto */}
-              <div className="flex justify-between items-center bg-gray-50 p-6 rounded-2xl border border-gray-150 print:bg-white print:border-2 print:border-black">
-                {/* QR Code */}
-                <div className="flex flex-col items-center gap-1.5 bg-white p-2.5 rounded-xl border border-gray-200">
-                  <QRCodeSVG 
-                    value={`https://jorgenewbery.com.ar/verify/REC-${100000 + activeReceipt.id}?amount=${activeReceipt.amount}&socio=${encodeURIComponent(activeReceipt.memberName)}`}
-                    size={75}
-                    level="H"
-                  />
-                  <span className="text-[7px] text-gray-400 font-mono">Verificación Digital</span>
-                </div>
-                
-                {/* Total */}
-                <div className="text-right">
-                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Total Recaudado</p>
-                  <p className="text-3xl font-black text-jn-black mt-1">${parseFloat(activeReceipt.amount).toLocaleString('es-AR')}</p>
-                  <p className="text-[9px] text-green-600 font-bold uppercase mt-1">✓ Pago Completado</p>
-                </div>
-              </div>
-              
-              <p className="text-[9px] text-gray-400 text-center leading-snug">
-                Este comprobante tiene carácter de recibo oficial de pago electrónico para el Club Social y Deportivo Jorge Newbery. <br />
-                Alpatacal 3026, Villa Devoto. C.A.B.A.
-              </p>
-            </div>
-
-            {/* Footer Modal Acciones */}
-            <div className="p-4 bg-gray-50 border-t border-gray-150 flex justify-end gap-2 print:hidden">
-              <button 
-                type="button" 
-                onClick={() => setShowReceiptModal(false)}
-                className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-150 rounded-lg transition-colors cursor-pointer"
-              >
-                Cerrar
-              </button>
-              <button 
-                type="button" 
-                onClick={() => window.print()}
-                className="px-6 py-2 text-xs font-bold bg-jn-black hover:bg-jn-red text-white rounded-lg transition-colors shadow-md cursor-pointer"
-              >
-                Imprimir Recibo
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal Recibo Oficial Independiente en PDF */}
+      <ReceiptPDF 
+        isOpen={showReceiptModal} 
+        onClose={() => setShowReceiptModal(false)} 
+        receipt={activeReceipt} 
+      />
 
     </div>
   );

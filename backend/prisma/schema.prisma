@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
 model User {
@@ -134,7 +134,7 @@ model PlayerProfile {
   season           String            @default("2026")
   description      String            @default("")
   birthDate        DateTime?
-  playerStatus     String            @default("ACTIVE") // ACTIVE, INJURED, SUSPENDED, INACTIVE
+  playerStatus     String            @default("ACTIVE") // ACTIVE, INJURED, SUSPENDED, INACTIVE, CONVOCADO
   videoUrl         String?
   photoUrl         String?
   phone            String?
@@ -150,6 +150,15 @@ model PlayerProfile {
   observations     String            @default("")
   bloodType        String?
   emergencyPhone   String?
+  // Campos Fase 3 - Gestión Deportiva Pro
+  isCaptain        Boolean           @default(false)
+  isSubCaptain     Boolean           @default(false)
+  licenciaAFA      Boolean           @default(false)
+  carnet           Boolean           @default(false)
+  seguro           Boolean           @default(false)
+  aptoFisico       Boolean           @default(false)
+  esSocio          Boolean           @default(false)
+  tutorNombre      String            @default("") // Para menores
   clubId           Int?
   club             Club?             @relation(fields: [clubId], references: [id])
   playerStatistics PlayerStatistic[]
@@ -619,6 +628,7 @@ model Club {
   liveStreams     LiveStream[]
   videos          Video[]
   playlists       Playlist[]
+  clubModules     ClubModule[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 }
@@ -1095,4 +1105,37 @@ model Advertisement {
   statistics  String   @default("{}")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// ══════════════════════════════════════
+// MARKETPLACE DE MÓDULOS
+// ══════════════════════════════════════
+
+model SystemModule {
+  id                Int           @id @default(autoincrement())
+  name              String        @unique
+  description       String        @default("")
+  category          String        @default("GENERAL")
+  icon              String        @default("Box")
+  version           String        @default("1.0.0")
+  author            String        @default("Club Digital Pro")
+  status            String        @default("ACTIVE") // ACTIVE, DEPRECATED, BETA
+  compatiblePlans   String        @default("[\"ALL\"]")
+  dependencies      String        @default("[]")
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  clubModules       ClubModule[]
+}
+
+model ClubModule {
+  id                Int           @id @default(autoincrement())
+  clubId            Int
+  club              Club          @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  moduleId          Int
+  module            SystemModule  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  isActive          Boolean       @default(false)
+  installedAt       DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@unique([clubId, moduleId])
 }
