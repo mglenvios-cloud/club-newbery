@@ -62,6 +62,9 @@ export default function UpcomingMatches() {
         <span>{timeLeft.minutes}m</span>:
         <span>{timeLeft.seconds}s</span>
       </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="space-y-4 select-none text-center py-6">
@@ -134,7 +137,7 @@ export default function UpcomingMatches() {
           })}
         </div>
       )}
-    </div>
+    </section>
   );
 }
 export { UpcomingMatches };

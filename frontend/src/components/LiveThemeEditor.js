@@ -372,6 +372,8 @@ export default function LiveThemeEditor() {
                       </button>
                     );
                   })}
+                </div>
+              </div>
             </div>
           )}
 
