@@ -47,8 +47,12 @@
   border-color: var(--live-primary) !important;
 }
 
+.bg-jn-black {
+  background-color: var(--live-bg-color, #070707) !important;
+}
+
 body {
-  background: var(--background);
+  background: var(--live-bg-color, #070707) !important;
   color: var(--foreground);
   font-family: var(--live-font), var(--font-sans), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
