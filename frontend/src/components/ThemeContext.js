@@ -20,6 +20,8 @@ const DEFAULT_THEME = {
   customLogoUrl: "/shield.png",
   tvTitle: "CLUB TV",
   tvDesc: "Centro multimedia oficial con videos HD, pre-roll/post-roll de sponsors y resúmenes IA.",
+  bgColor: "#070707",
+  objectScale: 1.0,
 };
 
 export const FONT_OPTIONS = [
@@ -119,6 +121,7 @@ export function ThemeProvider({ children }) {
       root.style.setProperty('--live-primary', theme.primaryColor);
       root.style.setProperty('--live-accent', theme.accentColor);
       root.style.setProperty('--live-tertiary', theme.tertiaryColor || '#ffffff');
+      root.style.setProperty('--live-bg-color', theme.bgColor || '#070707');
 
       const selectedFont = FONT_OPTIONS.find(f => f.id === theme.fontFamily)?.fontCss || "Inter, sans-serif";
       root.style.setProperty('--live-font', selectedFont);

@@ -24,8 +24,9 @@ export default function Newbery3DHero() {
         preserveDrawingBuffer: true,
         stencil: true
       });
-      scene = new BABYLON.Scene(engine);
-      scene.clearColor = new BABYLON.Color4(0.04, 0.04, 0.04, 1.0);
+      const bgHex = theme?.bgColor || "#070707";
+      const bgC = BABYLON.Color3.FromHexString(bgHex);
+      scene.clearColor = new BABYLON.Color4(bgC.r, bgC.g, bgC.b, 1.0);
     } catch (e) {
       console.error("Fallo al crear escena Babylon:", e);
       setWebGLSupported(false);
@@ -527,6 +528,8 @@ export default function Newbery3DHero() {
         const time = Date.now() * 0.001;
 
         if (mainMesh) {
+          const userScale = theme?.objectScale || 1.0;
+          mainMesh.scaling = new BABYLON.Vector3(userScale, userScale, userScale);
           mainMesh.rotation.y = time * 0.45;
           if (objectType !== 'shield') {
             mainMesh.rotation.x = time * 0.18;
