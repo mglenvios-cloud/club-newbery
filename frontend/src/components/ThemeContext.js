@@ -98,7 +98,7 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('cajn_live_theme_v8');
+      const saved = localStorage.getItem('cajn_live_theme_v9');
       if (saved) {
         setTheme({ ...DEFAULT_THEME, ...JSON.parse(saved) });
       }
@@ -111,7 +111,7 @@ export function ThemeProvider({ children }) {
   useEffect(() => {
     if (!isLoaded) return;
     try {
-      localStorage.setItem('cajn_live_theme_v8', JSON.stringify(theme));
+      localStorage.setItem('cajn_live_theme_v9', JSON.stringify(theme));
     } catch (e) {
       console.error('Error saving theme:', e);
     }
