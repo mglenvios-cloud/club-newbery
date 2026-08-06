@@ -17,7 +17,7 @@ const DEFAULT_THEME = {
   fontSizeScale: "100%", // "90%" | "100%" | "110%" | "125%" | "140%"
   object3D: "shield",
   shieldShape: "classic", // 'classic' | 'circular' | 'diamond' | 'box' | 'spanish' | 'triangular' | 'pentagon' | 'crowned'
-  customLogoUrl: "/shield.png",
+  customLogoUrl: "/icon-192.png",
   tvTitle: "CLUB TV",
   tvDesc: "Centro multimedia oficial con videos HD, pre-roll/post-roll de sponsors y resúmenes IA.",
   bgColor: "#070707",
