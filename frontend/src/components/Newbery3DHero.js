@@ -527,6 +527,14 @@ export default function Newbery3DHero() {
       scene.registerBeforeRender(() => {
         const time = Date.now() * 0.001;
 
+        if (scene) {
+          try {
+            const currentBgHex = theme?.bgColor || "#070707";
+            const currentBgC = BABYLON.Color3.FromHexString(currentBgHex);
+            scene.clearColor = new BABYLON.Color4(currentBgC.r, currentBgC.g, currentBgC.b, 1.0);
+          } catch (e) {}
+        }
+
         if (mainMesh) {
           const userScale = theme?.objectScale || 1.0;
           mainMesh.scaling = new BABYLON.Vector3(userScale, userScale, userScale);
@@ -566,7 +574,7 @@ export default function Newbery3DHero() {
       if (scene) scene.dispose();
       if (engine) engine.dispose();
     };
-  }, [theme?.object3D, theme?.shieldShape, theme?.primaryColor, theme?.accentColor, theme?.tertiaryColor, theme?.customLogoUrl, theme?.clubShortName]);
+  }, [theme?.object3D, theme?.shieldShape, theme?.primaryColor, theme?.accentColor, theme?.tertiaryColor, theme?.customLogoUrl, theme?.clubShortName, theme?.bgColor, theme?.objectScale]);
 
   if (!webGLSupported) {
     return (
