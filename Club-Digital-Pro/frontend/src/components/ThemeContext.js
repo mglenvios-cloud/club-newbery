@@ -98,9 +98,13 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('cajn_live_theme_v9');
+      const saved = localStorage.getItem('cajn_live_theme_v10');
       if (saved) {
-        setTheme({ ...DEFAULT_THEME, ...JSON.parse(saved) });
+        const parsed = JSON.parse(saved);
+        if (parsed && (parsed.customLogoUrl === '/shield.png' || !parsed.customLogoUrl)) {
+          parsed.customLogoUrl = '/icon-192.png';
+        }
+        setTheme({ ...DEFAULT_THEME, ...parsed });
       }
     } catch (e) {
       console.error('Error loading saved theme:', e);
@@ -111,7 +115,11 @@ export function ThemeProvider({ children }) {
   useEffect(() => {
     if (!isLoaded) return;
     try {
-      localStorage.setItem('cajn_live_theme_v9', JSON.stringify(theme));
+      const sanitizedTheme = {
+        ...theme,
+        customLogoUrl: theme.customLogoUrl === '/shield.png' ? '/icon-192.png' : theme.customLogoUrl
+      };
+      localStorage.setItem('cajn_live_theme_v10', JSON.stringify(sanitizedTheme));
     } catch (e) {
       console.error('Error saving theme:', e);
     }
