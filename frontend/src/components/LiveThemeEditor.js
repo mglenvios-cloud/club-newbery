@@ -106,9 +106,53 @@ export default function LiveThemeEditor() {
             </button>
           </div>
 
-          {/* CONTENIDO TAB 1: COMBINADOR TRICOLOR DE 3 COLORES */}
+          {/* CONTENIDO TAB 1: COMBINADOR TRICOLOR & FONDOS */}
           {activeTab === 'colors' && (
             <div className="space-y-4 text-xs">
+              
+              {/* Personalizador de Fondo de la Plataforma (AL PRINCIPIO DE LA PESTAÑA) */}
+              <div className="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 space-y-3 shadow-lg">
+                <div className="flex items-center justify-between text-emerald-400 font-extrabold text-[11px]">
+                  <span className="flex items-center gap-1.5"><Palette size={14} /> Color de Fondo de Páginas y 3D</span>
+                  <span className="font-mono text-[10px] text-white bg-black/60 px-2 py-0.5 rounded border border-emerald-500/40">{theme.bgColor || '#070707'}</span>
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {[
+                    { name: 'Noche', hex: '#040406' },
+                    { name: 'Azul Noche', hex: '#070a12' },
+                    { name: 'Verde Noche', hex: '#05120a' },
+                    { name: 'Granate', hex: '#140505' },
+                    { name: 'Carbón', hex: '#111111' },
+                    { name: 'Negro OLED', hex: '#000000' },
+                  ].map((bgPreset) => (
+                    <button
+                      key={bgPreset.hex}
+                      onClick={() => updateTheme({ bgColor: bgPreset.hex })}
+                      className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition-all ${
+                        (theme.bgColor || '#070707') === bgPreset.hex
+                          ? 'border-emerald-500 bg-emerald-500/20 text-white font-bold shadow-md'
+                          : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20'
+                      }`}
+                    >
+                      <span className="w-3.5 h-3.5 rounded-full border border-white/20" style={{ backgroundColor: bgPreset.hex }} />
+                      <span className="text-[9px] truncate">{bgPreset.name}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between pt-1 border-t border-white/5">
+                  <span className="text-[10px] text-gray-300 font-bold">Selector de Color de Fondo Libre:</span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={theme.bgColor || '#070707'}
+                      onChange={(e) => updateTheme({ bgColor: e.target.value })}
+                      className="w-7 h-7 rounded-lg cursor-pointer bg-transparent border-0"
+                    />
+                    <span className="text-[10px] font-mono text-emerald-400 font-bold">{theme.bgColor || '#070707'}</span>
+                  </div>
+                </div>
+              </div>
+
               {/* Combinador Personalizado de 3 Colores */}
               <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                 <div className="flex items-center gap-2 text-amber-400 font-extrabold text-[11px]">
@@ -243,54 +287,39 @@ export default function LiveThemeEditor() {
                       </button>
                     );
                   })}
-                </div>
-              </div>
-
-              {/* Personalizador de Fondo de la Plataforma */}
-              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
-                <div className="flex items-center justify-between text-emerald-400 font-extrabold text-[11px]">
-                  <span>🎨 Color de Fondo de Páginas y 3D</span>
-                  <span className="font-mono text-[10px] text-white">{theme.bgColor || '#070707'}</span>
-                </div>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                  {[
-                    { name: 'Noche', hex: '#040406' },
-                    { name: 'Azul Noche', hex: '#070a12' },
-                    { name: 'Verde Noche', hex: '#05120a' },
-                    { name: 'Granate', hex: '#140505' },
-                    { name: 'Carbón', hex: '#111111' },
-                    { name: 'Negro OLED', hex: '#000000' },
-                  ].map((bgPreset) => (
-                    <button
-                      key={bgPreset.hex}
-                      onClick={() => updateTheme({ bgColor: bgPreset.hex })}
-                      className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition-all ${
-                        (theme.bgColor || '#070707') === bgPreset.hex
-                          ? 'border-emerald-500 bg-emerald-500/20 text-white font-bold'
-                          : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20'
-                      }`}
-                    >
-                      <span className="w-3.5 h-3.5 rounded-full border border-white/20" style={{ backgroundColor: bgPreset.hex }} />
-                      <span className="text-[9px] truncate">{bgPreset.name}</span>
-                    </button>
-                  ))}
-                </div>
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-[10px] text-gray-400 font-bold">Color Personalizado Libre:</span>
-                  <input
-                    type="color"
-                    value={theme.bgColor || '#070707'}
-                    onChange={(e) => updateTheme({ bgColor: e.target.value })}
-                    className="w-7 h-7 rounded-lg cursor-pointer bg-transparent border-0"
-                  />
-                </div>
-              </div>
             </div>
           )}
 
           {/* CONTENIDO TAB 2: GEOMETRÍAS Y SELECCIÓN DE ESCUDOS 3D */}
           {activeTab === '3d' && (
             <div className="space-y-4 text-xs">
+              
+              {/* Slider de Escala / Tamaño Manual del Objeto 3D (AL PRINCIPIO DE LA PESTAÑA) */}
+              <div className="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 space-y-2 shadow-lg">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 font-black">
+                    📏 Tamaño del Objeto 3D (Escala Pelota/Escudo)
+                  </span>
+                  <span className="text-xs font-mono font-bold text-emerald-400 bg-black/60 px-2 py-0.5 rounded border border-emerald-500/40">
+                    {Math.round((theme.objectScale || 1.0) * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2.5"
+                  step="0.05"
+                  value={theme.objectScale || 1.0}
+                  onChange={(e) => updateTheme({ objectScale: parseFloat(e.target.value) })}
+                  className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                />
+                <div className="flex justify-between text-[9px] text-gray-400 font-mono font-bold">
+                  <span>50% (Pequeño)</span>
+                  <span>100% (Estándar)</span>
+                  <span>250% (Gigante)</span>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                   Objeto 3D Principal
