@@ -1,6 +1,6 @@
-// Configuración centralizada de marca para Newbery TV (Multi-club ready)
+// Configuración centralizada de marca para Club TV (Multi-club ready)
 export const config = {
-  channelName: "NEWBERY TV",
+  channelName: "CLUB TV",
   subTitle: "Todo el contenido oficial audiovisual y fotográfico de nuestro club unificado en un solo canal premium.",
   clubName: "Club Social y Deportivo Jorge Newbery",
   logoText: "JORGE NEWBERY",
