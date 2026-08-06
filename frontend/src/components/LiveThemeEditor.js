@@ -45,8 +45,8 @@ export default function LiveThemeEditor() {
                 <Sliders size={16} />
               </div>
               <div>
-                <h3 className="font-extrabold text-sm text-white">Editor Tricolor & Escudos 3D</h3>
-                <p className="text-[10px] text-gray-400">Combiná hasta 3 colores y 8 formas de escudo</p>
+                <h3 className="font-extrabold text-sm text-emerald-400">Editor Tricolor, Fondos & Escudos 3D (V9)</h3>
+                <p className="text-[10px] text-emerald-300 font-bold">Configurá la paleta de fondo, escala 3D y colores</p>
               </div>
             </div>
             <button
