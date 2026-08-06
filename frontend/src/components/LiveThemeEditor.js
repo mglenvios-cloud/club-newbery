@@ -163,6 +163,7 @@ export default function LiveThemeEditor() {
                             accentColor: p.accent,
                             tertiaryColor: p.tertiary,
                             presetName: p.name,
+                            ...(p.clubName ? { clubName: p.clubName, clubShortName: p.clubShortName, tvTitle: p.tvTitle } : {})
                           })
                         }
                         className={`p-2.5 rounded-xl border text-left flex flex-col gap-1.5 transition-all ${

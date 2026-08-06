@@ -93,7 +93,7 @@ export default function ClubDigitalPro() {
 
   const modulosDisponibles = [
     { title: '⚽ Gestión Deportiva', desc: 'Control unificado de disciplinas, categorías, planteles, entrenadores y cuerpo técnico.', color: 'from-blue-600 to-cyan-500', href: '/disciplinas' },
-    { title: '📺 Club TV', desc: 'Centro multimedia oficial con videos HD, pre-roll/post-roll de sponsors y resúmenes IA.', color: 'from-red-600 to-rose-500', href: '/newbery-tv' },
+    { title: `📺 ${theme?.tvTitle || 'Club TV'}`, desc: 'Centro multimedia oficial con videos HD, pre-roll/post-roll de sponsors y resúmenes IA.', color: 'from-red-600 to-rose-500', href: '/newbery-tv' },
     { title: '🏆 Futsal Profesional', desc: 'Sistema especializado en torneos de Futsal AFA, crónicas de partidos y eventos en vivo.', color: 'from-amber-500 to-yellow-500', href: '/disciplinas' },
     { title: '👥 Portal Socio', desc: 'Autogestión de socios, cobro online de cuotas sociales, reservas y control parental.', color: 'from-emerald-600 to-teal-500', href: '/portal' },
     { title: '📊 Estadísticas', desc: 'Panel administrativo comercial, control de morosidad, ingresos por sponsoreo y reportes.', color: 'from-indigo-600 to-purple-500', href: '/admin' },
@@ -183,10 +183,10 @@ export default function ClubDigitalPro() {
                 Caso de Éxito de Referencia
               </span>
               <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight">
-                Implementado en {clubNameDisplay}
+                Implementado en {theme?.clubShortName || 'Pinocho'}
               </h2>
               <p className="text-xs text-gray-400 leading-relaxed font-light">
-                La plataforma digital de {clubNameDisplay} sirve como modelo operativo real, demostrando la integración comercial para el Futsal AFA, la automatización del portal socio y la gestión deportiva integral.
+                La plataforma digital de {theme?.clubName || 'Pinocho'} sirve como modelo operativo real, demostrando la integración comercial para el Futsal AFA, la automatización del portal socio y la gestión deportiva integral.
               </p>
               
               <div className="space-y-3 font-bold text-xs">
@@ -194,7 +194,7 @@ export default function ClubDigitalPro() {
                   'Plataforma Digital de Marca Propia',
                   'Futsal AFA Oficial Integrado',
                   'Gestión Deportiva Multi-disciplina',
-                  `Multimedia Premium con ${tvTitleDisplay}`,
+                  `Multimedia Premium con ${theme?.tvTitle || 'CLUB TV'}`,
                   'Portal de Socios y Cobros Sociales Automáticos'
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-gray-300">
@@ -207,7 +207,7 @@ export default function ClubDigitalPro() {
 
             <div className="bg-black/50 border border-white/5 rounded-2xl p-6 space-y-4">
               <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                <span className="font-black text-xs text-gray-400 uppercase tracking-wider">Métricas Reales {clubShortDisplay}</span>
+                <span className="font-black text-xs text-gray-400 uppercase tracking-wider">Métricas Reales {theme?.clubShortName || 'Pinocho'}</span>
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               </div>
               <div className="grid grid-cols-2 gap-4 text-center">

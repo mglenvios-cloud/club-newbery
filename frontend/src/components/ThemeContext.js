@@ -57,14 +57,14 @@ export const SHIELD_SHAPE_OPTIONS = [
 ];
 
 export const COLOR_PRESETS = [
-  { name: "Pinocho (Verde, Blanco, Negro)", primary: "#16a34a", accent: "#ffffff", tertiary: "#09090b", preview: ["#16a34a", "#ffffff", "#09090b"] },
-  { name: "Jorge Newbery (Rojo, Blanco, Negro)", primary: "#dc2626", accent: "#ffffff", tertiary: "#09090b", preview: ["#dc2626", "#ffffff", "#09090b"] },
-  { name: "17 de Agosto (Verde, Blanco, Rojo)", primary: "#15803d", accent: "#ffffff", tertiary: "#b91c1c", preview: ["#15803d", "#ffffff", "#b91c1c"] },
-  { name: "Kimberley (Azul, Blanco, Marino)", primary: "#2563eb", accent: "#ffffff", tertiary: "#1e293b", preview: ["#2563eb", "#ffffff", "#1e293b"] },
-  { name: "San Lorenzo Futsal (Azulgrana & Blanco)", primary: "#0284c7", accent: "#dc2626", tertiary: "#ffffff", preview: ["#0284c7", "#dc2626", "#ffffff"] },
-  { name: "Boca / Central (Azul, Oro, Blanco)", primary: "#1d4ed8", accent: "#f59e0b", tertiary: "#ffffff", preview: ["#1d4ed8", "#f59e0b", "#ffffff"] },
-  { name: "Vélez / Racing (Azul, Celeste, Blanco)", primary: "#1e3a8a", accent: "#38bdf8", tertiary: "#ffffff", preview: ["#1e3a8a", "#38bdf8", "#ffffff"] },
-  { name: "Peñarol / BVB (Dorado, Negro, Blanco)", primary: "#eab308", accent: "#18181b", tertiary: "#ffffff", preview: ["#eab308", "#18181b", "#ffffff"] },
+  { name: "Pinocho (Verde, Blanco, Negro)", primary: "#16a34a", accent: "#ffffff", tertiary: "#09090b", clubName: "CLUB DEPORTIVO Y SOCIAL PINOCHO", clubShortName: "PINOCHO", tvTitle: "PINOCHO TV", preview: ["#16a34a", "#ffffff", "#09090b"] },
+  { name: "Jorge Newbery (Rojo, Blanco, Negro)", primary: "#dc2626", accent: "#ffffff", tertiary: "#09090b", clubName: "CLUB ATLÉTICO JORGE NEWBERY", clubShortName: "JORGE NEWBERY", tvTitle: "CLUB TV", preview: ["#dc2626", "#ffffff", "#09090b"] },
+  { name: "17 de Agosto (Verde, Blanco, Rojo)", primary: "#15803d", accent: "#ffffff", tertiary: "#b91c1c", clubName: "CLUB SOCIAL Y DEPORTIVO 17 DE AGOSTO", clubShortName: "17 DE AGOSTO", tvTitle: "17 DE AGOSTO TV", preview: ["#15803d", "#ffffff", "#b91c1c"] },
+  { name: "Kimberley (Azul, Blanco, Marino)", primary: "#2563eb", accent: "#ffffff", tertiary: "#1e293b", clubName: "CLUB ATLÉTICO KIMBERLEY", clubShortName: "KIMBERLEY", tvTitle: "KIMBERLEY TV", preview: ["#2563eb", "#ffffff", "#1e293b"] },
+  { name: "San Lorenzo Futsal (Azulgrana & Blanco)", primary: "#0284c7", accent: "#dc2626", tertiary: "#ffffff", clubName: "SAN LORENZO FUTSAL", clubShortName: "CASLA", tvTitle: "CASLA TV", preview: ["#0284c7", "#dc2626", "#ffffff"] },
+  { name: "Boca / Central (Azul, Oro, Blanco)", primary: "#1d4ed8", accent: "#f59e0b", tertiary: "#ffffff", clubName: "BOCA FUTSAL", clubShortName: "BOCA", tvTitle: "BOCA TV", preview: ["#1d4ed8", "#f59e0b", "#ffffff"] },
+  { name: "Vélez / Racing (Azul, Celeste, Blanco)", primary: "#1e3a8a", accent: "#38bdf8", tertiary: "#ffffff", clubName: "CLUB VÉLEZ SARSFIELD", clubShortName: "VÉLEZ", tvTitle: "VÉLEZ TV", preview: ["#1e3a8a", "#38bdf8", "#ffffff"] },
+  { name: "Peñarol / BVB (Dorado, Negro, Blanco)", primary: "#eab308", accent: "#18181b", tertiary: "#ffffff", clubName: "CLUB PEÑAROL", clubShortName: "PEÑAROL", tvTitle: "PEÑAROL TV", preview: ["#eab308", "#18181b", "#ffffff"] },
 ];
 
 export const OBJECT_3D_OPTIONS = [
