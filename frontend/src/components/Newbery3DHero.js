@@ -465,7 +465,8 @@ export default function Newbery3DHero() {
                     img.src = '/icon-192.png';
                   }
                 };
-                img.src = theme?.customLogoUrl || '/icon-192.png';
+                const logoSrc = (theme?.customLogoUrl && theme.customLogoUrl !== '/shield.png') ? theme.customLogoUrl : '/icon-192.png';
+                img.src = logoSrc;
               } else {
                 ctx.fillStyle = "#111111";
                 ctx.font = "bold 9px Montserrat, sans-serif";
