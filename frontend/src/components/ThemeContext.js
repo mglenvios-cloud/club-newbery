@@ -98,6 +98,18 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     try {
+      // Purge ALL old theme keys automatically (v1 through v9)
+      const OLD_KEYS = [
+        'cajn_live_theme',
+        'cajn_live_theme_v1', 'cajn_live_theme_v2', 'cajn_live_theme_v3',
+        'cajn_live_theme_v4', 'cajn_live_theme_v5', 'cajn_live_theme_v6',
+        'cajn_live_theme_v7', 'cajn_live_theme_v8', 'cajn_live_theme_v9',
+        'club_theme', 'live_branding',
+      ];
+      OLD_KEYS.forEach(key => {
+        try { localStorage.removeItem(key); } catch(_) {}
+      });
+
       const saved = localStorage.getItem('cajn_live_theme_v10');
       if (saved) {
         const parsed = JSON.parse(saved);
