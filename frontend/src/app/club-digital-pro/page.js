@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useTheme } from '@/components/ThemeContext';
 import {
   Trophy, Tv, Users, Activity, Brain, Image as ImageIcon,
