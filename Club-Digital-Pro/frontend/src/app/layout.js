@@ -6,13 +6,22 @@ export const metadata = {
   description: 'Administración SaaS multi-club dinámica y escalable.',
 };
 
+import { ThemeProvider } from '@/components/ThemeContext';
+import LiveThemeEditor from '@/components/LiveThemeEditor';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body>
-        <ClubProvider>
-          {children}
-        </ClubProvider>
+        <ThemeProvider>
+          <ClubProvider>
+            {children}
+          </ClubProvider>
+          <LiveThemeEditor />
+        </ThemeProvider>
       </body>
     </html>
   );
