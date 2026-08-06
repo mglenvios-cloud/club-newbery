@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Plus, Edit, Trash, X, Check, AlertCircle, Save,
@@ -190,8 +190,8 @@ export default function AdminMultimedia() {
       {/* HEADER */}
       <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-black text-jn-red uppercase tracking-widest bg-red-100 px-3 py-1 rounded-full border border-jn-red/20">Newbery TV Admin</span>
-          <h1 className="text-3xl font-black uppercase mt-2">Centro de Producción Newbery TV</h1>
+          <span className="text-xs font-black text-jn-red uppercase tracking-widest bg-red-100 px-3 py-1 rounded-full border border-jn-red/20">Club TV Admin</span>
+          <h1 className="text-3xl font-black uppercase mt-2">Centro de Producción Club TV</h1>
           <p className="text-gray-500 text-sm">Gestiona transmisiones, videos, goles, entrevistas y el estado de publicación en la plataforma oficial.</p>
         </div>
         <button
@@ -256,7 +256,7 @@ export default function AdminMultimedia() {
         <div className="bg-white border border-gray-200 rounded-2xl py-20 text-center text-gray-500">
           <Film size={40} className="mx-auto mb-4 text-gray-300" />
           <p className="font-bold text-sm uppercase">Sin contenido multimedia registrado</p>
-          <p className="text-xs text-gray-400 mt-1">Hacé click en "Subir Contenido" para inaugurar Newbery TV.</p>
+          <p className="text-xs text-gray-400 mt-1">Hacé click en "Subir Contenido" para inaugurar Club TV.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

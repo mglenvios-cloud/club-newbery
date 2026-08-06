@@ -95,7 +95,7 @@ export default function NewberyTvAdmin() {
   const [uploadSeason, setUploadSeason] = useState('2026');
   const [uploadTournament, setUploadTournament] = useState('AFA Futsal');
   const [customFolders, setCustomFolders] = useState([
-    'Liga Studio', 'Newbery TV', 'Futsal', 'Inferiores', 'Primera', 'Reserva', 'Entrenamientos', 'Resumenes', 'Entrevistas'
+    'Liga Studio', 'Club TV', 'Futsal', 'Inferiores', 'Primera', 'Reserva', 'Entrenamientos', 'Resumenes', 'Entrevistas'
   ]);
   const [newFolderInput, setNewFolderInput] = useState('');
 
