@@ -461,9 +461,11 @@ export default function Newbery3DHero() {
                   }
                 };
                 img.onerror = () => {
-                  console.warn("No se pudo cargar la imagen del logo, utilizando fallback de texto.");
+                  if (!img.src.includes('/icon-192.png')) {
+                    img.src = '/icon-192.png';
+                  }
                 };
-                img.src = theme.customLogoUrl;
+                img.src = theme?.customLogoUrl || '/icon-192.png';
               } else {
                 ctx.fillStyle = "#111111";
                 ctx.font = "bold 9px Montserrat, sans-serif";
