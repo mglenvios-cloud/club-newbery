@@ -127,11 +127,36 @@ export default function SocioLogin() {
           >
             {loading ? 'Iniciando Sesión...' : 'Ingresar al Portal'}
           </button>
+
+          {/* Botón de Acceso Rápido 1-Clic */}
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.setItem('jn-auth-token', 'demo-token-socio');
+              localStorage.setItem('token', 'demo-token-socio');
+              router.push('/portal');
+            }}
+            className="w-full bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/40 font-bold py-3.5 rounded-xl transition-all text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>⚡ Ingreso Rápido a Mi Portal (1-Clic)</span>
+          </button>
         </form>
 
         {/* Demo info / credentials helper */}
-        <div className="bg-white/5 border border-white/5 p-4 rounded-2xl text-[10px] space-y-1.5 text-gray-400">
-          <span className="font-bold text-gray-300 uppercase tracking-wide">💡 Credenciales de demostración:</span>
+        <div className="bg-white/5 border border-white/5 p-4 rounded-2xl text-[10px] space-y-2 text-gray-400">
+          <div className="flex items-center justify-between">
+            <span className="font-bold text-gray-300 uppercase tracking-wide">💡 Credenciales de demostración:</span>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('martin.perez.47542096@example.com');
+                setPassword('socio123');
+              }}
+              className="text-[9px] font-bold text-jn-red hover:underline cursor-pointer"
+            >
+              [Auto-completar]
+            </button>
+          </div>
           <p>Puedes ingresar utilizando cualquiera de los socios precargados:</p>
           <ul className="list-disc pl-4 space-y-0.5">
             <li>Email: <code className="text-jn-red">martin.perez.47542096@example.com</code></li>

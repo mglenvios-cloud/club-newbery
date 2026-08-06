@@ -1,16 +1,19 @@
 "use client";
 import React from 'react';
+import { useTheme } from './ThemeContext';
 
 export default function OurClubSection() {
+  const { theme } = useTheme();
+
   return (
     <section className="container mx-auto px-4 py-16">
       {/* Encabezado de la Sección */}
       <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white uppercase">
-          NUESTRO CLUB
+          {theme?.clubName ? `NUESTRO ${theme.clubShortName || 'CLUB'}` : 'NUESTRO CLUB'}
         </h2>
         <p className="text-sm sm:text-base text-gray-400 font-medium">
-          Más de 100 años construyendo deporte, valores y comunidad.
+          Construyendo deporte, valores y comunidad.
         </p>
       </div>
 
@@ -18,7 +21,13 @@ export default function OurClubSection() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Tarjeta 1: Deporte */}
         <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-4 hover:border-jn-red/40 transition-all hover:scale-[1.02]">
-          <div className="w-12 h-12 rounded-2xl bg-jn-red/10 text-jn-red flex items-center justify-center text-xl font-bold">
+          <div
+            className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold"
+            style={{
+              backgroundColor: `${theme?.primaryColor || '#dc2626'}20`,
+              color: theme?.primaryColor || '#dc2626',
+            }}
+          >
             ⚽
           </div>
           <div>
@@ -63,7 +72,7 @@ export default function OurClubSection() {
           <div>
             <h3 className="font-extrabold text-white text-lg mb-1">Historia</h3>
             <p className="text-xs text-gray-400 leading-relaxed font-medium">
-              Una institución con más de un siglo de trayectoria.
+              Una institución con sólida trayectoria.
             </p>
           </div>
         </div>

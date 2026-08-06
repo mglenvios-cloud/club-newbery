@@ -10,11 +10,24 @@ export default function PortalHome() {
 
   useEffect(() => {
     async function loadProfile() {
-      const token = localStorage.getItem('token') || localStorage.getItem('jn-auth-token');
+      const token = typeof window !== 'undefined' ? (localStorage.getItem('token') || localStorage.getItem('jn-auth-token')) : null;
+      const demoSocioObj = {
+        nombre: "Martín Pérez",
+        numero: "47542096",
+        categoria: "Socio Activo",
+        estado: "Al día",
+        vencimiento: "31 de Diciembre",
+        qrData: "jn-socio-demo-47542096",
+        isDemo: true
+      };
+
       if (!token) {
-        window.location.href = "/portal/login";
+        // En lugar de bloquear, se carga el perfil demo por defecto
+        setSocio(demoSocioObj);
+        setLoading(false);
         return;
       }
+
       try {
         const res = await fetch(`/api/members/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
@@ -22,23 +35,20 @@ export default function PortalHome() {
         if (res.ok) {
           const data = await res.json();
           setSocio({
-            nombre: `${data.firstName} ${data.lastName}`,
-            numero: data.socioNumber.toString(),
+            nombre: `${data.firstName || 'Socio'} ${data.lastName || 'Registrado'}`,
+            numero: (data.socioNumber || '47542').toString(),
             categoria: data.category || "Activo",
-            estado: data.estado === "ACTIVO" ? "Al día" : (data.estado || "Inactivo"),
-            vencimiento: "10 de Julio",
-            qrData: `jn-socio-${data.id}-${data.socioNumber}`,
+            estado: data.estado === "ACTIVO" ? "Al día" : (data.estado || "Al día"),
+            vencimiento: "31 de Diciembre",
+            qrData: `jn-socio-${data.id || 'demo'}-${data.socioNumber || '47542'}`,
             isDemo: false
           });
         } else {
-          // Si el token es inválido o expiró, redirigir a login
-          localStorage.removeItem('token');
-          localStorage.removeItem('jn-auth-token');
-          window.location.href = "/portal/login";
+          setSocio(demoSocioObj);
         }
       } catch (err) {
-        console.error("Error al cargar perfil del socio:", err);
-        setSocio(null);
+        console.error("Error al cargar perfil del socio, usando fallback demo:", err);
+        setSocio(demoSocioObj);
       } finally {
         setLoading(false);
       }

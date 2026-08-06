@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import { useTheme } from '@/components/ThemeContext';
 import {
   Trophy, Tv, Users, Activity, Brain, Image as ImageIcon,
   Calendar, Check, ShieldAlert, Sparkles, Building2, User,
@@ -10,6 +11,11 @@ import {
 import { API_URL } from '@/config';
 
 export default function ClubDigitalPro() {
+  const { theme } = useTheme();
+  const clubNameDisplay = theme?.clubName || 'CLUB JORGE NEWBERY';
+  const clubShortDisplay = theme?.clubShortName || 'JORGE NEWBERY';
+  const tvTitleDisplay = theme?.tvTitle || (theme?.clubShortName ? `${theme.clubShortName} TV` : 'CLUB TV');
+
   // Simulador State
   const [clubType, setClubType] = useState('Polideportivo');
   const [membersCount, setMembersCount] = useState('1000');
@@ -175,10 +181,10 @@ export default function ClubDigitalPro() {
                 Caso de Éxito de Referencia
               </span>
               <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight">
-                Implementado en Club Jorge Newbery
+                Implementado en {clubNameDisplay}
               </h2>
               <p className="text-xs text-gray-400 leading-relaxed font-light">
-                La plataforma digital del Club Atlético Jorge Newbery sirve como modelo operativo real, demostrando la integración comercial para el Futsal AFA, la automatización del portal socio y la gestión deportiva integral.
+                La plataforma digital de {clubNameDisplay} sirve como modelo operativo real, demostrando la integración comercial para el Futsal AFA, la automatización del portal socio y la gestión deportiva integral.
               </p>
               
               <div className="space-y-3 font-bold text-xs">
@@ -186,7 +192,7 @@ export default function ClubDigitalPro() {
                   'Plataforma Digital de Marca Propia',
                   'Futsal AFA Oficial Integrado',
                   'Gestión Deportiva Multi-disciplina',
-                  'Multimedia Premium con Newbery TV',
+                  `Multimedia Premium con ${tvTitleDisplay}`,
                   'Portal de Socios y Cobros Sociales Automáticos'
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-gray-300">
@@ -199,7 +205,7 @@ export default function ClubDigitalPro() {
 
             <div className="bg-black/50 border border-white/5 rounded-2xl p-6 space-y-4">
               <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                <span className="font-black text-xs text-gray-400 uppercase tracking-wider">Métricas Reales Jorge Newbery</span>
+                <span className="font-black text-xs text-gray-400 uppercase tracking-wider">Métricas Reales {clubShortDisplay}</span>
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               </div>
               <div className="grid grid-cols-2 gap-4 text-center">
@@ -303,7 +309,7 @@ export default function ClubDigitalPro() {
             <span className="text-jn-red text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5">
               <Tv size={12} /> Demostración Interactiva
             </span>
-            <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight">Newbery TV Experience</h2>
+            <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight">{tvTitleDisplay} Experience</h2>
             <p className="text-xs text-gray-500 max-w-xl mx-auto">
               Probá las capacidades profesionales de streaming, analítica e inteligencia artificial que potencian la difusión de tu club.
             </p>
@@ -317,8 +323,8 @@ export default function ClubDigitalPro() {
               {/* Scoreboard Widget */}
               <div className="bg-black/60 border border-white/5 rounded-2xl p-4 flex justify-between items-center text-center">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-jn-red flex items-center justify-center text-[10px] font-black">JN</div>
-                  <span className="font-black text-xs uppercase tracking-wider text-white">Jorge Newbery</span>
+                  <div className="w-8 h-8 rounded-full bg-jn-red flex items-center justify-center text-[10px] font-black">{clubShortDisplay.substring(0, 2).toUpperCase()}</div>
+                  <span className="font-black text-xs uppercase tracking-wider text-white">{clubShortDisplay}</span>
                 </div>
                 <div className="flex items-center gap-4 bg-zinc-900/80 px-4 py-2 rounded-xl border border-white/5">
                   <span className="text-xl font-black text-white">3</span>
@@ -326,8 +332,8 @@ export default function ClubDigitalPro() {
                   <span className="text-xl font-black text-white">2</span>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <span className="font-black text-xs uppercase tracking-wider text-white">Franja de Oro</span>
-                  <div className="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-[10px] font-black text-black">FO</div>
+                  <span className="font-black text-xs uppercase tracking-wider text-white">Rival AFA</span>
+                  <div className="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-[10px] font-black text-black">RA</div>
                 </div>
               </div>
 
@@ -371,7 +377,7 @@ export default function ClubDigitalPro() {
               <div className="bg-[#141416] border border-white/5 p-3 rounded-2xl flex items-center justify-around gap-4 overflow-hidden">
                 <span className="text-[8px] text-zinc-500 font-black uppercase tracking-wider">Patrocinadores de la transmisión:</span>
                 <span className="text-[10px] font-black uppercase text-gray-300 tracking-widest bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">⚡ LIGA PRO STUDIO</span>
-                <span className="text-[10px] font-black uppercase text-gray-300 tracking-widest bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">🔥 SPONSOR JORGE NEWBERY</span>
+                <span className="text-[10px] font-black uppercase text-gray-300 tracking-widest bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">🔥 SPONSOR {clubShortDisplay}</span>
               </div>
 
             </div>

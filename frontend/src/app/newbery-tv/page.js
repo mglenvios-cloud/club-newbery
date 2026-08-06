@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useTheme } from '@/components/ThemeContext';
 import { PlayCircle, Users, Clock, Video, Calendar, Shield, X, Maximize2, Tv, ChevronRight, Award, User } from 'lucide-react';
 import StatsPanel from '@/components/newbery-tv/StatsPanel';
 import AIPanel from '@/components/newbery-tv/AIPanel';
@@ -16,6 +17,7 @@ import { API_URL } from '@/config';
 import { apiFetch } from '@/lib/apiClient';
 
 export default function NewberyTv() {
+  const { theme } = useTheme();
   const [media, setMedia] = useState([]);
   const [news, setNews] = useState([]);
   const [channel, setChannel] = useState(null);
@@ -301,11 +303,11 @@ export default function NewberyTv() {
   
   const displayTitle = isLive 
     ? `${liveMatch.homeTeam} vs ${liveMatch.opponent}` 
-    : (videoDestacado ? videoDestacado.title : "Newbery TV");
+    : (videoDestacado ? videoDestacado.title : (theme?.tvTitle || "CLUB TV"));
   
   const displayDesc = isLive 
     ? `Transmisión oficial en vivo del partido frente a ${liveMatch.opponent} por ${liveMatch.competition}.` 
-    : (videoDestacado ? videoDestacado.description : config.subTitle);
+    : (videoDestacado ? videoDestacado.description : (theme?.tvDesc || config.subTitle));
 
   const displayCategory = isLive ? liveMatch.competition : (videoDestacado ? videoDestacado.category : "STREAMING");
   

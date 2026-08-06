@@ -3,6 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #111111;
+  --live-primary: #D32F2F;
+  --live-accent: #EF5350;
 }
 
 @theme inline {
@@ -10,9 +12,9 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  /* Club Jorge Newbery Colors */
-  --color-jn-red: #D32F2F;
-  --color-jn-darkred: #B71C1C;
+  /* Club Jorge Newbery Colors (Soportan variables dinámicas) */
+  --color-jn-red: var(--live-primary, #D32F2F);
+  --color-jn-darkred: var(--live-primary, #B71C1C);
   --color-jn-black: #111111;
   --color-jn-gray: #333333;
   --color-jn-white: #F8F9FA;
@@ -23,6 +25,26 @@
     --background: #111111;
     --foreground: #F8F9FA;
   }
+}
+
+/* Clases de utilidad para forzar el tema dinámico en todas las páginas */
+.bg-jn-red, .bg-jn-darkred {
+  background-color: var(--live-primary) !important;
+}
+.text-jn-red {
+  color: var(--live-primary) !important;
+}
+.border-jn-red {
+  border-color: var(--live-primary) !important;
+}
+.hover\:bg-jn-red:hover {
+  background-color: var(--live-primary) !important;
+}
+.hover\:text-jn-red:hover {
+  color: var(--live-primary) !important;
+}
+.hover\:border-jn-red:hover {
+  border-color: var(--live-primary) !important;
 }
 
 body {
