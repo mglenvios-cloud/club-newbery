@@ -741,12 +741,12 @@ function MazeGame({ onWin }) {
 // 4. QUIZ HISTÓRICO — 10 preguntas + timer 15s
 // ================================================================
 const QUIZ_QUESTIONS = [
-  { q: "¿En qué año fue fundado el Club Jorge Newbery?", opts: ["1908", "1920", "1935", "1945"], ans: 0 },
-  { q: "¿Cuáles son los colores oficiales del club?", opts: ["Azul y blanco", "Rojo, negro y blanco", "Verde y amarillo", "Naranja y negro"], ans: 1 },
-  { q: "¿Qué deporte es el más tradicional del semillero de Newbery?", opts: ["Vóley", "Natación", "Futsal", "Tenis"], ans: 2 },
+  { q: "¿En qué año fue fundado nuestro Club Social y Deportivo?", opts: ["1908", "1920", "1935", "1945"], ans: 0 },
+  { q: "¿Cuáles son los colores oficiales de nuestro club?", opts: ["Azul y blanco", "Rojo, negro y blanco", "Verde y amarillo", "Naranja y negro"], ans: 1 },
+  { q: "¿Qué deporte es el más tradicional del semillero de nuestro club?", opts: ["Vóley", "Natación", "Futsal", "Tenis"], ans: 2 },
   { q: "¿Qué significa 'Fair Play' en el deporte?", opts: ["Juego sucio", "Juego limpio y respeto", "Juego rápido", "Juego colectivo"], ans: 1 },
   { q: "¿Cuántos jugadores tiene un equipo de Futsal en la cancha?", opts: ["6", "7", "5", "4"], ans: 2 },
-  { q: "¿Quién fue Jorge Newbery?", opts: ["Un jugador de fútbol", "Un aviador y deportista pionero argentino", "Un entrenador de atletismo", "Un presidente de la AFA"], ans: 1 },
+  { q: "¿Qué representa la pasión deportiva en la comunidad?", opts: ["Un jugador de fútbol", "Un pionero y deportista argentino", "Un entrenador de atletismo", "Un presidente de la AFA"], ans: 1 },
   { q: "¿Qué disciplina incluye el Patín Artístico?", opts: ["Velocidad y resistencia", "Figuras y coreografía sobre ruedas", "Saltos en trampolín", "Natación sincronizada"], ans: 1 },
   { q: "¿Cuántos minutos dura un partido de Futsal oficial?", opts: ["90 minutos", "60 minutos", "40 minutos", "2 tiempos de 20 minutos"], ans: 3 },
   { q: "¿Qué valor es fundamental en el deporte para los más chicos?", opts: ["Ganar siempre", "El individualismo", "El trabajo en equipo", "La velocidad"], ans: 2 },

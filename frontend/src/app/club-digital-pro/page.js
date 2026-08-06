@@ -66,13 +66,13 @@ export default function ClubDigitalPro() {
     const modules = [];
     if (clubType === 'Polideportivo' || membersCount === '5000+') {
       modules.push({ title: '⚽ Gestión Deportiva Pro', desc: 'Control total de múltiples disciplinas, entrenamientos y planteles federados.' });
-      modules.push({ title: '📺 Newbery TV Premium', desc: 'Canal de streaming con pre-rolls de patrocinadores y resúmenes con IA.' });
+      modules.push({ title: '📺 Club TV Premium', desc: 'Canal de streaming con pre-rolls de patrocinadores y resúmenes con IA.' });
       modules.push({ title: '👥 Portal de Autogestión de Socios', desc: 'Pago de aranceles y reservas de canchas y turnos online.' });
-      modules.push({ title: '🤖 Newbery IA', desc: 'Asistente inteligente para la redacción de crónicas de partidos y consultas generales.' });
+      modules.push({ title: '🤖 Club IA', desc: 'Asistente inteligente para la redacción de crónicas de partidos y consultas generales.' });
       modules.push({ title: '📊 Analítica Avanzada', desc: 'Control de morosidad, ingresos publicitarios y asistencia de deportistas.' });
     } else if (clubType === 'Futsal' || clubType === 'Fútbol') {
       modules.push({ title: '🏆 Futsal & Fútbol AFA Pro', desc: 'Planillas técnicas de partidos, fixture, tarjetas y control de convocatorias.' });
-      modules.push({ title: '📺 Newbery TV', desc: 'Retransmisión de partidos completos y mejores jugadas de tus divisiones.' });
+      modules.push({ title: '📺 Club TV', desc: 'Retransmisión de partidos completos y mejores jugadas de tus divisiones.' });
       modules.push({ title: '📸 Biblioteca Multimedia', desc: 'Galería de fotos y videos ordenadas por jugador, temporada y competencia.' });
       modules.push({ title: '💰 Sponsors e Ingresos', desc: 'Gestión y rotación de banners de patrocinadores en todas las secciones.' });
     } else {
@@ -85,15 +85,15 @@ export default function ClubDigitalPro() {
   };
 
   const modulosDisponibles = [
-    { title: '⚽ Gestión Deportiva', desc: 'Control unificado de disciplinas, categorías, planteles, entrenadores y cuerpo técnico.', color: 'from-blue-600 to-cyan-500' },
-    { title: '📺 Newbery TV', desc: 'Centro multimedia oficial con videos HD, pre-roll/post-roll de sponsors y resúmenes IA.', color: 'from-red-600 to-rose-500' },
-    { title: '🏆 Futsal Profesional', desc: 'Sistema especializado en torneos de Futsal AFA, crónicas de partidos y eventos en vivo.', color: 'from-amber-500 to-yellow-500' },
-    { title: '👥 Portal Socio', desc: 'Autogestión de socios, cobro online de cuotas sociales, reservas y control parental.', color: 'from-emerald-600 to-teal-500' },
-    { title: '📊 Estadísticas', desc: 'Panel administrativo comercial, control de morosidad, ingresos por sponsoreo y reportes.', color: 'from-indigo-600 to-purple-500' },
-    { title: '🤖 Inteligencia Artificial', desc: 'Crónicas redactadas al instante, chat de soporte y automatización de cronogramas.', color: 'from-purple-600 to-pink-500' },
-    { title: '📸 Multimedia', desc: 'Galerías interactivas con filtros avanzados por jugador, temporada, rival y competencia.', color: 'from-pink-600 to-rose-500' },
-    { title: '💰 Sponsors', desc: 'Módulo comercial publicitario con rotación inteligente de banners y reportes de efectividad.', color: 'from-emerald-500 to-green-400' },
-    { title: '📅 Calendario Deportivo', desc: 'Agenda integrada de partidos, entrenamientos de todas las categorías y eventos sociales.', color: 'from-blue-500 to-indigo-500' }
+    { title: '⚽ Gestión Deportiva', desc: 'Control unificado de disciplinas, categorías, planteles, entrenadores y cuerpo técnico.', color: 'from-blue-600 to-cyan-500', href: '/disciplinas' },
+    { title: '📺 Club TV', desc: 'Centro multimedia oficial con videos HD, pre-roll/post-roll de sponsors y resúmenes IA.', color: 'from-red-600 to-rose-500', href: '/newbery-tv' },
+    { title: '🏆 Futsal Profesional', desc: 'Sistema especializado en torneos de Futsal AFA, crónicas de partidos y eventos en vivo.', color: 'from-amber-500 to-yellow-500', href: '/disciplinas' },
+    { title: '👥 Portal Socio', desc: 'Autogestión de socios, cobro online de cuotas sociales, reservas y control parental.', color: 'from-emerald-600 to-teal-500', href: '/portal' },
+    { title: '📊 Estadísticas', desc: 'Panel administrativo comercial, control de morosidad, ingresos por sponsoreo y reportes.', color: 'from-indigo-600 to-purple-500', href: '/admin' },
+    { title: '🤖 Inteligencia Artificial', desc: 'Crónicas redactadas al instante, chat de soporte y automatización de cronogramas.', color: 'from-purple-600 to-pink-500', href: '/newbery-ia' },
+    { title: '📸 Multimedia', desc: 'Galerías interactivas con filtros avanzados por jugador, temporada, rival y competencia.', color: 'from-pink-600 to-rose-500', href: '/galeria' },
+    { title: '💰 Sponsors', desc: 'Módulo comercial publicitario con rotación inteligente de banners y reportes de efectividad.', color: 'from-emerald-500 to-green-400', href: '/admin' },
+    { title: '📅 Calendario Deportivo', desc: 'Agenda integrada de partidos, entrenamientos de todas las categorías y eventos sociales.', color: 'from-blue-500 to-indigo-500', href: '/reservas' }
   ];
 
   return (
@@ -148,19 +148,20 @@ export default function ClubDigitalPro() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {modulosDisponibles.map((mod, i) => (
-              <div
+              <Link
                 key={i}
-                className="bg-[#111] border border-white/5 hover:border-white/10 rounded-3xl p-6 transition-all hover:translate-y-[-2px] flex flex-col justify-between gap-4 group relative overflow-hidden"
+                href={mod.href}
+                className="bg-[#111] border border-white/5 hover:border-white/10 hover:border-jn-red/40 rounded-3xl p-6 transition-all hover:translate-y-[-2px] flex flex-col justify-between gap-4 group relative overflow-hidden cursor-pointer"
               >
                 <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${mod.color} opacity-[0.02] rounded-bl-full pointer-events-none group-hover:opacity-[0.06] transition-opacity`} />
                 <div className="space-y-2">
-                  <h4 className="font-black text-base uppercase">{mod.title}</h4>
+                  <h4 className="font-black text-base uppercase text-white group-hover:text-jn-red transition-colors">{mod.title}</h4>
                   <p className="text-xs text-gray-400 leading-relaxed font-light">{mod.desc}</p>
                 </div>
-                <span className="text-[9px] text-jn-red font-black uppercase tracking-wider flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  Saber más <ChevronRight size={10} />
+                <span className="text-[10px] text-jn-red font-black uppercase tracking-wider flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
+                  Saber más <ChevronRight size={12} />
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
         </section>
@@ -175,10 +176,10 @@ export default function ClubDigitalPro() {
                 Caso de Éxito de Referencia
               </span>
               <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight">
-                Implementado en Club Jorge Newbery
+                Implementado en Pinocho
               </h2>
               <p className="text-xs text-gray-400 leading-relaxed font-light">
-                La plataforma digital del Club Atlético Jorge Newbery sirve como modelo operativo real, demostrando la integración comercial para el Futsal AFA, la automatización del portal socio y la gestión deportiva integral.
+                La plataforma digital de Pinocho sirve como modelo operativo real, demostrando la integración comercial para el Futsal AFA, la automatización del portal socio y la gestión deportiva integral.
               </p>
               
               <div className="space-y-3 font-bold text-xs">
@@ -186,7 +187,7 @@ export default function ClubDigitalPro() {
                   'Plataforma Digital de Marca Propia',
                   'Futsal AFA Oficial Integrado',
                   'Gestión Deportiva Multi-disciplina',
-                  'Multimedia Premium con Newbery TV',
+                  'Multimedia Premium con CLUB TV',
                   'Portal de Socios y Cobros Sociales Automáticos'
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-gray-300">
@@ -199,7 +200,7 @@ export default function ClubDigitalPro() {
 
             <div className="bg-black/50 border border-white/5 rounded-2xl p-6 space-y-4">
               <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                <span className="font-black text-xs text-gray-400 uppercase tracking-wider">Métricas Reales Jorge Newbery</span>
+                <span className="font-black text-xs text-gray-400 uppercase tracking-wider">Métricas Reales Pinocho</span>
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               </div>
               <div className="grid grid-cols-2 gap-4 text-center">

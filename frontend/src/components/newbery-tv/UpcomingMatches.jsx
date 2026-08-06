@@ -62,9 +62,6 @@ export default function UpcomingMatches() {
         <span>{timeLeft.minutes}m</span>:
         <span>{timeLeft.seconds}s</span>
       </div>
-    );
-  };
-
   if (loading) {
     return (
       <div className="space-y-4 select-none text-center py-6">
@@ -76,10 +73,12 @@ export default function UpcomingMatches() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <span className="text-[10px] text-zinc-500 font-black uppercase tracking-widest block">Próximas Transmisiones</span>
-        <span className="text-[8px] bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded font-black tracking-widest">FIXTURE</span>
+    <section className="space-y-4">
+      <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <div className="flex items-center gap-2">
+          <Calendar className="text-red-500" size={18} />
+          <h3 className="font-black text-base uppercase tracking-tight text-white">Próximos Partidos</h3>
+        </div>
       </div>
 
       {upcoming.length === 0 ? (
@@ -87,11 +86,11 @@ export default function UpcomingMatches() {
           Todavía no hay transmisiones programadas.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {upcoming.map((match) => {
             const isReminded = !!reminders[match.id];
             return (
-              <div key={match.id} className="bg-[#111] border border-white/5 rounded-3xl p-5 flex flex-col justify-between hover:border-white/10 transition-colors select-none text-left">
+              <div key={match.id} className="bg-zinc-900/60 border border-zinc-800/80 hover:border-red-500/30 p-4 rounded-xl transition-all space-y-3">
                 <div className="space-y-3">
                   <div className="flex justify-between items-start gap-2">
                     <span className="text-[8px] bg-red-950 text-red-400 border border-red-500/10 px-2.5 py-0.8 rounded font-black uppercase tracking-wider">
@@ -102,7 +101,7 @@ export default function UpcomingMatches() {
 
                   <div className="flex items-center justify-between text-center py-2">
                     <div className="text-left">
-                      <h5 className="font-black text-sm uppercase text-white leading-none">{match.homeTeam || "Jorge Newbery"}</h5>
+                      <h5 className="font-black text-sm uppercase text-white leading-none">{match.homeTeam || defaultTeam}</h5>
                       <span className="text-[8px] text-zinc-500 font-bold uppercase mt-0.5 block">Local</span>
                     </div>
                     <span className="text-red-500 font-black text-xs">VS</span>

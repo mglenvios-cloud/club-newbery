@@ -3,11 +3,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, X, Send, Sparkles, BookOpen, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { apiFetch } from '@/lib/apiClient';
+import { useTheme } from './ThemeContext';
 
 export default function FloatingIA() {
+  const { theme } = useTheme();
+  const clubName = theme?.clubShortName || "Club";
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { text: "¡Hola! Soy Newbery IA 🔴⚪⚫. ¿En qué puedo ayudarte hoy? Podés consultarme horarios, reglas de deportes, pedirme ayuda con la escuela o jugar una trivia.", isBot: true }
+    { text: `¡Hola! Soy ${clubName} IA 🔴⚪⚫. ¿En qué puedo ayudarte hoy? Podés consultarme horarios, reglas de deportes, pedirme ayuda con la escuela o jugar una trivia.`, isBot: true }
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);

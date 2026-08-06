@@ -2,8 +2,10 @@
 import React, { useState } from 'react';
 import { Shield, Eye, Clock, Award, CheckCircle, Save, Settings, Users } from 'lucide-react';
 import ClubShield from '@/components/ClubShield';
+import { useTheme } from '@/components/ThemeContext';
 
 export default function ParentalControl() {
+  const { theme } = useTheme();
   const [socialVisibility, setSocialVisibility] = useState(true);
   const [iaHomeworkFilter, setIaHomeworkFilter] = useState(true);
   const [playTimeLimit, setPlayTimeLimit] = useState("unlimited");
@@ -28,7 +30,7 @@ export default function ParentalControl() {
           <h2 className="text-3xl font-black text-jn-black tracking-tight flex items-center gap-3">
             <Shield className="text-jn-red" size={32} /> CONTROL PARENTAL Y SEGURIDAD
           </h2>
-          <p className="text-sm text-gray-500">Configurá el espacio digital seguro para tus hijos en la comunidad Jorge Newbery.</p>
+          <p className="text-sm text-gray-500">Configurá el espacio digital seguro para tus hijos en {theme?.clubName || 'nuestra comunidad'}.</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">

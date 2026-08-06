@@ -6,8 +6,12 @@ import FutsalScene3D from '@/components/FutsalScene3D';
 import ClubShield from '@/components/ClubShield';
 import { API_URL } from '@/config';
 import { apiFetch } from '@/lib/apiClient';
+import { useTheme } from '@/components/ThemeContext';
 
 export default function FutsalAFA() {
+  const { theme } = useTheme();
+  const clubShortName = theme?.clubShortName || 'Nuestro Club';
+  const clubName = theme?.clubName || 'Club Deportivo';
   const [selectedDivision, setSelectedDivision] = useState("Primera Masculina"); // "Primera Masculina" or "Primera Femenina"
   const [activeTab, setActiveTab] = useState("plantel"); // plantel, fixture, stats, media, news
 
@@ -105,7 +109,7 @@ export default function FutsalAFA() {
     .slice(0, 5);
 
   const standings = [
-    { pos: 1, equipo: "Jorge Newbery", pts: 45, pj: 18, pg: 14, pe: 3, pp: 1, gf: 65, gc: 32 },
+    { pos: 1, equipo: clubShortName, pts: 45, pj: 18, pg: 14, pe: 3, pp: 1, gf: 65, gc: 32 },
     { pos: 2, equipo: "17 de Agosto", pts: 42, pj: 18, pg: 13, pe: 3, pp: 2, gf: 58, gc: 38 },
     { pos: 3, equipo: "Boca Juniors", pts: 40, pj: 18, pg: 12, pe: 4, pp: 2, gf: 54, gc: 40 },
     { pos: 4, equipo: "San Lorenzo", pts: 38, pj: 18, pg: 11, pe: 5, pp: 2, gf: 50, gc: 42 },
@@ -127,7 +131,7 @@ export default function FutsalAFA() {
         <div className="relative z-20 container mx-auto px-6 md:px-12 flex flex-col md:flex-row md:items-center justify-between gap-10">
           
           <div className="max-w-2xl space-y-6">
-            {/* Escudo Jorge Newbery y Título */}
+            {/* Escudo y Título */}
             <div className="flex items-center gap-4">
               <ClubShield className="w-16 h-20 drop-shadow-[0_0_15px_rgba(211,47,47,0.4)]" animate={true} />
               <div>
@@ -146,7 +150,7 @@ export default function FutsalAFA() {
             </p>
             
             <p className="text-sm md:text-base text-gray-400 font-light max-w-lg leading-relaxed">
-              Jorge Newbery compite en la máxima categoría del Futsal Argentino. Acompañá al primer equipo masculino y femenino en cada encuentro.
+              {clubName} compite en la máxima categoría del Futsal Argentino. Acompañá al primer equipo masculino y femenino en cada encuentro.
             </p>
             
             {/* ─── CENTRO DEL PARTIDO ─── */}

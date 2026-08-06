@@ -5,6 +5,8 @@ import {
   DollarSign, Clock, RefreshCw, X, ShieldAlert, Sparkles
 } from 'lucide-react';
 
+import { apiFetch } from '@/lib/apiClient';
+import { useTheme } from '@/components/ThemeContext';
 import { API_URL } from '@/config';
 import ReceiptPDF from '@/components/ReceiptPDF';
 
@@ -362,7 +364,7 @@ export default function MisCuotasSocio() {
                 Simulador Mercado Pago Checkout
               </span>
               <h3 className="font-black text-lg uppercase mt-2.5">Portal de Pagos Oficial</h3>
-              <p className="text-xs text-gray-400">Club Atlético Jorge Newbery</p>
+              <p className="text-xs text-gray-400">{theme?.clubName || 'Club Deportivo'}</p>
             </div>
 
             {/* Payment Summary */}

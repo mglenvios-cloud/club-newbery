@@ -5,7 +5,8 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import SponsorBanner from '@/components/SponsorBanner';
 import FloatingIA from '@/components/FloatingIA';
-import { ArrowRight, Trophy, Users, Activity, ShieldCheck, Sparkles, Medal } from 'lucide-react';
+import { ArrowRight, Trophy, Users, ShieldCheck } from 'lucide-react';
+import { useTheme } from '@/components/ThemeContext';
 
 import HeroOverlay from '@/components/HeroOverlay';
 import OurClubSection from '@/components/OurClubSection';
@@ -20,6 +21,8 @@ const Newbery3DHero = dynamic(() => import('@/components/Newbery3DHero'), {
 });
 
 export default function Home() {
+  const { theme } = useTheme();
+
   return (
     <div className="min-h-screen bg-jn-black text-white font-sans selection:bg-jn-red selection:text-white">
       <Navbar />
@@ -42,8 +45,8 @@ export default function Home() {
         {/* Sección Destacados & Accesos Rápidos */}
         <section className="container mx-auto px-4 py-12">
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-4">
-              CLUB ATLÉTICO JORGE NEWBERY
+            <h2 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-4 uppercase">
+              {theme?.clubName || 'CLUB ATLÉTICO JORGE NEWBERY'}
             </h2>
             <p className="text-gray-400 text-base">
               Plataforma Oficial Institucional • Villa Devoto, Buenos Aires
@@ -52,7 +55,13 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-4 hover:border-jn-red/40 transition-all">
-              <div className="w-12 h-12 rounded-2xl bg-jn-red/10 text-jn-red flex items-center justify-center">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                style={{
+                  backgroundColor: `${theme?.primaryColor || '#dc2626'}20`,
+                  color: theme?.primaryColor || '#dc2626',
+                }}
+              >
                 <Trophy size={24} />
               </div>
               <h3 className="font-bold text-white text-lg">Gestión Deportiva</h3>
@@ -61,7 +70,8 @@ export default function Home() {
               </p>
               <Link
                 href="/admin/gestion-deportiva"
-                className="inline-flex items-center gap-2 text-xs font-bold text-jn-red hover:underline"
+                className="inline-flex items-center gap-2 text-xs font-bold hover:underline"
+                style={{ color: theme?.primaryColor || '#dc2626' }}
               >
                 <span>Acceder a Consola</span>
                 <ArrowRight size={14} />
@@ -74,7 +84,7 @@ export default function Home() {
               </div>
               <h3 className="font-bold text-white text-lg">El Semillero / Inferiores</h3>
               <p className="text-xs text-gray-400 leading-relaxed">
-                Álbum Panini 2026, minijuegos interativos, nivel de deportista y desarrollo infantil.
+                Álbum Panini 2026, minijuegos interactivos, nivel de deportista y desarrollo infantil.
               </p>
               <Link
                 href="/mundo-inferiores"

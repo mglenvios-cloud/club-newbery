@@ -6,7 +6,10 @@ import ClubShield from '@/components/ClubShield';
 import { API_URL } from '@/config';
 import { apiFetch } from '@/lib/apiClient';
 
+import { useTheme } from '@/components/ThemeContext';
+
 export default function MundoInferiores() {
+  const { theme } = useTheme();
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState("ALL");
@@ -59,7 +62,7 @@ export default function MundoInferiores() {
             Semillero 🌟
           </span>
           <h1 className="text-4xl font-black uppercase tracking-tight">MUNDO INFERIORES</h1>
-          <p className="text-sm text-gray-400 max-w-md mx-auto">Fichas digitales, estadísticas y logros de las futuras promesas del Club Jorge Newbery.</p>
+          <p className="text-sm text-gray-400 max-w-md mx-auto">Fichas digitales, estadísticas y logros de las futuras promesas de {theme?.clubName || 'nuestro club'}.</p>
         </div>
       </div>
 

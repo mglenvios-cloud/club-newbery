@@ -2,6 +2,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import FloatingIA from "@/components/FloatingIA";
+import { ThemeProvider } from "@/components/ThemeContext";
+import LiveThemeEditor from "@/components/LiveThemeEditor";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -40,12 +42,20 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body className={`${inter.className} min-h-screen flex flex-col relative`}>
-        <Navbar />
-        <main className="flex-grow pt-16 pb-16 md:pb-0">
-          {children}
-        </main>
-        <FloatingIA />
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@700;900&family=Montserrat:ital,wght@0,700;0,900;1,700&family=Orbitron:wght@700;900&family=Outfit:wght@700;900&family=Poppins:wght@600;800;900&family=Roboto+Condensed:wght@700;900&family=Russo+One&family=Space+Mono:wght@700&family=Teko:wght@700&display=swap" rel="stylesheet" />
+      </head>
+      <body className={`${inter.className} min-h-screen flex flex-col relative bg-jn-black text-white`}>
+        <ThemeProvider>
+          <Navbar />
+          <main className="flex-grow pt-16 pb-16 md:pb-0">
+            {children}
+          </main>
+          <FloatingIA />
+          <LiveThemeEditor />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -10,16 +10,14 @@ export default function Newbery3DHero() {
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    // Verificar si WebGL está soportado por el navegador
     if (!BABYLON.Engine.isSupported()) {
       console.warn("WebGL no está soportado en este navegador. Cargando fallback.");
-      setTimeout(() => setWebGLSupported(false), 0);
+      setWebGLSupported(false);
       return;
     }
 
     let engine;
     try {
-      // Inicializar Motor
       engine = new BABYLON.Engine(canvasRef.current, true, {
         preserveDrawingBuffer: true,
         stencil: true
@@ -30,9 +28,7 @@ export default function Newbery3DHero() {
       return;
     }
 
-    // Inicializar Escena
     const scene = new BABYLON.Scene(engine);
-    // Fondo oscuro/negro deportivo
     scene.clearColor = new BABYLON.Color4(0.04, 0.04, 0.04, 1.0);
 
     // Cámara ArcRotate
@@ -44,7 +40,6 @@ export default function Newbery3DHero() {
       BABYLON.Vector3.Zero(),
       scene
     );
-    // Limitar zoom para evitar que rompan el layout
     camera.attachControl(canvasRef.current, true, false);
     camera.lowerRadiusLimit = 5;
     camera.upperRadiusLimit = 9;
@@ -59,7 +54,6 @@ export default function Newbery3DHero() {
     );
     hemiLight.intensity = 0.7;
 
-    // Luz de punto roja brillante (Efecto neón)
     const redLight = new BABYLON.PointLight(
       "redLight",
       new BABYLON.Vector3(2.5, 2, 2.5),
@@ -68,7 +62,6 @@ export default function Newbery3DHero() {
     redLight.diffuse = new BABYLON.Color3(0.9, 0.1, 0.1);
     redLight.intensity = 1.8;
 
-    // Luz de punto blanca brillante
     const whiteLight = new BABYLON.PointLight(
       "whiteLight",
       new BABYLON.Vector3(-2.5, -2, -2.5),
@@ -84,7 +77,6 @@ export default function Newbery3DHero() {
       scene
     );
     
-    // Crear Material para la pelota con textura dinámica
     const ballMaterial = new BABYLON.StandardMaterial("ballMaterial", scene);
     const dynamicTexture = new BABYLON.DynamicTexture(
       "dynamicTexture",
@@ -98,34 +90,28 @@ export default function Newbery3DHero() {
     ballMaterial.roughness = 0.2;
     ball.material = ballMaterial;
 
-    // Dibujar el diseño del balón en la textura dinámica
     const drawBallTexture = () => {
       const ctx = dynamicTexture.getContext();
       
-      // Fondo blanco del cuero
       ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(0, 0, 512, 256);
 
-      // Definir los centros de los parches pentagonales para cubrir la esfera
       const patches = [
         { x: 42, y: 50 }, { x: 128, y: 50 }, { x: 213, y: 50 }, { x: 298, y: 50 }, { x: 384, y: 50 }, { x: 470, y: 50 },
         { x: 0, y: 128 }, { x: 85, y: 128 }, { x: 170, y: 128 }, { x: 256, y: 128 }, { x: 341, y: 128 }, { x: 426, y: 128 }, { x: 512, y: 128 },
         { x: 42, y: 206 }, { x: 128, y: 206 }, { x: 213, y: 206 }, { x: 298, y: 206 }, { x: 384, y: 206 }, { x: 470, y: 206 }
       ];
 
-      // Dibujar costuras/líneas entre parches para simular cuero cosido (en gris oscuro/rojo)
       ctx.strokeStyle = "#DDDDDD";
       ctx.lineWidth = 2.5;
       
       ctx.beginPath();
       patches.forEach((p) => {
-        // Conectar con el siguiente horizontal
         const nextH = patches.find(other => Math.abs(other.y - p.y) < 5 && other.x > p.x && other.x - p.x < 100);
         if (nextH) {
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(nextH.x, nextH.y);
         }
-        // Conectar con el siguiente vertical diagonal
         const nextV = patches.find(other => other.y > p.y && other.y - p.y < 85 && Math.abs(other.x - p.x) < 50);
         if (nextV) {
           ctx.moveTo(p.x, p.y);
@@ -134,9 +120,7 @@ export default function Newbery3DHero() {
       });
       ctx.stroke();
 
-      // Dibujar pentágonos negros con borde rojo
       patches.forEach((p) => {
-        // Omitimos el parche central de la fila 2 para imprimir el logo de Jorge Newbery
         if (p.x === 256 && p.y === 128) {
           return;
         }
@@ -159,7 +143,6 @@ export default function Newbery3DHero() {
         ctx.stroke();
       });
 
-      // Dibujar el logo oficial / marca en la parte central blanca
       ctx.strokeStyle = "#D32F2F";
       ctx.lineWidth = 3;
       ctx.fillStyle = "#FFFFFF";
@@ -168,7 +151,6 @@ export default function Newbery3DHero() {
       ctx.fill();
       ctx.stroke();
 
-      // Texto interno de marca del club
       ctx.fillStyle = "#111111";
       ctx.font = "bold 9px 'Montserrat', sans-serif";
       ctx.textAlign = "center";
@@ -178,23 +160,21 @@ export default function Newbery3DHero() {
       ctx.font = "black 9px 'Montserrat', sans-serif";
       ctx.fillText("NEWBERY", 256, 134);
 
-      // Marca adicional para realismo
       ctx.fillStyle = "#888888";
       ctx.font = "bold 8px 'Montserrat', sans-serif";
       ctx.fillText("FUTSAL OFICIAL", 256, 185);
 
-      // Actualizar textura
       dynamicTexture.update();
     };
 
     drawBallTexture();
 
-    // Crear esferas orbitantes (partículas/átomos del club)
+    // Crear esferas orbitantes (átomos del club)
     const orbiters = [];
     const colors = [
-      new BABYLON.Color3(0.83, 0.11, 0.11), // Rojo Club
-      new BABYLON.Color3(1, 1, 1),          // Blanco
-      new BABYLON.Color3(0.2, 0.2, 0.2),    // Negro
+      new BABYLON.Color3(0.83, 0.11, 0.11),
+      new BABYLON.Color3(1, 1, 1),
+      new BABYLON.Color3(0.2, 0.2, 0.2),
     ];
 
     for (let i = 0; i < 18; i++) {
@@ -211,7 +191,6 @@ export default function Newbery3DHero() {
       orbMat.specularColor = new BABYLON.Color3(0.8, 0.8, 0.8);
       orb.material = orbMat;
 
-      // Definir parámetros de órbita
       orbiters.push({
         mesh: orb,
         radiusX: 2.2 + Math.random() * 1.5,
@@ -223,19 +202,14 @@ export default function Newbery3DHero() {
       });
     }
 
-    // Bucle de renderizado y animación
     scene.registerBeforeRender(() => {
       const time = Date.now() * 0.001;
 
-      // Rotación tridimensional de la pelota de futsal
       ball.rotation.y = time * 0.45;
       ball.rotation.x = time * 0.18;
       ball.rotation.z = Math.sin(time * 0.3) * 0.1;
-
-      // Flotación arriba/abajo
       ball.position.y = Math.sin(time * 1.5) * 0.15;
 
-      // Animación de órbitas
       orbiters.forEach((orb) => {
         orb.angle += orb.speed;
         orb.mesh.position.x = Math.cos(orb.angle) * orb.radiusX;
@@ -243,7 +217,6 @@ export default function Newbery3DHero() {
         orb.mesh.position.y = Math.sin(time * orb.wobbleSpeed) * 0.5 + orb.heightOffset;
       });
 
-      // Mover luces ligeramente para generar brillos cambiantes
       redLight.position.x = Math.sin(time) * 3;
       redLight.position.z = Math.cos(time) * 3;
     });
@@ -252,7 +225,6 @@ export default function Newbery3DHero() {
       scene.render();
     });
 
-    // Resize Handler
     const handleResize = () => {
       engine.resize();
     };
@@ -284,8 +256,7 @@ export default function Newbery3DHero() {
 
   return (
     <div className="w-full h-full relative">
-      <canvas ref={canvasRef} className="w-full h-full block outline-none" />
-      {/* Controles de cámara flotantes para avisarle al usuario que es 3D */}
+      <canvas ref={canvasRef} className="w-full h-full block outline-none cursor-grab active:cursor-grabbing" />
       <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 pointer-events-none">
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
           <Sparkles size={10} className="text-jn-red animate-spin [animation-duration:4s]" />

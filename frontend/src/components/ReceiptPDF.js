@@ -35,6 +35,10 @@ const formatDate = (dateStr) => {
  * Plantilla HTML Aislada Exclusiva para el Recibo
  */
 export function StandaloneReceiptTemplate({ receipt }) {
+  const { theme } = useTheme();
+  const displayClubName = theme?.clubName || 'Club Atlético Jorge Newbery';
+  const displayShortName = theme?.clubShortName || 'JN';
+
   const receiptNum = receipt?.numero || receipt?.receiptNumber || `REC-${100000 + (receipt?.id || 1)}`;
   const fecha = formatDate(receipt?.fechaEmision || receipt?.fechaPago || receipt?.date || new Date());
   const socioNombre = receipt?.memberName || (receipt?.socio ? `${receipt.socio.firstName} ${receipt.socio.lastName}` : receipt?.nombreCliente || 'Socio / Cliente');
@@ -63,11 +67,11 @@ export function StandaloneReceiptTemplate({ receipt }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '4px solid #b91c1c', paddingBottom: '20px', marginBottom: '24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <div style={{ width: '56px', height: '56px', backgroundColor: '#b91c1c', color: '#ffffff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '22px', border: '2px solid #991b1b', textTransform: 'uppercase' }}>
-            JN
+            {displayShortName.substring(0, 2)}
           </div>
           <div>
             <h1 style={{ margin: '0', fontSize: '20px', fontWeight: '900', textTransform: 'uppercase', color: '#0f172a', letterSpacing: '-0.5px' }}>
-              Club Atlético Jorge Newbery
+              {displayClubName}
             </h1>
             <p style={{ margin: '2px 0 0 0', fontSize: '10px', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>
               Institución Deportiva &amp; Social • Devoto, CABA

@@ -2,8 +2,10 @@
 import React, { useState } from 'react';
 import { Trophy, Star, Medal, Users2, ShieldAlert, Award, Calendar, ThumbsUp, Gamepad2 } from 'lucide-react';
 import ClubShield from '@/components/ClubShield';
+import { useTheme } from '@/components/ThemeContext';
 
 export default function RankingsPage() {
+  const { theme } = useTheme();
   const [rankingType, setRankingType] = useState("XP"); // XP, COMPANERO, ASISTENCIA, FAIRPLAY, JUEGOS
 
   const rankings = {
@@ -152,7 +154,7 @@ export default function RankingsPage() {
 
         {/* NOTA DE VALORES */}
         <div className="bg-gradient-to-br from-jn-red/5 to-jn-darkred/5 border border-jn-red/10 p-6 rounded-2xl text-center max-w-lg mx-auto">
-          <h4 className="font-bold text-sm text-jn-red uppercase tracking-wider mb-2">⭐ Valores del Club Jorge Newbery</h4>
+          <h4 className="font-bold text-sm text-jn-red uppercase tracking-wider mb-2">⭐ Valores de {theme?.clubName || 'Nuestro Club'}</h4>
           <p className="text-xs text-gray-500 leading-relaxed">
             Recordá que los rankings se actualizan semanalmente. Los profes cargan la asistencia y las estrellas de Fair Play al finalizar cada práctica. ¡El respeto y el compañerismo cotizan doble!
           </p>
