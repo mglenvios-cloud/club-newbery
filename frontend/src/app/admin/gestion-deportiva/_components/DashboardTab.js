@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '@/components/ThemeContext';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, AreaChart, Area, Legend
@@ -84,6 +85,7 @@ const CategoryBadge = ({ category, count, color }) => (
 );
 
 export default function DashboardTab({ stats, players, teams, coaches, matches, trainings, onRefresh, loading, skeletonLoading, usingDemoData, onNavigate }) {
+  const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
@@ -206,11 +208,13 @@ export default function DashboardTab({ stats, players, teams, coaches, matches, 
         <div className="absolute inset-0 bg-[url('/shield.png')] bg-right bg-no-repeat bg-contain opacity-5" />
         <div className="relative">
           <div className="flex items-center gap-3 mb-1">
-            <Trophy size={24} className="text-jn-red" />
-            <span className="text-sm font-black uppercase tracking-widest text-red-400">Centro de Gestión Deportiva</span>
+            <Trophy size={24} className="text-jn-red" style={{ color: theme?.primaryColor }} />
+            <span className="text-sm font-black uppercase tracking-widest text-red-400" style={{ color: theme?.accentColor }}>
+              {theme?.managementTitle || 'Centro de Gestión Deportiva'}
+            </span>
           </div>
-          <h1 className="text-3xl font-black mb-1">Club Atlético Jorge Newbery</h1>
-          <p className="text-gray-400 text-sm font-medium">Futsal AFA — Temporada 2026 · {OFFICIAL_CATEGORIES.length} Categorías</p>
+          <h1 className="text-3xl font-black mb-1">{theme?.clubName || 'Club Atlético Jorge Newbery'}</h1>
+          <p className="text-gray-400 text-sm font-medium">{theme?.disciplineSubtitle || `Futsal AFA — Temporada 2026 · ${OFFICIAL_CATEGORIES.length} Categorías`}</p>
           <div className="flex items-center gap-4 mt-4">
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />

@@ -2,11 +2,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const DEFAULT_THEME = {
-  clubName: "CLUB DEPORTIVO",
-  clubShortName: "CLUB DIGITAL",
-  subTitle: "PLATAFORMA OFICIAL",
+  clubName: "CLUB JORGE NEWBERY",
+  clubShortName: "JORGE NEWBERY",
+  subTitle: "CLUB DIGITAL",
   tagline: "El futuro del deporte comienza aquí",
-  badgeText: "⚽ Ecosistema Digital Deportivo",
+  badgeText: "⚽ Más de 100 años haciendo historia",
   managementTitle: "Centro de Gestión Deportiva",
   disciplineSubtitle: "Futsal AFA — Temporada 2026 · 11 Categorías",
   primaryColor: "#dc2626",   // Color Principal
@@ -57,14 +57,14 @@ export const SHIELD_SHAPE_OPTIONS = [
 ];
 
 export const COLOR_PRESETS = [
-  { name: "Trilogy Red & White", primary: "#dc2626", accent: "#ffffff", tertiary: "#111827", preview: ["#dc2626", "#ffffff", "#111827"] },
+  { name: "Pinocho (Verde, Blanco, Negro)", primary: "#16a34a", accent: "#ffffff", tertiary: "#09090b", preview: ["#16a34a", "#ffffff", "#09090b"] },
+  { name: "Jorge Newbery (Rojo, Blanco, Negro)", primary: "#dc2626", accent: "#ffffff", tertiary: "#09090b", preview: ["#dc2626", "#ffffff", "#09090b"] },
+  { name: "17 de Agosto (Verde, Blanco, Rojo)", primary: "#15803d", accent: "#ffffff", tertiary: "#b91c1c", preview: ["#15803d", "#ffffff", "#b91c1c"] },
+  { name: "Kimberley (Azul, Blanco, Marino)", primary: "#2563eb", accent: "#ffffff", tertiary: "#1e293b", preview: ["#2563eb", "#ffffff", "#1e293b"] },
+  { name: "San Lorenzo Futsal (Azulgrana & Blanco)", primary: "#0284c7", accent: "#dc2626", tertiary: "#ffffff", preview: ["#0284c7", "#dc2626", "#ffffff"] },
   { name: "Boca / Central (Azul, Oro, Blanco)", primary: "#1d4ed8", accent: "#f59e0b", tertiary: "#ffffff", preview: ["#1d4ed8", "#f59e0b", "#ffffff"] },
-  { name: "San Lorenzo / Barca (Azulgrana & Blanco)", primary: "#991b1b", accent: "#1e40af", tertiary: "#ffffff", preview: ["#991b1b", "#1e40af", "#ffffff"] },
-  { name: "Tricolor Italiano (Verde, Blanco, Rojo)", primary: "#059669", accent: "#ffffff", tertiary: "#dc2626", preview: ["#059669", "#ffffff", "#dc2626"] },
   { name: "Vélez / Racing (Azul, Celeste, Blanco)", primary: "#1e3a8a", accent: "#38bdf8", tertiary: "#ffffff", preview: ["#1e3a8a", "#38bdf8", "#ffffff"] },
   { name: "Peñarol / BVB (Dorado, Negro, Blanco)", primary: "#eab308", accent: "#18181b", tertiary: "#ffffff", preview: ["#eab308", "#18181b", "#ffffff"] },
-  { name: "Flamengo / Newell's (Negro, Rojo, Blanco)", primary: "#18181b", accent: "#dc2626", tertiary: "#ffffff", preview: ["#18181b", "#dc2626", "#ffffff"] },
-  { name: "Fiorentina (Violeta, Oro, Blanco)", primary: "#7c3aed", accent: "#f59e0b", tertiary: "#ffffff", preview: ["#7c3aed", "#f59e0b", "#ffffff"] },
 ];
 
 export const OBJECT_3D_OPTIONS = [

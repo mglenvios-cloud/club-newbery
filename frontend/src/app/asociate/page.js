@@ -8,6 +8,7 @@ import { useTheme } from '@/components/ThemeContext';
 
 export default function AsociatePage() {
   const { theme } = useTheme();
+  const tvTitleDisplay = theme?.tvTitle || (theme?.clubShortName ? `${theme.clubShortName} TV` : 'CLUB TV');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [dni, setDni] = useState('');
@@ -62,7 +63,7 @@ export default function AsociatePage() {
         <div className="text-center mb-12 flex flex-col items-center">
           <ClubShield className="w-14 h-16 drop-shadow-[0_0_15px_rgba(211,47,47,0.4)] mb-4" />
           <h1 className="text-5xl font-black text-jn-white mb-2 uppercase tracking-tight">Hacete Socio</h1>
-          <p className="text-sm text-gray-400 max-w-lg">Sumate a la familia de {theme?.clubName || 'nuestro club'}. Rápido, digital y sin papeles.</p>
+          <p className="text-sm text-gray-400 max-w-lg">Sumate a la familia de {theme?.clubName || 'nuestra institución'}. Rápido, digital y sin papeles.</p>
         </div>
 
         {successData ? (
@@ -107,7 +108,7 @@ export default function AsociatePage() {
                 <li className="flex items-center gap-3"><CheckCircle className="text-jn-red flex-shrink-0" size={18} /> Ingreso libre a las instalaciones del club</li>
                 <li className="flex items-center gap-3"><CheckCircle className="text-jn-red flex-shrink-0" size={18} /> Descuentos en alquiler de canchas y quinchos</li>
                 <li className="flex items-center gap-3"><CheckCircle className="text-jn-red flex-shrink-0" size={18} /> Precios preferenciales en aranceles de disciplinas</li>
-                <li className="flex items-center gap-3"><CheckCircle className="text-jn-red flex-shrink-0" size={18} /> Acceso prioritario a transmisiones en vivo (Newbery TV)</li>
+                <li className="flex items-center gap-3"><CheckCircle className="text-jn-red flex-shrink-0" size={18} /> Acceso prioritario a transmisiones en vivo ({tvTitleDisplay})</li>
                 <li className="flex items-center gap-3"><CheckCircle className="text-jn-red flex-shrink-0" size={18} /> Voto en asambleas para elecciones de la directiva</li>
               </ul>
             </div>

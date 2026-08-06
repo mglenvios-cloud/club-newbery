@@ -4,7 +4,7 @@ import { Palette, Type, RefreshCw, X, Check, Sparkles, Sliders, Box, Image as Im
 import { useTheme, COLOR_PRESETS, OBJECT_3D_OPTIONS, FONT_OPTIONS, FONT_SIZE_OPTIONS, SHIELD_SHAPE_OPTIONS } from './ThemeContext';
 
 export default function LiveThemeEditor() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('colors'); // 'colors' | 'texts' | 'tv' | '3d' | 'logo'
   const { theme, updateTheme, resetTheme } = useTheme();
 
@@ -376,7 +376,7 @@ export default function LiveThemeEditor() {
                     type="text"
                     value={theme.clubName}
                     onChange={(e) => updateTheme({ clubName: e.target.value })}
-                    placeholder="Ej: CLUB PINOCHO"
+                    placeholder="Ej: CLUB JORGE NEWBERY"
                     className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white font-bold focus:outline-none focus:border-red-500 transition-colors"
                   />
                 </div>
@@ -387,7 +387,7 @@ export default function LiveThemeEditor() {
                     type="text"
                     value={theme.clubShortName}
                     onChange={(e) => updateTheme({ clubShortName: e.target.value })}
-                    placeholder="Ej: PINOCHO"
+                    placeholder="Ej: JORGE NEWBERY"
                     className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white font-bold focus:outline-none focus:border-red-500 transition-colors"
                   />
                 </div>
