@@ -100,7 +100,7 @@ export async function apiFetch(path, options = {}) {
 
     return response;
   } catch (error) {
-    console.error(`[API] Error de red: ${url}`, error.message);
+    console.warn(`[API] Servidor backend no disponible (${url}):`, error.message);
     throw error;
   }
 }

@@ -143,6 +143,11 @@ export function ThemeProvider({ children }) {
       root.style.setProperty('--live-tertiary', theme.tertiaryColor || '#ffffff');
       root.style.setProperty('--live-bg-color', theme.bgColor || '#070707');
 
+      // Apply background color directly to body and html so every page changes instantly
+      const bgVal = theme.bgColor || '#070707';
+      document.body.style.backgroundColor = bgVal;
+      document.documentElement.style.backgroundColor = bgVal;
+
       const selectedFont = FONT_OPTIONS.find(f => f.id === theme.fontFamily)?.fontCss || "Inter, sans-serif";
       root.style.setProperty('--live-font', selectedFont);
       document.body.style.fontFamily = selectedFont;

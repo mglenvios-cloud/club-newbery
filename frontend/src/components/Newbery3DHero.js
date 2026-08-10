@@ -24,9 +24,14 @@ export default function Newbery3DHero() {
         preserveDrawingBuffer: true,
         stencil: true
       });
+      scene = new BABYLON.Scene(engine);
       const bgHex = theme?.bgColor || "#070707";
-      const bgC = BABYLON.Color3.FromHexString(bgHex);
-      scene.clearColor = new BABYLON.Color4(bgC.r, bgC.g, bgC.b, 1.0);
+      try {
+        const bgC = BABYLON.Color3.FromHexString(bgHex);
+        scene.clearColor = new BABYLON.Color4(bgC.r, bgC.g, bgC.b, 1.0);
+      } catch(_) {
+        scene.clearColor = new BABYLON.Color4(0.027, 0.027, 0.027, 1.0);
+      }
     } catch (e) {
       console.error("Fallo al crear escena Babylon:", e);
       setWebGLSupported(false);

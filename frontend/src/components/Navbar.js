@@ -13,6 +13,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Inicio', path: '/' },
+    { name: 'Editor 3D 🎨', path: '/customizer' },
     { 
       name: 'Disciplinas', 
       path: '#',

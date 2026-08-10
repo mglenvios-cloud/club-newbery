@@ -1,9 +1,12 @@
-import React from 'react';
-import { PlayCircle, Users, Clock, Video, Calendar, Shield, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { PlayCircle, Users, Clock, Video, Calendar, Shield, User, Copy, Check, ExternalLink } from 'lucide-react';
 import LiveBadge from './LiveBadge';
 import { config } from './config';
+import { getCanonicalYouTubeUrl } from '@/lib/youtubeUtils';
 
 export default function HeroLive({ liveMatch, videoDestacado, onPlayVideo }) {
+  const [copied, setCopied] = useState(false);
+
   // Determinamos qué mostrar prioritariamente (LIVE primero, luego destacado)
   const isLive = liveMatch && liveMatch.status === 'LIVE';
   
@@ -17,12 +20,25 @@ export default function HeroLive({ liveMatch, videoDestacado, onPlayVideo }) {
 
   const displayCategory = isLive ? liveMatch.competition : (videoDestacado ? videoDestacado.category : "STREAMING");
   
+  const targetUrl = isLive
+    ? (liveMatch.liveStreamUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+    : (videoDestacado ? videoDestacado.url : 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+
+  const canonicalYtUrl = getCanonicalYouTubeUrl(targetUrl);
+  const lpfPlayUrl = "https://www.lpfplay.com/page/684743a8b6b14151aae96cad";
+
+  const handleCopyYouTubeLink = () => {
+    navigator.clipboard.writeText(canonicalYtUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
   const handlePlayClick = () => {
     if (isLive) {
       onPlayVideo({
         id: `live-${liveMatch.id}`,
         title: `Transmisión en Vivo: Jorge Newbery vs ${liveMatch.opponent}`,
-        url: liveMatch.liveStreamUrl || 'https://www.w3schools.com/html/mov_bbb.mp4',
+        url: liveMatch.liveStreamUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         category: 'Partidos Completos',
         description: displayDesc,
         matchId: liveMatch.id,
@@ -36,7 +52,7 @@ export default function HeroLive({ liveMatch, videoDestacado, onPlayVideo }) {
   return (
     <section className="relative w-full min-h-[75vh] md:min-h-[85vh] flex items-center bg-black overflow-hidden border-b border-zinc-800">
       
-      {/* 1. Background Cover Image with high-impact zoom scale effect */}
+      {/* 1. Background Cover Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center scale-105 opacity-50 transform hover:scale-100 transition-transform duration-10000 ease-out" 
         style={{ backgroundImage: `url('${config.defaultFallbackImage}')` }}
@@ -77,7 +93,7 @@ export default function HeroLive({ liveMatch, videoDestacado, onPlayVideo }) {
           </p>
         </div>
 
-        {/* Match Metadata (Venue, Referee, Date, Attendance) */}
+        {/* Match Metadata */}
         {isLive ? (
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-zinc-400 font-mono border-y border-white/5 py-4 w-fit select-none">
             <span className="flex items-center gap-2">
@@ -103,11 +119,11 @@ export default function HeroLive({ liveMatch, videoDestacado, onPlayVideo }) {
         )}
 
         {/* High-Fidelity Call-To-Action Buttons */}
-        <div className="flex flex-wrap gap-4 pt-2">
+        <div className="flex flex-wrap items-center gap-3 pt-2">
           {(isLive || videoDestacado) && (
             <button
               onClick={handlePlayClick}
-              className="group flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full font-black text-xs uppercase tracking-wider transition-all hover:scale-105 shadow-[0_0_25px_rgba(220,38,38,0.5)] cursor-pointer"
+              className="group flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-7 py-3.5 rounded-full font-black text-xs uppercase tracking-wider transition-all hover:scale-105 shadow-[0_0_25px_rgba(220,38,38,0.5)] cursor-pointer"
             >
               {isLive ? (
                 <Video size={16} className="group-hover:rotate-12 transition-transform" />
@@ -118,18 +134,39 @@ export default function HeroLive({ liveMatch, videoDestacado, onPlayVideo }) {
             </button>
           )}
 
-          {videoDestacado && !isLive && (
-            <button 
-              onClick={handlePlayClick}
-              className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/20 hover:border-white/30 backdrop-blur-md px-8 py-4 rounded-full font-black text-xs uppercase tracking-wider transition-all hover:scale-105 cursor-pointer"
-            >
-              <span>Ver Resumen</span>
-            </button>
-          )}
+          {/* Enlace Directo a YouTube */}
+          <a
+            href={canonicalYtUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-500/40 px-6 py-3.5 rounded-full font-black text-xs uppercase tracking-wider transition-all hover:scale-105 cursor-pointer"
+          >
+            <ExternalLink size={15} />
+            <span>ABRIR EN YOUTUBE</span>
+          </a>
+
+          {/* Link Directo a LPF Play */}
+          <a
+            href={lpfPlayUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 bg-gradient-to-r from-blue-900 to-indigo-900 hover:from-blue-800 hover:to-indigo-800 text-white border border-blue-400/40 px-6 py-3.5 rounded-full font-black text-xs uppercase tracking-wider transition-all hover:scale-105 shadow-lg shadow-blue-950/50 cursor-pointer"
+          >
+            <ExternalLink size={15} />
+            <span>TRANSMISIÓN LPF PLAY</span>
+          </a>
+
+          {/* Copiar Link YouTube */}
+          <button
+            onClick={handleCopyYouTubeLink}
+            className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/20 hover:border-white/30 backdrop-blur-md px-6 py-3.5 rounded-full font-black text-xs uppercase tracking-wider transition-all hover:scale-105 cursor-pointer"
+          >
+            {copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
+            <span>{copied ? '¡LINK COPIADO!' : 'COPIAR LINK YOUTUBE'}</span>
+          </button>
         </div>
       </div>
 
-      {/* Styled JSX for local animation frames */}
       <style jsx>{`
         @keyframes slideUp {
           from {
