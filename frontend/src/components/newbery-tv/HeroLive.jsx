@@ -1,187 +1,202 @@
 import React, { useState } from 'react';
-import { PlayCircle, Users, Clock, Video, Calendar, Shield, User, Copy, Check, ExternalLink } from 'lucide-react';
+import { PlayCircle, Users, Clock, Video, Calendar, Shield, Copy, Check, ExternalLink, Youtube, Trophy, MonitorPlay, ShieldCheck } from 'lucide-react';
 import LiveBadge from './LiveBadge';
 import { config } from './config';
 import { getCanonicalYouTubeUrl } from '@/lib/youtubeUtils';
 
 export default function HeroLive({ liveMatch, videoDestacado, onPlayVideo }) {
-  const [copied, setCopied] = useState(false);
+  const DEFAULT_YT_LINK = 'https://youtu.be/clxMCC1Ovjw?si=SmkYXQSBta8VPFEH';
+  const DEFAULT_LFP_LINK = 'https://www.lpfplay.com/page/684743a8b6b14151aae96cad';
 
-  // Determinamos qué mostrar prioritariamente (LIVE primero, luego destacado)
+  const [ytInputUrl, setYtInputUrl] = useState(DEFAULT_YT_LINK);
+  const [ytCopied, setYtCopied] = useState(false);
+
+  const [lfpInputUrl, setLfpInputUrl] = useState(DEFAULT_LFP_LINK);
+  const [lfpCopied, setLfpCopied] = useState(false);
+
   const isLive = liveMatch && liveMatch.status === 'LIVE';
-  
+  const opponentName = (liveMatch && liveMatch.opponent && liveMatch.opponent !== 'undefined') ? liveMatch.opponent : 'San Lorenzo';
+  const compName = (liveMatch && liveMatch.competition && liveMatch.competition !== 'undefined') ? liveMatch.competition : 'AFA Primera';
+
   const displayTitle = isLive 
-    ? `${liveMatch.homeTeam} vs ${liveMatch.opponent}` 
-    : (videoDestacado ? videoDestacado.title : "Newbery TV");
+    ? `${liveMatch.homeTeam || 'Jorge Newbery'} vs ${opponentName}` 
+    : (videoDestacado ? videoDestacado.title : "Jorge Newbery vs Atlanta 2026");
   
   const displayDesc = isLive 
-    ? `Transmisión oficial en vivo del partido frente a ${liveMatch.opponent} por ${liveMatch.competition}.` 
-    : (videoDestacado ? videoDestacado.description : config.subTitle);
+    ? `Transmisión oficial en vivo del partido frente a ${opponentName} por ${compName}.` 
+    : (videoDestacado ? videoDestacado.description : "Los goles y mejores jugadas del triunfo 3-1 en Devoto.");
 
-  const displayCategory = isLive ? liveMatch.competition : (videoDestacado ? videoDestacado.category : "STREAMING");
-  
-  const targetUrl = isLive
-    ? (liveMatch.liveStreamUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ')
-    : (videoDestacado ? videoDestacado.url : 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+  const displayCategory = isLive ? compName : (videoDestacado ? videoDestacado.category : "AFA Primera");
 
-  const canonicalYtUrl = getCanonicalYouTubeUrl(targetUrl);
-  const lpfPlayUrl = "https://www.lpfplay.com/page/684743a8b6b14151aae96cad";
+  const handleCopyYtLink = () => {
+    navigator.clipboard.writeText(ytInputUrl || DEFAULT_YT_LINK);
+    setYtCopied(true);
+    setTimeout(() => setYtCopied(false), 2500);
+  };
 
-  const handleCopyYouTubeLink = () => {
-    navigator.clipboard.writeText(canonicalYtUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+  const handleCopyLfpLink = () => {
+    navigator.clipboard.writeText(lfpInputUrl || DEFAULT_LFP_LINK);
+    setLfpCopied(true);
+    setTimeout(() => setLfpCopied(false), 2500);
+  };
+
+  const handleOpenLfpExternal = () => {
+    window.open(lfpInputUrl || DEFAULT_LFP_LINK, '_blank', 'noopener,noreferrer');
   };
 
   const handlePlayClick = () => {
-    if (isLive) {
+    if (onPlayVideo) {
       onPlayVideo({
-        id: `live-${liveMatch.id}`,
-        title: `Transmisión en Vivo: Jorge Newbery vs ${liveMatch.opponent}`,
-        url: liveMatch.liveStreamUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        category: 'Partidos Completos',
+        id: `yt-stream`,
+        title: displayTitle,
+        url: ytInputUrl || DEFAULT_YT_LINK,
+        category: displayCategory,
         description: displayDesc,
-        matchId: liveMatch.id,
         isLiveStream: true
       });
-    } else if (videoDestacado) {
-      onPlayVideo(videoDestacado);
     }
   };
 
   return (
-    <section className="relative w-full min-h-[75vh] md:min-h-[85vh] flex items-center bg-black overflow-hidden border-b border-zinc-800">
-      
-      {/* 1. Background Cover Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center scale-105 opacity-50 transform hover:scale-100 transition-transform duration-10000 ease-out" 
-        style={{ backgroundImage: `url('${config.defaultFallbackImage}')` }}
-      ></div>
-
-      {/* 2. Premium Gradients Overlay Layers */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#070707] via-black/60 to-transparent z-0"></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/45 to-transparent z-0"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_bottom,rgba(220,38,38,0.15),transparent_45%)] z-0"></div>
-
-      <div className="relative z-10 container mx-auto px-6 max-w-6xl py-12 md:py-20 space-y-6 md:space-y-8 text-left animate-slide-up">
-        
-        {/* Category Pill or Live Pulse Badge */}
-        {isLive ? (
-          <div className="inline-flex items-center gap-2 bg-red-600/10 border border-red-500/35 px-4 py-2 rounded-2xl animate-pulse shadow-lg shadow-red-950/30">
-            <LiveBadge animate={true} text="PARTIDO EN VIVO" />
+    <section className="relative w-full bg-black border-b border-zinc-800 p-4 md:p-8 space-y-8">
+      {/* TARJETAS DUALES: CARD YOUTUBE Y CARD LFP PLAY */}
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 z-20 relative pt-4">
+        {/* TARJETA 1: YOUTUBE */}
+        <div className="p-6 rounded-3xl border border-red-500/30 bg-zinc-900/90 space-y-4 shadow-xl text-left">
+          <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-red-600/20 text-red-400 border border-red-500/30">
+                <Youtube className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-white text-sm">Tarjeta 1: Link de YouTube</h3>
+                <p className="text-[11px] text-zinc-400">Copiar y transmitir enlace de YouTube</p>
+              </div>
+            </div>
+            <span className="px-2 py-0.5 rounded bg-red-600/20 text-red-400 text-[10px] font-bold">YouTube</span>
           </div>
-        ) : (
-          <span className="inline-block bg-red-950/50 border border-red-500/25 text-red-400 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest select-none">
-            {displayCategory}
-          </span>
-        )}
 
-        {/* Big Impact Title */}
-        <div className="space-y-4 max-w-4xl">
-          <h1 className="text-4xl sm:text-6xl md:text-8xl font-black uppercase tracking-tight leading-none text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
-            {isLive ? (
-              <>
-                {liveMatch.homeTeam} <span className="text-red-600 drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">VS</span> {liveMatch.opponent}
-              </>
-            ) : (
-              displayTitle
-            )}
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-zinc-300">Enlace o Link de YouTube:</label>
+              <input
+                type="text"
+                value={ytInputUrl}
+                onChange={(e) => setYtInputUrl(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-black border border-zinc-800 text-white font-mono text-xs focus:border-red-500 focus:outline-none"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={handleCopyYtLink}
+                className="flex-1 py-2.5 rounded-xl bg-red-600/20 hover:bg-red-600/30 border border-red-500/40 text-red-400 text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95"
+              >
+                {ytCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                <span>{ytCopied ? '¡Link Copiado!' : 'Copiar Link YouTube'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handlePlayClick}
+                className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
+              >
+                <MonitorPlay className="w-4 h-4" />
+                <span>Ver en TV</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* TARJETA 2: EXCLUSIVA LFP PLAY */}
+        <div className="p-6 rounded-3xl border border-amber-500/40 bg-gradient-to-br from-zinc-900/90 via-zinc-900 to-amber-950/20 space-y-4 shadow-xl text-left">
+          <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                <Trophy className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-white text-sm flex items-center gap-2">
+                  <span>Tarjeta 2: Canal Exclusivo LFP PLAY</span>
+                  <span className="px-1.5 py-0.5 rounded bg-amber-500 text-black text-[9px] font-black uppercase">OFICIAL</span>
+                </h3>
+                <p className="text-[11px] text-zinc-400">Liga Profesional de Fútbol Argentina</p>
+              </div>
+            </div>
+            <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] font-bold">LFP Play</span>
+          </div>
+
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-amber-300 flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                <span>Enlace Oficial LFP Play (Liga Profesional):</span>
+              </label>
+              <input
+                type="text"
+                value={lfpInputUrl}
+                onChange={(e) => setLfpInputUrl(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-black border border-amber-500/40 text-amber-200 font-mono text-xs focus:border-amber-400 focus:outline-none"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={handleCopyLfpLink}
+                className="px-3 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95"
+              >
+                {lfpCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                <span>{lfpCopied ? '¡Copiado!' : 'Copiar Link LFP'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleOpenLfpExternal}
+                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all active:scale-95 text-decoration-none"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span>Abrir LFP Play Directo</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* HERO BANNER SECTION */}
+      <div className="relative z-10 container mx-auto px-6 max-w-6xl py-6 space-y-6 text-left">
+        <div className="inline-flex items-center gap-2 bg-red-600/10 border border-red-500/35 px-4 py-2 rounded-2xl animate-pulse shadow-lg">
+          <LiveBadge animate={true} text="PARTIDO EN VIVO" />
+        </div>
+
+        <div className="space-y-3 max-w-4xl">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase tracking-tight leading-none text-white">
+            {liveMatch?.homeTeam || 'Jorge Newbery'} <span className="text-red-600">VS</span> {opponentName}
           </h1>
-          
-          <p className="text-zinc-300 text-sm md:text-base max-w-2xl font-light leading-relaxed drop-shadow-sm">
+          <p className="text-zinc-300 text-sm md:text-base max-w-2xl font-light leading-relaxed">
             {displayDesc}
           </p>
         </div>
 
-        {/* Match Metadata */}
-        {isLive ? (
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-zinc-400 font-mono border-y border-white/5 py-4 w-fit select-none">
-            <span className="flex items-center gap-2">
-              <Clock size={14} className="text-red-500 animate-pulse" />
-              <span>MINUTO <strong className="text-white">{liveMatch.liveMinute || 0}&apos;</strong></span>
-            </span>
-            <span className="flex items-center gap-2">
-              <Users size={14} className="text-red-500" />
-              <span><strong className="text-white">{liveMatch.attendance || 0}</strong> espectadores</span>
-            </span>
-            <span className="flex items-center gap-2">
-              <Shield size={14} className="text-red-500" />
-              <span>ESTADIO: <strong className="text-white">{liveMatch.venue || 'Jorge Newbery'}</strong></span>
-            </span>
-          </div>
-        ) : (
-          videoDestacado && videoDestacado.matchId && (
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[10px] text-zinc-400 font-black uppercase tracking-wider py-2 select-none">
-              <span className="flex items-center gap-1.5"><Calendar size={13} className="text-red-500" /> {new Date(videoDestacado.createdAt).toLocaleDateString('es-AR')}</span>
-              <span className="flex items-center gap-1.5"><Shield size={13} className="text-red-500" /> {videoDestacado.competition || 'Torneo Oficial'}</span>
-            </div>
-          )
-        )}
-
-        {/* High-Fidelity Call-To-Action Buttons */}
         <div className="flex flex-wrap items-center gap-3 pt-2">
-          {(isLive || videoDestacado) && (
-            <button
-              onClick={handlePlayClick}
-              className="group flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-7 py-3.5 rounded-full font-black text-xs uppercase tracking-wider transition-all hover:scale-105 shadow-[0_0_25px_rgba(220,38,38,0.5)] cursor-pointer"
-            >
-              {isLive ? (
-                <Video size={16} className="group-hover:rotate-12 transition-transform" />
-              ) : (
-                <PlayCircle size={16} className="group-hover:scale-110 transition-transform" />
-              )}
-              <span>{isLive ? "VER TRANSMISIÓN" : "VER AHORA"}</span>
-            </button>
-          )}
-
-          {/* Enlace Directo a YouTube */}
-          <a
-            href={canonicalYtUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-500/40 px-6 py-3.5 rounded-full font-black text-xs uppercase tracking-wider transition-all hover:scale-105 cursor-pointer"
-          >
-            <ExternalLink size={15} />
-            <span>ABRIR EN YOUTUBE</span>
-          </a>
-
-          {/* Link Directo a LPF Play */}
-          <a
-            href={lpfPlayUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-900 to-indigo-900 hover:from-blue-800 hover:to-indigo-800 text-white border border-blue-400/40 px-6 py-3.5 rounded-full font-black text-xs uppercase tracking-wider transition-all hover:scale-105 shadow-lg shadow-blue-950/50 cursor-pointer"
-          >
-            <ExternalLink size={15} />
-            <span>TRANSMISIÓN LPF PLAY</span>
-          </a>
-
-          {/* Copiar Link YouTube */}
           <button
-            onClick={handleCopyYouTubeLink}
-            className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/20 hover:border-white/30 backdrop-blur-md px-6 py-3.5 rounded-full font-black text-xs uppercase tracking-wider transition-all hover:scale-105 cursor-pointer"
+            onClick={handlePlayClick}
+            className="group flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-7 py-3.5 rounded-full font-black text-xs uppercase tracking-wider transition-all hover:scale-105 shadow-[0_0_25px_rgba(220,38,38,0.5)] cursor-pointer"
           >
-            {copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
-            <span>{copied ? '¡LINK COPIADO!' : 'COPIAR LINK YOUTUBE'}</span>
+            <Video size={16} />
+            <span>VER TRANSMISIÓN</span>
+          </button>
+
+          <button
+            onClick={handleOpenLfpExternal}
+            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-6 py-3.5 rounded-full font-black text-xs uppercase tracking-wider transition-all hover:scale-105 shadow-lg shadow-amber-500/20 cursor-pointer"
+          >
+            <ExternalLink size={15} />
+            <span>ABRIR EN LFP PLAY</span>
           </button>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-slide-up {
-          animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-      `}</style>
     </section>
   );
 }
