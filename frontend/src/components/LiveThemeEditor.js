@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { Palette, Type, RefreshCw, X, Check, Sparkles, Sliders, Box, Image as ImageIcon, Tv, Shield, Paintbrush, ZoomIn } from 'lucide-react';
-import { useTheme, COLOR_PRESETS, OBJECT_3D_OPTIONS, FONT_OPTIONS, FONT_SIZE_OPTIONS, SHIELD_SHAPE_OPTIONS } from './ThemeContext';
+import { useTheme, COLOR_PRESETS, TEXT_COLOR_PRESETS, OBJECT_3D_OPTIONS, FONT_OPTIONS, FONT_SIZE_OPTIONS, SHIELD_SHAPE_OPTIONS } from './ThemeContext';
 
 export default function LiveThemeEditor() {
   const [isOpen, setIsOpen] = useState(true);
@@ -314,6 +314,72 @@ export default function LiveThemeEditor() {
                       </button>
                     );
                   })}
+                </div>
+              </div>
+
+              {/* Paleta de Colores de Letras & Tipografía */}
+              <div className="p-3.5 rounded-2xl bg-amber-950/40 border border-amber-500/30 space-y-3 shadow-lg">
+                <label className="block text-[11px] font-bold text-amber-400 uppercase tracking-wider font-black flex items-center justify-between">
+                  <span>🎨 Paletas de Colores de Letras</span>
+                  <span className="text-[9px] text-amber-300 font-mono">En Vivo</span>
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(TEXT_COLOR_PRESETS || []).map((tp, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => updateTheme({ headingColor: tp.heading, textColor: tp.text, textAccentColor: tp.accent })}
+                      className="p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-left space-y-1 transition-all"
+                    >
+                      <div className="flex items-center gap-1">
+                        {tp.preview.map((c, cIdx) => (
+                          <span key={cIdx} className="w-3.5 h-3.5 rounded-full border border-white/20 shadow-sm" style={{ backgroundColor: c }} />
+                        ))}
+                      </div>
+                      <span className="text-[10px] font-bold block truncate text-white">{tp.name}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Custom Color Pickers para Letras */}
+                <div className="space-y-2 pt-2 border-t border-white/10 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-gray-300 font-medium">🖍️ Color de Títulos (H1-H6)</span>
+                    <input
+                      type="color"
+                      value={theme.headingColor || '#ffffff'}
+                      onChange={(e) => updateTheme({ headingColor: e.target.value })}
+                      className="w-7 h-7 rounded-lg cursor-pointer bg-transparent border-0"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-gray-300 font-medium">📝 Color de Texto de Cuerpo</span>
+                    <input
+                      type="color"
+                      value={theme.textColor || '#f8fafc'}
+                      onChange={(e) => updateTheme({ textColor: e.target.value })}
+                      className="w-7 h-7 rounded-lg cursor-pointer bg-transparent border-0"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-gray-300 font-medium">🌟 Color de Texto Destacado</span>
+                    <input
+                      type="color"
+                      value={theme.textAccentColor || theme.primaryColor || '#dc2626'}
+                      onChange={(e) => updateTheme({ textAccentColor: e.target.value })}
+                      className="w-7 h-7 rounded-lg cursor-pointer bg-transparent border-0"
+                    />
+                  </div>
+                </div>
+
+                {/* Card de Vista Previa de la Tipografía */}
+                <div className="p-3 rounded-xl bg-black/60 border border-white/10 space-y-1 mt-2">
+                  <span className="text-[9px] font-mono text-gray-400 block uppercase">Vista Previa de Letras:</span>
+                  <h4 style={{ color: theme.headingColor || '#ffffff' }} className="text-xs font-black truncate">
+                    TÍTULO OFICIAL DEL CLUB
+                  </h4>
+                  <p style={{ color: theme.textColor || '#f8fafc' }} className="text-[10px]">
+                    Texto de cuerpo informativo con <span style={{ color: theme.textAccentColor || theme.primaryColor || '#dc2626' }} className="font-bold">destacados en vivo</span>.
+                  </p>
                 </div>
               </div>
 

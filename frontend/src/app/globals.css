@@ -53,10 +53,23 @@
 
 body {
   background: var(--live-bg-color, #070707) !important;
-  color: var(--foreground);
+  color: var(--live-text-color, var(--foreground));
   font-family: var(--live-font), var(--font-sans), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dynamic Typography Color Utility Classes */
+h1, h2, h3, h4, h5, h6, .theme-heading-text {
+  color: var(--live-heading-color, #ffffff);
+}
+
+.theme-body-text {
+  color: var(--live-text-color, #f8fafc) !important;
+}
+
+.theme-accent-text {
+  color: var(--live-text-accent, var(--live-primary, #dc2626)) !important;
 }
 
 /* Clases Utilitarias con Soporte de Tema Dinámico */

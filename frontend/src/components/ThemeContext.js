@@ -12,6 +12,9 @@ const DEFAULT_THEME = {
   primaryColor: "#dc2626",   // Color Principal
   accentColor: "#ffffff",    // Color Secundario
   tertiaryColor: "#111827",  // Color Terciario / Detalles
+  headingColor: "#ffffff",   // Color Títulos H1, H2, H3
+  textColor: "#f8fafc",      // Color Texto Cuerpo
+  textAccentColor: "#dc2626",// Color Texto Destacado
   presetName: "Trilogy Red & White",
   fontFamily: "sans",
   fontSizeScale: "100%", // "90%" | "100%" | "110%" | "125%" | "140%"
@@ -23,6 +26,15 @@ const DEFAULT_THEME = {
   bgColor: "#070707",
   objectScale: 1.0,
 };
+
+export const TEXT_COLOR_PRESETS = [
+  { name: "🤍 Blanco Clásico & Plata", heading: "#ffffff", text: "#f8fafc", accent: "#dc2626", preview: ["#ffffff", "#f8fafc", "#dc2626"] },
+  { name: "🥇 Dorado Campeón & Blanco", heading: "#f59e0b", text: "#ffffff", accent: "#fde047", preview: ["#f59e0b", "#ffffff", "#fde047"] },
+  { name: "⚡ Neón Cyber & Menta", heading: "#38bdf8", text: "#34d399", accent: "#facc15", preview: ["#38bdf8", "#34d399", "#facc15"] },
+  { name: "🔴 Rojo Fuego Institucional", heading: "#ef4444", text: "#f8fafc", accent: "#fbbf24", preview: ["#ef4444", "#f8fafc", "#fbbf24"] },
+  { name: "💎 Elegancia Platino & Turquesa", heading: "#e2e8f0", text: "#94a3b8", accent: "#2dd4bf", preview: ["#e2e8f0", "#94a3b8", "#2dd4bf"] },
+  { name: "💚 Verde Neón & OLED", heading: "#22c55e", text: "#ffffff", accent: "#4ade80", preview: ["#22c55e", "#ffffff", "#4ade80"] },
+];
 
 export const FONT_OPTIONS = [
   { id: "sans", name: "Inter (Moderna Sans)", fontCss: "Inter, system-ui, sans-serif" },
@@ -143,6 +155,11 @@ export function ThemeProvider({ children }) {
       root.style.setProperty('--live-tertiary', theme.tertiaryColor || '#ffffff');
       root.style.setProperty('--live-bg-color', theme.bgColor || '#070707');
 
+      // Tipografía y Colores de Letras Dinámicos
+      root.style.setProperty('--live-heading-color', theme.headingColor || '#ffffff');
+      root.style.setProperty('--live-text-color', theme.textColor || '#f8fafc');
+      root.style.setProperty('--live-text-accent', theme.textAccentColor || theme.primaryColor || '#dc2626');
+
       // Apply background color directly to body and html so every page changes instantly
       const bgVal = theme.bgColor || '#070707';
       document.body.style.backgroundColor = bgVal;
@@ -170,7 +187,7 @@ export function ThemeProvider({ children }) {
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, updateTheme, resetTheme, COLOR_PRESETS, OBJECT_3D_OPTIONS, PRESET_LOGOS, FONT_OPTIONS, FONT_SIZE_OPTIONS, SHIELD_SHAPE_OPTIONS }}>
+    <ThemeContext.Provider value={{ theme, updateTheme, resetTheme, COLOR_PRESETS, TEXT_COLOR_PRESETS, OBJECT_3D_OPTIONS, PRESET_LOGOS, FONT_OPTIONS, FONT_SIZE_OPTIONS, SHIELD_SHAPE_OPTIONS }}>
       {children}
     </ThemeContext.Provider>
   );
