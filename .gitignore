@@ -61,3 +61,5 @@ backend/scratch/
 # El schema y las migrations SÍ deben subirse
 # Solo ignorar los archivos de query engine generados localmente
 backend/node_modules/.prisma/
+
+.vercel
