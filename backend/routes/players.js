@@ -1,6 +1,93 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const prisma = require('../prismaClient');
+const admin = require('../config/firebase-admin');
+const firebaseStorage = require('../config/storage');
+const { dualAuth } = require('../middleware/firebaseAuth');
+
 const router = express.Router();
+
+const uploadPhoto = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB
+});
+
+// Configurar fotografía de jugador (Aporte de Foto para Mundo Inferiores)
+router.post('/:id/photo', dualAuth, uploadPhoto.single('file'), async (req, res) => {
+  const { id } = req.params;
+  const playerId = parseInt(id, 10);
+
+  if (isNaN(playerId)) {
+    return res.status(400).json({ error: 'ID de jugador inválido' });
+  }
+
+  try {
+    const player = await prisma.playerProfile.findUnique({
+      where: { id: playerId }
+    });
+
+    if (!player) {
+      return res.status(404).json({ error: 'Jugador no encontrado' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se envió ningún archivo de imagen' });
+    }
+
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedMimeTypes.includes(req.file.mimetype)) {
+      return res.status(400).json({ error: 'Formato no permitido. Solo se aceptan imágenes (JPG, PNG, WEBP, GIF)' });
+    }
+
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+    if (!allowedExtensions.includes(ext)) {
+      return res.status(400).json({ error: 'Extensión de archivo no válida' });
+    }
+
+    const safeBaseName = path.basename(req.file.originalname, ext).replace(/[^a-zA-Z0-9_-]/g, '_');
+    const storagePath = `mundo-inferiores/players/${playerId}/${Date.now()}-${safeBaseName}${ext}`;
+
+    const useLocalJson = !process.env.GOOGLE_APPLICATION_CREDENTIALS && 
+                         !process.env.FIREBASE_STORAGE_BUCKET && 
+                         !process.env.STORAGE_BUCKET && 
+                         !process.env.STORAGE_EMULATOR_HOST;
+    let fileUrl = '';
+
+    if (useLocalJson) {
+      const localFilePath = path.join(__dirname, '../uploads', storagePath);
+      fs.mkdirSync(path.dirname(localFilePath), { recursive: true });
+      fs.writeFileSync(localFilePath, req.file.buffer);
+      fileUrl = `/uploads/${storagePath}`;
+    } else {
+      const bucket = admin.storage().bucket();
+      const file = bucket.file(storagePath);
+      await file.save(req.file.buffer, {
+        metadata: { contentType: req.file.mimetype }
+      });
+      try {
+        await file.makePublic();
+      } catch (e) {}
+      fileUrl = firebaseStorage.getPublicUrl(storagePath);
+    }
+
+    const updatedPlayer = await prisma.playerProfile.update({
+      where: { id: playerId },
+      data: { photoUrl: fileUrl }
+    });
+
+    res.status(200).json({
+      success: true,
+      playerId: updatedPlayer.id,
+      photoUrl: updatedPlayer.photoUrl
+    });
+  } catch (error) {
+    console.error('[Players Photo Upload Error]', error);
+    res.status(500).json({ error: 'Error al procesar la fotografía del jugador' });
+  }
+});
 
 // Listar todos los perfiles de jugadores
 router.get('/', async (req, res) => {

@@ -67,7 +67,10 @@ router.post('/upload', authenticateToken, upload.single('file'), async (req, res
     const category = req.body.category || req.query.category || 'documentos';
     const storagePath = firebaseStorage.buildStoragePath(category, req.file.originalname);
 
-    const useLocalJson = !process.env.GOOGLE_APPLICATION_CREDENTIALS && !process.env.FIREBASE_STORAGE_BUCKET && !process.env.STORAGE_EMULATOR_HOST;
+    const useLocalJson = !process.env.GOOGLE_APPLICATION_CREDENTIALS && 
+                         !process.env.FIREBASE_STORAGE_BUCKET && 
+                         !process.env.STORAGE_BUCKET && 
+                         !process.env.STORAGE_EMULATOR_HOST;
     let fileUrl = '';
 
     if (useLocalJson) {
@@ -163,7 +166,10 @@ router.post('/upload-url', authenticateToken, async (req, res) => {
     
     const storagePath = firebaseStorage.buildStoragePath(resolvedCategory, originalName);
     
-    const useLocalJson = !process.env.GOOGLE_APPLICATION_CREDENTIALS && !process.env.FIREBASE_STORAGE_BUCKET && !process.env.STORAGE_EMULATOR_HOST;
+    const useLocalJson = !process.env.GOOGLE_APPLICATION_CREDENTIALS && 
+                         !process.env.FIREBASE_STORAGE_BUCKET && 
+                         !process.env.STORAGE_BUCKET && 
+                         !process.env.STORAGE_EMULATOR_HOST;
     let fileUrl = '';
 
     if (useLocalJson) {

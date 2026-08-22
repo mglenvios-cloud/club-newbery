@@ -3,8 +3,8 @@ const admin = require('firebase-admin');
 if (!admin.apps.length) {
   try {
     admin.initializeApp({
-      projectId: process.env.GCLOUD_PROJECT || 'club-newbery-digital',
-      storageBucket: process.env.STORAGE_BUCKET || 'club-newbery-digital.appspot.com',
+      projectId: process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || 'club-newbery-digital',
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET || process.env.STORAGE_BUCKET || 'club-newbery-digital.appspot.com',
     });
   } catch (err) {
     console.warn('Firebase Admin fallback initialisation:', err.message);
